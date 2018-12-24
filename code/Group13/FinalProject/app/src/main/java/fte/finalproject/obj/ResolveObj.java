@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-//
+// 获取章节列表返回结果
 public class ResolveObj {
     // 请求结果
     @SerializedName("ok")

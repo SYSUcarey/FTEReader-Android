@@ -2,6 +2,7 @@ package fte.finalproject.obj;
 
 import com.google.gson.annotations.SerializedName;
 
+// 获取章节内容返回结果
 public class ChapterObj {
     // 请求结果
     @SerializedName("ok")
