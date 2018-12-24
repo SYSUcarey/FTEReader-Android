@@ -3,35 +3,40 @@ package fte.finalproject.obj;
 import com.google.gson.annotations.SerializedName;
 
 public class ChapterObj {
-    // 章节链接
-    @SerializedName("link")
-    private String link;
+    // 请求结果
+    @SerializedName("ok")
+    private boolean ok;
 
-    public String getLink() {
-        return link;
+    @SerializedName("chapter")
+    private Chapter ichapter;
+
+    public boolean isOk() {
+        return ok;
     }
 
-    // 章节标题
-    @SerializedName("title")
-    private String title;
-
-    public String getTitle() {
-        return title;
+    public Chapter getIchapter() {
+        return ichapter;
     }
 
-    // 是否可读
-    @SerializedName("unreadable")
-    private boolean unreadable;
+    /*
+     * 章节详情
+     */
+    private class Chapter {
+        // 章节标题
+        @SerializedName("title")
+        private String title;
 
-    public boolean isUnreadable() {
-        return unreadable;
-    }
+        // 章节内容
+        @SerializedName("body")
+        private String body;
 
-    // 章节内容
-    @SerializedName("body")
-    private String body;
 
-    public String getBody() {
-        return body;
+        public String getTitle() {
+            return title;
+        }
+
+        public String getBody() {
+            return body;
+        }
     }
 }

@@ -1,5 +1,6 @@
 package fte.finalproject.service;
 
+import fte.finalproject.obj.ChapterObj;
 import fte.finalproject.obj.ResolveObj;
 import retrofit2.http.GET;
 import rx.Observable;
@@ -20,5 +21,5 @@ public interface BookService {
      * @return ResolveObj 章节对象
      */
     @GET("/chapter/{link}")
-    Observable<ResolveObj> getChapter(String link);
+    Observable<ChapterObj> getChapter(String link);
 }

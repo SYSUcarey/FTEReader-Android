@@ -4,73 +4,87 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+//
 public class ResolveObj {
     // 请求结果
     @SerializedName("ok")
     private boolean ok;
 
+    @SerializedName("mixToc")
+    private mixToc imixToc;
+
     public boolean isOk() {
         return ok;
     }
-
-    /*
-     * 章节列表
-     */
-    @SerializedName("mixToc")
-    private mixToc imixToc;
 
     public mixToc getImixToc() {
         return imixToc;
     }
 
+    /*
+     * 章节列表
+     */
     private class mixToc {
         @SerializedName("_id")
         private String _id;
+        // 书籍id
+        @SerializedName("book")
+        private String book;
+        // 章节数
+        @SerializedName("chaptersCount1")
+        private int chaptersCount;
+        // 章节列表
+        @SerializedName("chapters")
+        private List<Chapter> chapters;
+        // 更新时间
+        @SerializedName("updated")
+        private String updated;
 
         public String get_id() {
             return _id;
         }
 
-        // 书籍id
-        @SerializedName("book")
-        private String book;
-
         public String getBook() {
             return book;
         }
-
-        // 章节数
-        @SerializedName("chaptersCount1")
-        private int chaptersCount;
 
         public int getChaptersCount() {
             return chaptersCount;
         }
 
-        // 章节列表
-        @SerializedName("chapters")
-        private List<ChapterObj> chapterObjs;
-
-        public List<ChapterObj> getChapterObjs() {
-            return chapterObjs;
+        public List<Chapter> getChapterObjs() {
+            return chapters;
         }
-
-        // 更新时间
-        @SerializedName("updated")
-        private String updated;
 
         public String getUpdated() {
             return updated;
         }
-    }
 
-    /*
-     * 章节详情
-     */
-    @SerializedName("chapter")
-    private ChapterObj ichapter;
+        private class Chapter {
+            // 章节链接
+            @SerializedName("link")
+            private String link;
 
-    public ChapterObj getIchapter() {
-        return ichapter;
+            // 章节标题
+            @SerializedName("title")
+            private String title;
+
+            // 是否不可读
+            @SerializedName("unreadable")
+            private boolean unreadable;
+
+            public String getLink() {
+                return link;
+            }
+
+            public String getTitle() {
+                return title;
+            }
+
+            public boolean isUnreadable() {
+                return unreadable;
+            }
+        }
+
     }
 }
