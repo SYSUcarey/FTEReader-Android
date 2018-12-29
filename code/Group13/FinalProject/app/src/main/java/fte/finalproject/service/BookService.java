@@ -118,6 +118,7 @@ public class BookService {
      * @param type String hot(热门)、new(新书)、reputation(好评)、over(完结)
      *        major String 玄幻
      *        start String 起始位置，从0开始
+     *        limit String 获取数量限制 20
      *        tag String 东方玄幻、异界大陆、异界争霸、远古神话
      *        gender String 性别 male、female
      * @return CategoryObj
