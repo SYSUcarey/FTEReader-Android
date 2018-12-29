@@ -8,35 +8,35 @@ import java.util.List;
 public class ClassificationObj1 {
     // male分类
     @SerializedName("male")
-    private List<SubClass> maleList;
+    private List<SubClass1> maleList;
 
     // female分类
     @SerializedName("female")
-    private List<SubClass> femaleList;
+    private List<SubClass1> femaleList;
 
     // picture分类
     @SerializedName("picture")
-    private List<SubClass> picList;
+    private List<SubClass1> picList;
 
     @SerializedName("press")
-    private List<SubClass> pressList;
+    private List<SubClass1> pressList;
 
     @SerializedName("ok")
     private boolean ok;
 
-    public List<SubClass> getMaleList() {
+    public List<SubClass1> getMaleList() {
         return maleList;
     }
 
-    public List<SubClass> getFemaleList() {
+    public List<SubClass1> getFemaleList() {
         return femaleList;
     }
 
-    public List<SubClass> getPicList() {
+    public List<SubClass1> getPicList() {
         return picList;
     }
 
-    public List<SubClass> getPressList() {
+    public List<SubClass1> getPressList() {
         return pressList;
     }
 
@@ -45,7 +45,7 @@ public class ClassificationObj1 {
     }
 
     // 一级分类
-    public class SubClass {
+    public class SubClass1 {
         // 名称
         @SerializedName("name")
         private String name;

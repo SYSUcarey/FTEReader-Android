@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.util.Observable;
 import java.util.concurrent.TimeUnit;
 
+import fte.finalproject.obj.CategoryObj;
 import fte.finalproject.obj.ClassificationObj1;
+import fte.finalproject.obj.ClassificationObj2;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -60,11 +62,23 @@ public class BookService {
             .client(build)
             .build();
 
+    // 用于访问api
     private UrlService ApiService = retrofitForApi.create(UrlService.class);
+
+    // 用于访问图片
     private UrlService StaticsService = retrofitForStatics.create(UrlService.class);
+
+    // 用于访问章节
     private UrlService ChapterService = retrofitForChapter.create(UrlService.class);
 
+    // 一级分类
     private ClassificationObj1 classificationObj1;
+
+    // 二级分类
+    private ClassificationObj2 classificationObj2;
+
+    // 书籍列表
+    private CategoryObj categoryObj;
 
     /*
      * 获取一级分类
@@ -82,5 +96,43 @@ public class BookService {
         }
         return classificationObj1;
     }
+
+    /*
+     * 获取二级分类
+     * @param 无
+     * @return ClassificationObj2
+     */
+    public ClassificationObj2 getClassification2() {
+        Response<ClassificationObj2> response = null;
+        try {
+            response = ApiService.getClassificationObj2().execute();
+            classificationObj2 = response.body();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return classificationObj2;
+    }
+
+    /*
+     * 获取主题书单列表
+     * @param type String hot(热门)、new(新书)、reputation(好评)、over(完结)
+     *        major String 玄幻
+     *        start String 起始位置，从0开始
+     *        tag String 东方玄幻、异界大陆、异界争霸、远古神话
+     *        gender String 性别 male、female
+     * @return CategoryObj
+     * 示例 bookService.getBooksByCategoty("hot", "玄幻", "0", "20", "东方玄幻", "male");
+     */
+    public CategoryObj getBooksByCategoty(String type, String major, String start, String limit, String tag, String gender) {
+        Response<CategoryObj> response = null;
+        try {
+            response = ApiService.getBooksByCategory(type, major, start, limit, tag, gender).execute();
+            categoryObj = response.body();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return categoryObj;
+    }
+
 
 }
