@@ -115,8 +115,7 @@ public class BookService {
 
     /*
      * 获取单一排行榜
-     * @param rankingId String _id 周榜、monthRank 月榜、totalRank 总榜
-     *          _id、monthRank、totalRank均为榜单id，可从AllRankingObj中获得
+     * @param rankingId String _id 周榜、monthRank 月榜、totalRank 总榜 可从AllRankingObj中获得
      * @return SingleRankingObj
      */
 
@@ -190,7 +189,7 @@ public class BookService {
 
     /*
      * 获取章节列表
-     * @param String bookid 书籍id
+     * @param String bookid 书籍id，可从CategoryObj中获得
      * @return CptListObj 章节列表对象
      */
 
@@ -207,7 +206,7 @@ public class BookService {
 
     /*
      * 获取章节内容
-     * @param String link 章节链接
+     * @param String link 章节链接，可从CptListObj中获得
      * @return ChapterObj 章节对象
      */
 

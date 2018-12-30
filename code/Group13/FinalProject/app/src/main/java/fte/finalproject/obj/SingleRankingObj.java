@@ -20,33 +20,41 @@ public class SingleRankingObj {
     }
 
     public class Ranking {
+        // 周榜id
         @SerializedName("_id")
         private String _id;
 
+        // 更新时间
         @SerializedName("updated")
         private String updated;
 
+        // 排行榜全名
         @SerializedName("title")
         private String title;
 
         @SerializedName("tag")
         private String tag;
 
+        // 排行榜大图标
         @SerializedName("cover")
         private String cover;
 
+        // 排行榜小图标
         @SerializedName("icon")
         private String icon;
 
         @SerializedName("__v")
         private String __v;
 
+        // 月榜id
         @SerializedName("monthRank")
         private String monthRank;
 
+        // 总榜id
         @SerializedName("totalRank")
         private String totalRank;
 
+        // 排行榜简称
         @SerializedName("shortTitle")
         private String shortTitle;
 
@@ -65,6 +73,7 @@ public class SingleRankingObj {
         @SerializedName("new")
         private boolean _new;
 
+        // 性别
         @SerializedName("gender")
         private String gender;
 
@@ -75,9 +84,11 @@ public class SingleRankingObj {
         @SerializedName("books")
         private List<BookObj> bookList;
 
+        // 周榜id
         @SerializedName("id")
         private String id;
 
+        // 总数
         @SerializedName("total")
         private int total;
 

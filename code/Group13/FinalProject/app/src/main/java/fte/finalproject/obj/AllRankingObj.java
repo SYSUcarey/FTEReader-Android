@@ -6,9 +6,11 @@ import java.util.List;
 
 public class AllRankingObj {
 
+    // 男生
     @SerializedName("male")
     private List<subClass> maleList;
 
+    // 女生
     @SerializedName("female")
     private List<subClass> femaleList;
 
@@ -28,24 +30,30 @@ public class AllRankingObj {
     }
 
     public class subClass {
+        // 周榜id
         @SerializedName("_id")
         private String id;
 
+        // 排行榜全名
         @SerializedName("title")
         private String title;
 
+        // 排行榜大图标
         @SerializedName("cover")
         private String cover;
 
         @SerializedName("collapse")
         private boolean collapse;
 
+        // 月榜id
         @SerializedName("monthRank")
         private String monthRank;
 
+        // 总榜id
         @SerializedName("totalRank")
         private String totalRank;
 
+        // 排行榜简称
         @SerializedName("shortTitle")
         private String shortTitle;
 
