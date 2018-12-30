@@ -22,7 +22,7 @@ public class ChapterObj {
     /*
      * 章节详情
      */
-    private class Chapter {
+    public class Chapter {
         // 章节标题
         @SerializedName("title")
         private String title;

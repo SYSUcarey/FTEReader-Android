@@ -7,8 +7,10 @@ import java.util.Observable;
 import java.util.concurrent.TimeUnit;
 
 import fte.finalproject.obj.CategoryObj;
+import fte.finalproject.obj.ChapterObj;
 import fte.finalproject.obj.ClassificationObj1;
 import fte.finalproject.obj.ClassificationObj2;
+import fte.finalproject.obj.CptListObj;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -80,6 +82,12 @@ public class BookService {
     // 书籍列表
     private CategoryObj categoryObj;
 
+    // 章节列表
+    private CptListObj cptListObj;
+
+    // 章节内容
+    private ChapterObj chapterObj;
+
     /*
      * 获取一级分类
      * @param 无
@@ -135,5 +143,36 @@ public class BookService {
         return categoryObj;
     }
 
+    /*
+     * 获取章节列表
+     * @param String bookid 书籍id
+     * @return CptListObj 章节列表对象
+     */
+    public CptListObj getChaptersByBookId(String bookid) {
+        Response<CptListObj> response = null;
+        try {
+            response = ApiService.getChapters(bookid).execute();
+            cptListObj = response.body();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return cptListObj;
+    }
+
+    /*
+     * 获取章节内容
+     * @param String link 章节链接
+     * @return ChapterObj 章节对象
+     */
+    public ChapterObj getChapterByLink(String link) {
+        Response<ChapterObj> response = null;
+        try {
+            response = ChapterService.getChapter(link).execute();
+            chapterObj = response.body();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return chapterObj;
+    }
 
 }

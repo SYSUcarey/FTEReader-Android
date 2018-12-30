@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 // 获取章节列表返回结果
-public class ResolveObj {
+public class CptListObj {
     // 请求结果
     @SerializedName("ok")
     private boolean ok;
@@ -24,7 +24,7 @@ public class ResolveObj {
     /*
      * 章节列表
      */
-    private class mixToc {
+    public class mixToc {
         @SerializedName("_id")
         private String _id;
         // 书籍id
@@ -35,7 +35,7 @@ public class ResolveObj {
         private int chaptersCount;
         // 章节列表
         @SerializedName("chapters")
-        private List<Chapter> chapters;
+        public List<Chapter> chapters;
         // 更新时间
         @SerializedName("updated")
         private String updated;
@@ -60,7 +60,7 @@ public class ResolveObj {
             return updated;
         }
 
-        private class Chapter {
+        public class Chapter {
             // 章节链接
             @SerializedName("link")
             private String link;
