@@ -1,18 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:orientation="vertical"
+    android:background="#FFFFFF">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginTop="10dp">
+        <RadioGroup
+            android:id="@+id/main_RG"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentLeft="true"
+            android:layout_marginStart="10dp"
+            android:visibility="gone">
+            <RadioButton
+                android:id="@+id/main_RB_male"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="男" />
+            <RadioButton
+                android:id="@+id/main_RB_female"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="女" />
+        </RadioGroup>
 
-</android.support.constraint.ConstraintLayout>
+        <!--标题：书架/排行榜/分类-->
+        <TextView
+            android:id="@+id/main_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="书架"
+            android:textSize="20sp"
+            android:textColor="#030303"
+            android:layout_centerInParent="true"/>
+
+        <ImageView
+            android:id="@+id/main_search"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@mipmap/search"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"/>
+    </RelativeLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/main_viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <RadioGroup
+        android:id="@+id/main_bottomRG"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/main_bottom_bookshelf"
+            style="@style/BottomRB"
+            android:text="书架"
+            android:drawableTop="@mipmap/bookshelf"
+            android:checked="true"
+            />
+        <RadioButton
+            android:id="@+id/main_bottom_ranking"
+            style="@style/BottomRB"
+            android:text="排行榜"
+            android:drawableTop="@mipmap/ranking"
+            />
+        <RadioButton
+            android:id="@+id/main_bottom_category"
+            style="@style/BottomRB"
+            android:text="分类"
+            android:drawableTop="@mipmap/category"/>
+    </RadioGroup>
+
+
+</LinearLayout>

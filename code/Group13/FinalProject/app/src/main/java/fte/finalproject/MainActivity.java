@@ -1,35 +1,128 @@
 package fte.finalproject;
 
+import android.graphics.drawable.Drawable;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 
-import fte.finalproject.obj.CategoryObj;
-import fte.finalproject.obj.ClassificationObj1;
-import fte.finalproject.obj.ClassificationObj2;
-import fte.finalproject.service.BookService;
+import java.util.ArrayList;
+import java.util.List;
 
+import fte.finalproject.Fragment.BookShelfFragment;
+import fte.finalproject.Fragment.CategoryFragment;
+import fte.finalproject.Fragment.RankingFragment;
+import fte.finalproject.Fragment.TabFragmentPagerAdapter;
 
+//总体界面，包含书架、排行榜、分类
 public class MainActivity extends AppCompatActivity {
+    private RadioGroup radioGroup;
+    private TextView title;
+    private ImageView search;
+
+    private RadioGroup bottomRG;
+    private RadioButton bookshelfRB;
+    private RadioButton rankingRB;
+    private RadioButton categoryRB;
+
+    private ViewPager viewPager;
+    private List<Fragment> fragmentList = new ArrayList<>();
+    private TabFragmentPagerAdapter fragmentPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Thread thread = new Thread(new Runnable() {
+        //初始化控件
+        radioGroup = findViewById(R.id.main_RG);
+        title = findViewById(R.id.main_title);
+        bottomRG = findViewById(R.id.main_bottomRG);
+        bookshelfRB = findViewById(R.id.main_bottom_bookshelf);
+        rankingRB = findViewById(R.id.main_bottom_ranking);
+        categoryRB = findViewById(R.id.main_bottom_category);
+        viewPager = findViewById(R.id.main_viewPager);
+
+        //初始化Fragment
+        BookShelfFragment bookShelfFragment = new BookShelfFragment();
+        RankingFragment rankingFragment = new RankingFragment();
+        CategoryFragment categoryFragment = new CategoryFragment();
+        fragmentList.add(bookShelfFragment);
+        fragmentList.add(rankingFragment);
+        fragmentList.add(categoryFragment);
+
+        viewPager.setOnPageChangeListener(new MyPagerChangeListener());
+        fragmentPagerAdapter = new TabFragmentPagerAdapter(getSupportFragmentManager(), fragmentList);
+        viewPager.setAdapter(fragmentPagerAdapter);
+        viewPager.setCurrentItem(0);
+        viewPager.setOffscreenPageLimit(2);
+
+        //设置底部按钮图标大小
+        Drawable drawable = getResources().getDrawable(R.mipmap.bookshelf);
+        drawable.setBounds(0, 0, 100, 100);
+        bookshelfRB.setCompoundDrawables(null, drawable , null,null);
+        drawable = getResources().getDrawable(R.mipmap.ranking);
+        drawable.setBounds(0, 0, 100, 100);
+        rankingRB.setCompoundDrawables(null, drawable, null,null);
+        drawable = getResources().getDrawable(R.mipmap.category);
+        drawable.setBounds(0, 0, 100, 100);
+        categoryRB.setCompoundDrawables(null, drawable,null, null);
+
+        //处理底部RG事件
+        bottomRG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
-            public void run() {
-                BookService bookService = new BookService();
-                CategoryObj categoryObj = bookService.getBooksByCategoty("hot", "玄幻", "0", "20", "东方玄幻", "male");
-                Log.d("ok",  String.valueOf(categoryObj.isOk()));
-                for (int i = 0; i < categoryObj.getBooks().size(); i++) {
-                    Log.d("title", categoryObj.getBooks().get(i).getTitle());
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                int index = 0;
+                switch (checkedId) {
+                    case R.id.main_bottom_bookshelf:
+                        index = 0;
+                        break;
+                    case R.id.main_bottom_ranking:
+                        index = 1;
+                        break;
+                    case R.id.main_bottom_category:
+                        index = 2;
+                        break;
                 }
-                Log.d("total", String.valueOf(categoryObj.getTotal()));
+                viewPager.setCurrentItem(index);
             }
         });
 
-        thread.start();
+    }
+
+    //设置一个ViewPager的监听事件，左右滑动ViewPager时进行处理
+    public class MyPagerChangeListener implements ViewPager.OnPageChangeListener {
+        @Override
+        public void onPageScrollStateChanged(int arg0) {
+        }
+        @Override
+        public void onPageScrolled(int arg0, float arg1, int arg2) {
+        }
+        @Override
+        public void onPageSelected(int arg0) {
+            switch (arg0) {
+                case 0:
+                    title.setText("书架");
+                    radioGroup.setVisibility(View.GONE);
+                    bookshelfRB.setChecked(true);
+                    break;
+                case 1:
+                    title.setText("排行榜");
+                    radioGroup.setVisibility(View.VISIBLE);
+                    rankingRB.setChecked(true);
+                    break;
+                case 2:
+                    title.setText("分类");
+                    radioGroup.setVisibility(View.GONE);
+                    categoryRB.setChecked(true);
+                    break;
+            }
+        }
     }
 }
