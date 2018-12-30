@@ -1,15 +1,35 @@
 package fte.finalproject.service;
 
+import fte.finalproject.obj.AllRankingObj;
 import fte.finalproject.obj.CategoryObj;
 import fte.finalproject.obj.ChapterObj;
 import fte.finalproject.obj.ClassificationObj1;
 import fte.finalproject.obj.ClassificationObj2;
-import fte.finalproject.obj.ResolveObj;
+import fte.finalproject.obj.CptListObj;
+import fte.finalproject.obj.SingleRankingObj;
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface UrlService {
+    /*
+     * 获取所有排行榜
+     * @param 无
+     * @return Call<AllRankingObj>
+     */
+    @GET("/ranking/gender")
+    Call<AllRankingObj> getAllRanking();
+
+    /*
+     * 获取单一排行榜
+     * @param rankingId String _id 周榜、monthRank 月榜、totalRank 总榜
+     * @return Call<SingleRankingObj>
+     */
+    @GET("/ranking/{rankingId}")
+    Call<SingleRankingObj> getSingleRanking(@Path("rankingId") String rankingId);
+
+
     /*
      * 获取一级分类
      * @param 无
@@ -42,16 +62,17 @@ public interface UrlService {
     /*
      * 获取章节列表
      * @param bookid 书籍id
-     * @return ResolveObj 解析对象
+     * @return Call<CptListObj>
      */
     @GET("/mix-atoc/{bookid}?view=chapters")
-    Call<ResolveObj> getChapters(String bookid);
+    Call<CptListObj> getChapters(@Path("bookid") String bookid);
 
     /*
      * 获取章节内容
      * @param link 章节链接
-     * @return ResolveObj 章节对象
+     * @return ChapterObj 章节对象
      */
     @GET("/chapter/{link}")
-    Call<ChapterObj> getChapter(String link);
+    Call<ChapterObj> getChapter(@Path("link") String link);
+
 }
