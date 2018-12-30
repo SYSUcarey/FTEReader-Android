@@ -1,5 +1,6 @@
 package fte.finalproject.Fragment;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -16,9 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fte.finalproject.R;
+import fte.finalproject.ReadPageActivity;
 import fte.finalproject.myRecyclerview.MyRecyclerViewAdapter;
 import fte.finalproject.myRecyclerview.MyViewHolder;
-import fte.finalproject.obj.BookObj;
 import fte.finalproject.obj.ShelfBookObj;
 
 public class BookShelfFragment extends Fragment {
@@ -40,7 +41,6 @@ public class BookShelfFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
 
         // 获取 Fragment 的视图
         view = inflater.inflate(R.layout.fragment_book_shelf, null);
@@ -75,13 +75,27 @@ public class BookShelfFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         // 设置 RecyclerAdapter
-        adapter = new MyRecyclerViewAdapter<ShelfBookObj>(getActivity(), R.layout.book_item, myBooks) {
+        adapter = new MyRecyclerViewAdapter<ShelfBookObj>(getActivity(), R.layout.item_book, myBooks) {
             @Override
             public void convert(MyViewHolder holder, ShelfBookObj shelfBookObj) {
                 TextView bookName = holder.getView(R.id.item_book_name);
                 bookName.setText(shelfBookObj.getName());
             }
         };
+        adapter.setOnItemClickListener(new MyRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int position) {
+                Intent intent = new Intent(getActivity(), ReadPageActivity.class);
+                Bundle bundle = new Bundle();
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onLongClick(int position) {
+
+            }
+        });
         recyclerView.setAdapter(adapter);
     }
 

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <android.support.v4.view.ViewPager
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </android.support.v4.view.ViewPager>
+
+    <RadioGroup
+        android:id="@+id/read_page_bottom_rg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone">
+        <RadioButton
+            android:id="@+id/read_page_day_and_night_rb"
+            style="@style/BottomRB"
+            android:text="夜间"
+            android:drawableTop="@mipmap/nighttime" />
+        <RadioButton
+            android:id="@+id/read_page_horizontal_and_vertical_rb"
+            style="@style/BottomRB"
+            android:text="横屏"
+            android:drawableTop="@mipmap/horizontal_screen" />
+        <RadioButton
+            android:id="@+id/read_page_setting_rb"
+            style="@style/BottomRB"
+            android:text="设置"
+            android:drawableTop="@mipmap/textsize" />
+        <RadioButton
+            android:id="@+id/read_page_download_rb"
+            style="@style/BottomRB"
+            android:text="下载"
+            android:drawableTop="@mipmap/download"/>
+        <RadioButton
+            android:id="@+id/read_page_catalog_rb"
+            style="@style/BottomRB"
+            android:text="目录"
+            android:drawableTop="@mipmap/catalog"/>
+    </RadioGroup>
+</RelativeLayout>

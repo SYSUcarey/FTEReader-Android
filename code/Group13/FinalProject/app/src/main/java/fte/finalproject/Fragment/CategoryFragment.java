@@ -24,6 +24,7 @@ public class CategoryFragment extends Fragment {
     private List<Fragment> fragmentList = new ArrayList<>();
     private TabFragmentPagerAdapter fragmentPagerAdapter;
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -85,4 +86,5 @@ public class CategoryFragment extends Fragment {
             }
         }
     }
+
 }
