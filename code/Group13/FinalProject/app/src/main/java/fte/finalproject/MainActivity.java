@@ -4,11 +4,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import fte.finalproject.obj.AllRankingObj;
 import fte.finalproject.obj.CategoryObj;
 import fte.finalproject.obj.ChapterObj;
 import fte.finalproject.obj.ClassificationObj1;
 import fte.finalproject.obj.ClassificationObj2;
 import fte.finalproject.obj.CptListObj;
+import fte.finalproject.obj.SingleRankingObj;
 import fte.finalproject.service.BookService;
 
 
@@ -19,14 +21,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-   /*     Thread thread = new Thread(new Runnable() {
+        /*Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 BookService bookService = new BookService();
-                ChapterObj chapterObj = bookService.getChapterByLink("http://book.my716.com/getBooks.aspx?method=content&bookId=633074&chapterFile=U_753547_201607012243064741_3164_2.txt");
-                Log.d("ok",  String.valueOf(chapterObj.isOk()));
-                Log.d("title", chapterObj.getIchapter().getTitle());
-                Log.d("body", chapterObj.getIchapter().getBody());
+                SingleRankingObj singleRankingObj = bookService.getSingleRankingObj("564d853484665f97662d0810");
+                Log.d("ok",  String.valueOf(singleRankingObj.isOk()));
+                Log.d("title", singleRankingObj.getRanking().getTitle());
+                for (int i = 0; i < singleRankingObj.getRanking().getBookList().size(); i++) {
+                    Log.d("book", singleRankingObj.getRanking().getBookList().get(i).getTitle());
+                }
             }
         });
 

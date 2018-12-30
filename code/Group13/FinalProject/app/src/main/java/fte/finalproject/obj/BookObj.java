@@ -51,6 +51,7 @@ public class BookObj {
     @SerializedName("latelyFollower")
     private int latelyFollower;
 
+    // 留存率
     @SerializedName("retentionRatio")
     private float retentionRatio;
 
