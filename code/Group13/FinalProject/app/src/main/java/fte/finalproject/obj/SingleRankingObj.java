@@ -20,7 +20,7 @@ public class SingleRankingObj {
     }
 
     public class Ranking {
-        // 周榜id
+        //  周榜id
         @SerializedName("_id")
         private String _id;
 
