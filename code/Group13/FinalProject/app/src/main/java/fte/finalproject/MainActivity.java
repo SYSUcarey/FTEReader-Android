@@ -63,14 +63,14 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setOffscreenPageLimit(2);
 
         //设置底部按钮图标大小
-        Drawable drawable = getResources().getDrawable(R.mipmap.bookshelf);
-        drawable.setBounds(0, 0, 100, 100);
+        Drawable drawable = getResources().getDrawable(R.mipmap.bookshelf_red);
+        drawable.setBounds(0, 0, 70, 70);
         bookshelfRB.setCompoundDrawables(null, drawable , null,null);
         drawable = getResources().getDrawable(R.mipmap.ranking);
-        drawable.setBounds(0, 0, 100, 100);
+        drawable.setBounds(0, 0, 70, 70);
         rankingRB.setCompoundDrawables(null, drawable, null,null);
         drawable = getResources().getDrawable(R.mipmap.category);
-        drawable.setBounds(0, 0, 100, 100);
+        drawable.setBounds(0, 0, 70, 70);
         categoryRB.setCompoundDrawables(null, drawable,null, null);
 
         //处理底部RG事件
@@ -81,12 +81,39 @@ public class MainActivity extends AppCompatActivity {
                 switch (checkedId) {
                     case R.id.main_bottom_bookshelf:
                         index = 0;
+                        Drawable drawable = getResources().getDrawable(R.mipmap.bookshelf_red);
+                        drawable.setBounds(0, 0, 70, 70);
+                        bookshelfRB.setCompoundDrawables(null, drawable , null,null);
+                        drawable = getResources().getDrawable(R.mipmap.ranking);
+                        drawable.setBounds(0, 0, 70, 70);
+                        rankingRB.setCompoundDrawables(null, drawable, null,null);
+                        drawable = getResources().getDrawable(R.mipmap.category);
+                        drawable.setBounds(0, 0, 70, 70);
+                        categoryRB.setCompoundDrawables(null, drawable,null, null);
                         break;
                     case R.id.main_bottom_ranking:
                         index = 1;
+                        drawable = getResources().getDrawable(R.mipmap.bookshelf);
+                        drawable.setBounds(0, 0, 70, 70);
+                        bookshelfRB.setCompoundDrawables(null, drawable , null,null);
+                        drawable = getResources().getDrawable(R.mipmap.ranking_red);
+                        drawable.setBounds(0, 0, 70, 70);
+                        rankingRB.setCompoundDrawables(null, drawable, null,null);
+                        drawable = getResources().getDrawable(R.mipmap.category);
+                        drawable.setBounds(0, 0, 70, 70);
+                        categoryRB.setCompoundDrawables(null, drawable,null, null);
                         break;
                     case R.id.main_bottom_category:
                         index = 2;
+                        drawable = getResources().getDrawable(R.mipmap.bookshelf);
+                        drawable.setBounds(0, 0, 70, 70);
+                        bookshelfRB.setCompoundDrawables(null, drawable , null,null);
+                        drawable = getResources().getDrawable(R.mipmap.ranking);
+                        drawable.setBounds(0, 0, 70, 70);
+                        rankingRB.setCompoundDrawables(null, drawable, null,null);
+                        drawable = getResources().getDrawable(R.mipmap.category_red);
+                        drawable.setBounds(0, 0, 70, 70);
+                        categoryRB.setCompoundDrawables(null, drawable,null, null);
                         break;
                 }
                 viewPager.setCurrentItem(index);
