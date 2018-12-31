@@ -1,9 +1,11 @@
 package fte.finalproject.service;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Observable;
 import java.util.concurrent.TimeUnit;
 
@@ -292,4 +294,23 @@ public class BookService {
         }
         return fuzzySearchResultObj;
     }
+
+    /*
+     * 获取图片
+     * @param path
+     * @return Bitmap 图片
+     */
+    public Bitmap getImg(String path) {
+        Response<InputStream> response = null;
+        Bitmap bitmap = null;
+        try {
+            response = StaticsService.getImg(path).execute();
+            InputStream is = response.body();
+            bitmap = BitmapFactory.decodeStream(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bitmap;
+    }
+
 }

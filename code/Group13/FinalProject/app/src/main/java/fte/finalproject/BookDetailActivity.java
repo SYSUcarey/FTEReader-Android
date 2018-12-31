@@ -33,6 +33,8 @@ public class BookDetailActivity extends AppCompatActivity {
 
     private BookObj bookObj;
 
+    private Bitmap cover;
+
     private List<ChapterLinkObj> linkList;
 
     private StringBuilder stringBuilder = new StringBuilder();
@@ -58,6 +60,7 @@ public class BookDetailActivity extends AppCompatActivity {
             public void run() {
                 BookService bookService = BookService.getBookService();
                 bookObj = bookService.getBookById(bookid);
+                cover = bookService.getImg(bookObj.getCover());
                 CptListObj cptListObj = bookService.getChaptersByBookId(bookid);
                 linkList = cptListObj.getImixToc().getChapterLinks();
             }
@@ -67,7 +70,7 @@ public class BookDetailActivity extends AppCompatActivity {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                DatabaseControl.getInstance(BookDetailActivity.this).addShelfBook(new ShelfBookObj(bookid, bookObj.getTitle(), bookObj.getCover(), 0, "online", 0, bookObj.getLongIntro()));
+                DatabaseControl.getInstance(BookDetailActivity.this).addShelfBook(new ShelfBookObj(bookid, bookObj.getTitle(), cover, 0, "online", 0, bookObj.getLongIntro(), bookObj.getAuthor(), bookObj.getMajorCate()));
             }
         });
 

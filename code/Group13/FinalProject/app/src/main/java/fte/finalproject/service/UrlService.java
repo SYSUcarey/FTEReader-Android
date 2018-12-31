@@ -2,6 +2,8 @@ package fte.finalproject.service;
 
 import android.graphics.Bitmap;
 
+import java.io.InputStream;
+
 import fte.finalproject.obj.AllRankingObj;
 import fte.finalproject.obj.BookObj;
 import fte.finalproject.obj.CategoryObj;
@@ -104,5 +106,13 @@ public interface UrlService {
      */
     @GET("/novelSearchApi")
     Call<FuzzySearchResultObj> getFuzzySearchResult(@Query("name") String name);
+
+    /*
+     * 获取图片
+     * @param path
+     * @return Call<Bitmap> 图片
+     */
+    @GET("{path}")
+    Call<InputStream> getImg(@Path("path") String path);
 
 }
