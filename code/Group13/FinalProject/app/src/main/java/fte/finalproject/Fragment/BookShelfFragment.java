@@ -22,6 +22,7 @@ import fte.finalproject.myRecyclerview.MyRecyclerViewAdapter;
 import fte.finalproject.myRecyclerview.MyViewHolder;
 import fte.finalproject.obj.ShelfBookObj;
 
+//书架界面
 public class BookShelfFragment extends Fragment {
     // Fragment 的 视图
     View view;

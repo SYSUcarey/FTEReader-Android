@@ -30,6 +30,10 @@ public class MainActivity extends AppCompatActivity {
     private RadioButton rankingRB;
     private RadioButton categoryRB;
 
+    private RadioGroup topRG;
+    private RadioButton maleRB;
+    private RadioButton femaleRB;
+
     private ViewPager viewPager;
     private List<Fragment> fragmentList = new ArrayList<>();
     private TabFragmentPagerAdapter fragmentPagerAdapter;
@@ -40,12 +44,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //初始化控件
-        radioGroup = findViewById(R.id.main_RG);
+        radioGroup = findViewById(R.id.main_top_RG);
         title = findViewById(R.id.main_title);
         bottomRG = findViewById(R.id.main_bottomRG);
         bookshelfRB = findViewById(R.id.main_bottom_bookshelf);
         rankingRB = findViewById(R.id.main_bottom_ranking);
         categoryRB = findViewById(R.id.main_bottom_category);
+        topRG = findViewById(R.id.main_top_RG);
+        maleRB = findViewById(R.id.main_top_male);
+        femaleRB = findViewById(R.id.main_top_female);
         viewPager = findViewById(R.id.main_viewPager);
 
         //初始化Fragment
@@ -72,6 +79,39 @@ public class MainActivity extends AppCompatActivity {
         drawable = getResources().getDrawable(R.mipmap.category);
         drawable.setBounds(0, 0, 70, 70);
         categoryRB.setCompoundDrawables(null, drawable,null, null);
+
+        //设置顶部按钮图标大小
+        drawable = getResources().getDrawable(R.mipmap.male_blue);
+        drawable.setBounds(0, 0, 70, 70);
+        maleRB.setCompoundDrawables(null, drawable, null, null);
+        drawable = getResources().getDrawable(R.mipmap.female_black);
+        drawable.setBounds(0, 0, 70, 70);
+        femaleRB.setCompoundDrawables(null, drawable, null, null);
+
+        //处理顶部RG事件
+        topRG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId) {
+                    case R.id.main_top_male:
+                        Drawable drawable = getResources().getDrawable(R.mipmap.male_blue);
+                        drawable.setBounds(0, 0, 70, 70);
+                        maleRB.setCompoundDrawables(null, drawable, null, null);
+                        drawable = getResources().getDrawable(R.mipmap.female_black);
+                        drawable.setBounds(0, 0, 70, 70);
+                        femaleRB.setCompoundDrawables(null, drawable, null, null);
+                        break;
+                    case R.id.main_top_female:
+                        drawable = getResources().getDrawable(R.mipmap.male_black);
+                        drawable.setBounds(0, 0, 70, 70);
+                        maleRB.setCompoundDrawables(null, drawable, null, null);
+                        drawable = getResources().getDrawable(R.mipmap.female_red);
+                        drawable.setBounds(0, 0, 70, 70);
+                        femaleRB.setCompoundDrawables(null, drawable, null, null);
+                        break;
+                }
+            }
+        });
 
         //处理底部RG事件
         bottomRG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {

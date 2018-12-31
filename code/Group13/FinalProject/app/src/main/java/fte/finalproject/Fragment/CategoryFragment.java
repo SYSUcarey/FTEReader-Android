@@ -38,7 +38,13 @@ public class CategoryFragment extends Fragment {
         //初始化Fragment
         MaleInCategoryFragment maleFragment = new MaleInCategoryFragment();
         MaleInCategoryFragment femaleFragment = new MaleInCategoryFragment();
+        Bundle bundle1 = new Bundle();
+        bundle1.putBoolean("isMale", true);
+        maleFragment.setArguments(bundle1);
         fragmentList.add(maleFragment);
+        Bundle bundle2 = new Bundle();
+        bundle2.putBoolean("isMale", false);
+        maleFragment.setArguments(bundle2);
         fragmentList.add(femaleFragment);
 
         viewPager.setOnPageChangeListener(new MyPagerChangeListener());
