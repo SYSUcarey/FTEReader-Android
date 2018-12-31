@@ -2,15 +2,17 @@ package fte.finalproject.Fragment;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 
 import java.util.List;
 
-public class TabFragmentPagerAdapter extends android.support.v4.app.FragmentPagerAdapter {
+public class TabFragmentPagerAdapter extends FragmentPagerAdapter {
     private FragmentManager fm;
     private List<Fragment> list;
 
     public TabFragmentPagerAdapter(FragmentManager fm, List<Fragment> list) {
         super(fm);
+        this.fm = fm;
         this.list = list;
     }
 

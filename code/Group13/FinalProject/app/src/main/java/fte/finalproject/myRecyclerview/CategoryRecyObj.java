@@ -2,14 +2,14 @@ package fte.finalproject.myRecyclerview;
 
 public class CategoryRecyObj {
     private String categoryName;
-    private int bookCount;
+    private String bookCount;
 
-    public CategoryRecyObj(String categoryName, int bookCount) {
+    public CategoryRecyObj(String categoryName, String bookCount) {
         this.categoryName = categoryName;
         this.bookCount = bookCount;
     }
 
-    public int getBookCount() {
+    public String getBookCount() {
         return bookCount;
     }
 
@@ -17,7 +17,7 @@ public class CategoryRecyObj {
         return categoryName;
     }
 
-    public void setBookCount(int bookCount) {
+    public void setBookCount(String bookCount) {
         this.bookCount = bookCount;
     }
 

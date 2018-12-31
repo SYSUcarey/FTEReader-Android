@@ -17,7 +17,7 @@ import java.util.List;
 import fte.finalproject.Fragment.BookShelfFragment;
 import fte.finalproject.Fragment.CategoryFragment;
 import fte.finalproject.Fragment.RankingFragment;
-import fte.finalproject.Fragment.TabFragmentPagerAdapter;
+import fte.finalproject.Fragment.TabFragmentStatePagerAdapter;
 
 //总体界面，包含书架、排行榜、分类
 public class MainActivity extends AppCompatActivity {
@@ -30,9 +30,13 @@ public class MainActivity extends AppCompatActivity {
     private RadioButton rankingRB;
     private RadioButton categoryRB;
 
+    private RadioGroup topRG;
+    private RadioButton maleRB;
+    private RadioButton femaleRB;
+
     private ViewPager viewPager;
     private List<Fragment> fragmentList = new ArrayList<>();
-    private TabFragmentPagerAdapter fragmentPagerAdapter;
+    private TabFragmentStatePagerAdapter fragmentPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,24 +44,30 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //初始化控件
-        radioGroup = findViewById(R.id.main_RG);
+        radioGroup = findViewById(R.id.main_top_RG);
         title = findViewById(R.id.main_title);
         bottomRG = findViewById(R.id.main_bottomRG);
         bookshelfRB = findViewById(R.id.main_bottom_bookshelf);
         rankingRB = findViewById(R.id.main_bottom_ranking);
         categoryRB = findViewById(R.id.main_bottom_category);
+        topRG = findViewById(R.id.main_top_RG);
+        maleRB = findViewById(R.id.main_top_male);
+        femaleRB = findViewById(R.id.main_top_female);
         viewPager = findViewById(R.id.main_viewPager);
 
         //初始化Fragment
         BookShelfFragment bookShelfFragment = new BookShelfFragment();
         RankingFragment rankingFragment = new RankingFragment();
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("isMale", true);
+        rankingFragment.setArguments(bundle);
         CategoryFragment categoryFragment = new CategoryFragment();
         fragmentList.add(bookShelfFragment);
         fragmentList.add(rankingFragment);
         fragmentList.add(categoryFragment);
 
         viewPager.setOnPageChangeListener(new MyPagerChangeListener());
-        fragmentPagerAdapter = new TabFragmentPagerAdapter(getSupportFragmentManager(), fragmentList);
+        fragmentPagerAdapter = new TabFragmentStatePagerAdapter(getSupportFragmentManager(), fragmentList);
         viewPager.setAdapter(fragmentPagerAdapter);
         viewPager.setCurrentItem(0);
         viewPager.setOffscreenPageLimit(2);
@@ -72,6 +82,51 @@ public class MainActivity extends AppCompatActivity {
         drawable = getResources().getDrawable(R.mipmap.category);
         drawable.setBounds(0, 0, 70, 70);
         categoryRB.setCompoundDrawables(null, drawable,null, null);
+
+        //设置顶部按钮图标大小
+        drawable = getResources().getDrawable(R.mipmap.male_blue);
+        drawable.setBounds(0, 0, 70, 70);
+        maleRB.setCompoundDrawables(null, drawable, null, null);
+        drawable = getResources().getDrawable(R.mipmap.female_black);
+        drawable.setBounds(0, 0, 70, 70);
+        femaleRB.setCompoundDrawables(null, drawable, null, null);
+
+        //处理顶部RG事件
+        topRG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId) {
+                    case R.id.main_top_male:
+                        Drawable drawable = getResources().getDrawable(R.mipmap.male_blue);
+                        drawable.setBounds(0, 0, 70, 70);
+                        maleRB.setCompoundDrawables(null, drawable, null, null);
+                        drawable = getResources().getDrawable(R.mipmap.female_black);
+                        drawable.setBounds(0, 0, 70, 70);
+                        femaleRB.setCompoundDrawables(null, drawable, null, null);
+                        RankingFragment rankingFragment1 = new RankingFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putBoolean("isMale", true);
+                        rankingFragment1.setArguments(bundle);
+                        fragmentList.set(1, rankingFragment1);
+                        fragmentPagerAdapter.refresh(fragmentList);
+                        break;
+                    case R.id.main_top_female:
+                        drawable = getResources().getDrawable(R.mipmap.male_black);
+                        drawable.setBounds(0, 0, 70, 70);
+                        maleRB.setCompoundDrawables(null, drawable, null, null);
+                        drawable = getResources().getDrawable(R.mipmap.female_red);
+                        drawable.setBounds(0, 0, 70, 70);
+                        femaleRB.setCompoundDrawables(null, drawable, null, null);
+                        RankingFragment rankingFragment2 = new RankingFragment();
+                        bundle = new Bundle();
+                        bundle.putBoolean("isMale", false);
+                        rankingFragment2.setArguments(bundle);
+                        fragmentList.set(1, rankingFragment2);
+                        fragmentPagerAdapter.refresh(fragmentList);
+                        break;
+                }
+            }
+        });
 
         //处理底部RG事件
         bottomRG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {

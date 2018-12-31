@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,26 +9,32 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginTop="10dp">
         <RadioGroup
-            android:id="@+id/main_RG"
+            android:id="@+id/main_top_RG"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_alignParentLeft="true"
             android:layout_marginStart="10dp"
-            android:visibility="gone">
+            android:visibility="gone"
+            android:layout_alignParentBottom="true">
             <RadioButton
-                android:id="@+id/main_RB_male"
+                android:id="@+id/main_top_male"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="男" />
+                android:layout_marginStart="10dp"
+                android:button="@null"
+                android:drawableTop="@mipmap/male_blue"
+                android:checked="true"/>
             <RadioButton
-                android:id="@+id/main_RB_female"
+                android:id="@+id/main_top_female"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="女" />
+                android:layout_marginStart="10dp"
+                android:button="@null"
+                android:drawableTop="@mipmap/female_black" />
         </RadioGroup>
 
         <!--标题：书架/排行榜/分类-->
@@ -40,7 +45,8 @@
             android:text="书架"
             android:textSize="20sp"
             android:textColor="#030303"
-            android:layout_centerInParent="true"/>
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"/>
 
         <ImageView
             android:id="@+id/main_search"
@@ -48,7 +54,7 @@
             android:layout_height="20dp"
             android:src="@mipmap/search"
             android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
+            android:layout_alignParentTop="true"
             android:layout_marginEnd="10dp"/>
     </RelativeLayout>
 
