@@ -31,7 +31,7 @@ import fte.finalproject.myRecyclerview.RankRecyObj;
 
 //排行榜界面
 public class RankingFragment extends Fragment {
-    private boolean isMale;
+    private boolean isMale;             //男生/女生
     private int color1 = Color.parseColor("#F5D6D6");//最热榜
     private int color2 = Color.parseColor("#D8F8C2");//热搜榜
     private int color3 = Color.parseColor("#F9EBB0");//潜力榜

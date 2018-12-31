@@ -27,7 +27,7 @@ public class CategoryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_category, null);
+        View view = inflater.inflate(R.layout.fragment_category, null);
         //初始化控件
         RG = view.findViewById(R.id.category_RG);
         viewPager = view.findViewById(R.id.category_viewPager);
