@@ -61,7 +61,7 @@ public class BookShelfFragment extends Fragment {
         myBooks = new ArrayList<>();
         Bitmap bitmap = ((BitmapDrawable)getResources().getDrawable(R.mipmap.bookcover)).getBitmap();
         for(int i = 0; i < 10; i++) {
-            ShelfBookObj s = new ShelfBookObj(0, "圣墟", bitmap, 0, "df", 0);
+            ShelfBookObj s = new ShelfBookObj(0, "圣墟", bitmap, 0, "df", 0, " ");
             myBooks.add(s);
         }
         System.out.println("getBookSize: " + myBooks.size());

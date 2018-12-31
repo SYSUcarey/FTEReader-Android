@@ -54,7 +54,7 @@ public class MaleInCategoryFragment extends Fragment {
     private ClassificationObj1 classificationObj1;
     private ClassificationObj2 classificationObj2;
 
-    // bookservice 类 （后续用单例模式修改）
+    // bookservice 类 （用单例模式获取）
     private BookService bookService;
 
     // 一级分类(写死)
@@ -215,7 +215,7 @@ public class MaleInCategoryFragment extends Fragment {
     // 获取分类数据
     private void getMyCategories() {
         boolean isNetWorkConnected = isNetWorkConnected(getActivity());
-        bookService = new BookService();
+        bookService = BookService.getBookService();
         if(isNetWorkConnected) {
             System.out.println("网络连接状况：已连接");
             // 调用子线程进行访问，获取一级、二级分类信息
