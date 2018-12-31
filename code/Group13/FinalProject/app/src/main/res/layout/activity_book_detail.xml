@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".BookDetailActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/detail_topLL"
+        android:orientation="vertical"
+        android:layout_margin="5dp">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/detail_cover"
+                android:src="@mipmap/bookcover"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/detail_bookTitle"
+                android:text="圣墟"
+                android:textSize="20sp"
+                app:layout_constraintLeft_toRightOf="@id/detail_cover"
+                app:layout_constraintTop_toTopOf="@id/detail_cover"
+                android:layout_gravity="top"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/detail_TV"
+                android:text="辰东 | 东方玄幻 | 496万字"
+                android:textSize="12sp"
+                android:textColor="@color/colorGrey"
+                app:layout_constraintLeft_toLeftOf="@id/detail_bookTitle"
+                app:layout_constraintTop_toBottomOf="@id/detail_bookTitle"
+                app:layout_constraintBottom_toTopOf="@id/detail_update"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/detail_update"
+                android:text="昨天"
+                android:textSize="12sp"
+                android:textColor="@color/colorRed"
+                android:layout_weight="1"
+                app:layout_constraintLeft_toLeftOf="@id/detail_bookTitle"
+                app:layout_constraintBottom_toBottomOf="@id/detail_cover"
+                android:layout_marginBottom="10dp"/>
+
+        </android.support.constraint.ConstraintLayout>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/detail_CV"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/detail_follower1"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:text="人数: "
+                    android:textColor="@color/colorGrey"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/detail_follower2"
+                    android:text="17万人+"
+                    android:textSize="18sp"
+                    android:textColor="@color/colorBlack"
+                    android:layout_toRightOf="@id/detail_follower1"
+                    android:layout_centerVertical="true"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/detail_retentionRatio1"
+                    android:layout_toLeftOf="@id/detail_retentionRatio2"
+                    android:layout_centerVertical="true"
+                    android:text="读者留存率: "
+                    android:textColor="@color/colorGrey"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/detail_retentionRatio2"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:text="52.68%"
+                    android:textSize="18sp"
+                    android:textColor="@color/colorBlack"/>
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/detail_longIntro"
+            app:layout_constraintTop_toBottomOf="@+id/detail_CV"
+            android:textSize="10sp"
+            android:text="在破败中崛起，在寂灭中复苏。沧海成尘，雷电枯竭，那一缕幽雾又一次临近大地，世间的枷锁被打开了，一个全新的世界就此揭开神秘的一角……"/>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/detail_midRL"
+        app:layout_constraintTop_toBottomOf="@id/detail_topLL"
+        android:layout_margin="5dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/detail_recomTitle"
+            android:text="同类推荐"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/detail_recomRL"
+            android:layout_below="@+id/detail_recomTitle">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/detail_recom1"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/detail_recom2"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/detail_recom3"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <RadioGroup
+        android:id="@+id/detail_bottomRG"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <RadioButton
+            android:id="@+id/main_bottom_bookshelf"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:button="@null"
+            android:gravity="center"
+            android:text="加入书架"
+            android:textColor="@color/colorRed" />
+
+        <RadioButton
+            android:id="@+id/main_bottom_ranking"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/colorRed"
+            android:button="@null"
+            android:gravity="center"
+            android:text="免费阅读"
+            android:textColor="@color/colorWhite" />
+
+        <RadioButton
+            android:id="@+id/main_bottom_category"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:button="@null"
+            android:gravity="center"
+            android:text="全本缓存"
+            android:textColor="@color/colorRed" />
+    </RadioGroup>
+
+</android.support.constraint.ConstraintLayout>

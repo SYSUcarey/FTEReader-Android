@@ -27,6 +27,12 @@ public class BookService {
     private static String StaticsUrl = "http://statics.zhuishushenqi.com";
     private static String ChapterUrl = "http://chapter2.zhuishushenqi.com";
 
+    private static BookService bookService = new BookService();
+
+    public static synchronized BookService getBookService() {
+        return bookService;
+    }
+
     OkHttpClient build = new OkHttpClient.Builder()
             .connectTimeout(2, TimeUnit.SECONDS)
             .readTimeout(2, TimeUnit.SECONDS)
@@ -40,7 +46,6 @@ public class BookService {
             .addConverterFactory(GsonConverterFactory.create())
             // RxJava封装OkHttp的Call函数，本质还是利用OkHttp请求数据
             .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-            // build 即为okhttp声明的变量，下文会讲
             .client(build)
             .build();
 
@@ -51,7 +56,6 @@ public class BookService {
             .addConverterFactory(GsonConverterFactory.create())
             // RxJava封装OkHttp的Call函数，本质还是利用OkHttp请求数据
             .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-            // build 即为okhttp声明的变量，下文会讲
             .client(build)
             .build();
 
@@ -62,7 +66,6 @@ public class BookService {
             .addConverterFactory(GsonConverterFactory.create())
             // RxJava封装OkHttp的Call函数，本质还是利用OkHttp请求数据
             .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-            // build 即为okhttp声明的变量，下文会讲
             .client(build)
             .build();
 

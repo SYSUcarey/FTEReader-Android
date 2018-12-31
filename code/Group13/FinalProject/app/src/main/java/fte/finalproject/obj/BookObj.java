@@ -27,11 +27,11 @@ public class BookObj {
     @SerializedName("site")
     private String site;
 
-    // 书籍二级分类
+    // 书籍一级分类
     @SerializedName("majorCate")
     private String majorCate;
 
-    // 书籍子分类
+    // 书籍二级分类
     @SerializedName("minorCate")
     private String minorCate;
 
