@@ -58,14 +58,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        new Thread(new Runnable() {
+        /*new Thread(new Runnable() {
             @Override
             public void run() {
                 Bitmap bitmap = BookService.getBookService().getImg("/agent/http%3A%2F%2Fimg.1391.com%2Fapi%2Fv1%2Fbookcenter%2Fcover%2F1%2F1228859%2F_1228859_441552.jpg%2F");
                 Log.d("width", String.valueOf(bitmap.getWidth()));
                 Log.d("height", String.valueOf(bitmap.getHeight()));
             }
-        }).start();
+        }).start();*/
 
         //初始化控件
         radioGroup = findViewById(R.id.main_top_RG);
