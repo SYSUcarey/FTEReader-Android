@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".BookDetailActivity">
+    tools:context=".BookDetailActivity"
+    android:layout_marginTop="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -148,6 +149,17 @@
             android:textColor="@color/colorBlack"
             android:layout_marginTop="5dp"/>
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/detail_more"
+            android:layout_alignParentRight="true"
+            android:layout_above="@id/detail_recomRL"
+            android:background="@null"
+            android:text="更多"
+            android:textSize="11sp"
+            android:textColor="@color/colorGrey"/>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -193,7 +205,7 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <RadioButton
-            android:id="@+id/main_bottom_bookshelf"
+            android:id="@+id/detail_bottom_add"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -204,7 +216,7 @@
             android:textColor="@color/colorRed"/>
 
         <RadioButton
-            android:id="@+id/main_bottom_ranking"
+            android:id="@+id/detail_bottom_read"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -216,7 +228,7 @@
             android:textColor="@color/colorWhite" />
 
         <RadioButton
-            android:id="@+id/main_bottom_category"
+            android:id="@+id/detail_bottom_download"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

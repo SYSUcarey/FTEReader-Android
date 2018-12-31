@@ -12,6 +12,7 @@ import fte.finalproject.obj.ChapterObj;
 import fte.finalproject.obj.ClassificationObj1;
 import fte.finalproject.obj.ClassificationObj2;
 import fte.finalproject.obj.CptListObj;
+import fte.finalproject.obj.SearchResultObj;
 import fte.finalproject.obj.SingleRankingObj;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -20,12 +21,14 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Url;
 
 
 public class BookService {
     private static String ApiUrl = "http://api.zhuishushenqi.com";
     private static String StaticsUrl = "http://statics.zhuishushenqi.com";
     private static String ChapterUrl = "http://chapter2.zhuishushenqi.com";
+    private static String SearchUrl = "https://www.apiopen.top";
 
     private static BookService bookService = new BookService();
 
@@ -69,6 +72,14 @@ public class BookService {
             .client(build)
             .build();
 
+    // 用于书籍搜索
+    Retrofit retrofitForSearch = new Retrofit.Builder()
+            .baseUrl(SearchUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+            .client(build)
+            .build();
+
     // 用于访问api
     private UrlService ApiService = retrofitForApi.create(UrlService.class);
 
@@ -77,6 +88,9 @@ public class BookService {
 
     // 用于访问章节
     private UrlService ChapterService = retrofitForChapter.create(UrlService.class);
+
+    // 用于搜索书籍
+    private UrlService SearchService = retrofitForSearch.create(UrlService.class);
 
     // 所有排行榜
     private AllRankingObj allRankingObj;
@@ -98,6 +112,9 @@ public class BookService {
 
     // 章节内容
     private ChapterObj chapterObj;
+
+    // 书籍搜索结果
+    private SearchResultObj searchResultObj;
 
     /*
      * 获取所有排行榜
@@ -173,16 +190,15 @@ public class BookService {
      *        major String 玄幻 可以从一级分类获得
      *        start String 起始位置，从0开始
      *        limit String 获取数量限制 20
-     *        tag String 东方玄幻、异界大陆、异界争霸、远古神话 可以从二级分类获得
      *        gender String 性别 male、female
      * @return CategoryObj
-     * 示例 bookService.getBooksByCategoty("hot", "玄幻", "0", "20", "东方玄幻", "male");
+     * 示例 bookService.getBooksByCategoty("hot", "玄幻", "0", "20", "male");
      */
 
-    public CategoryObj getBooksByCategoty(String type, String major, String start, String limit, String tag, String gender) {
+    public CategoryObj getBooksByCategoty(String type, String major, String start, String limit, String gender) {
         Response<CategoryObj> response = null;
         try {
-            response = ApiService.getBooksByCategory(type, major, start, limit, tag, gender).execute();
+            response = ApiService.getBooksByCategory(type, major, start, limit, gender).execute();
             categoryObj = response.body();
         } catch (IOException e) {
             e.printStackTrace();
@@ -222,6 +238,22 @@ public class BookService {
             e.printStackTrace();
         }
         return chapterObj;
+    }
+
+    /*
+     * 获取书籍搜索结果
+     * @param name String 书名
+     * @return SearchResultObj 搜索结果对象
+     */
+    public SearchResultObj getSearchResultObj(String name) {
+        Response<SearchResultObj> response = null;
+        try {
+            response = SearchService.getSearchResult(name).execute();
+            searchResultObj = response.body();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return searchResultObj;
     }
 
 }

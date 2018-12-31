@@ -6,6 +6,7 @@ import fte.finalproject.obj.ChapterObj;
 import fte.finalproject.obj.ClassificationObj1;
 import fte.finalproject.obj.ClassificationObj2;
 import fte.finalproject.obj.CptListObj;
+import fte.finalproject.obj.SearchResultObj;
 import fte.finalproject.obj.SingleRankingObj;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -52,12 +53,11 @@ public interface UrlService {
      *        major String 玄幻
      *        start String 起始位置，从0开始
      *        limit String 限制获取数量 20
-     *        tag String 东方玄幻、异界大陆、异界争霸、远古神话
      *        gender String 性别 male、female
      * @return Call<CategoryObj>
      */
     @GET("/book/by-categories")
-    Call<CategoryObj> getBooksByCategory(@Query("type") String type, @Query("major") String major, @Query("start") String start, @Query("limit") String limit, @Query("tag") String tag, @Query("gender") String gender);
+    Call<CategoryObj> getBooksByCategory(@Query("type") String type, @Query("major") String major, @Query("start") String start, @Query("limit") String limit,  @Query("gender") String gender);
 
     /*
      * 获取章节列表
@@ -70,9 +70,17 @@ public interface UrlService {
     /*
      * 获取章节内容
      * @param link 章节链接
-     * @return ChapterObj 章节对象
+     * @return Call<ChapterObj> 章节对象
      */
     @GET("/chapter/{link}")
     Call<ChapterObj> getChapter(@Path("link") String link);
+
+    /*
+     * 获取书籍搜索结果
+     * @param name String 书名
+     * @return Call<SearchResultObj> 搜索结果对象
+     */
+    @GET("/novelSearchApi")
+    Call<SearchResultObj> getSearchResult(@Query("name") String name);
 
 }
