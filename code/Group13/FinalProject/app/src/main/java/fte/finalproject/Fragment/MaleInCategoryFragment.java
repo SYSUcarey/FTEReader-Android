@@ -3,6 +3,7 @@ package fte.finalproject.Fragment;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import org.w3c.dom.Text;
 import java.util.ArrayList;
 import java.util.List;
 
+import fte.finalproject.CategoryActivity;
 import fte.finalproject.R;
 import fte.finalproject.ReadPageActivity;
 import fte.finalproject.myRecyclerview.CategoryRecyObj;
@@ -117,7 +119,17 @@ public class MaleInCategoryFragment extends Fragment {
         adapter.setOnItemClickListener(new MyRecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void onClick(int position) {
-                System.out.println("onClick");
+                //跳转具体分类界面
+                Intent intent = new Intent(getActivity(), CategoryActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("isRanking", false);
+                bundle.putBoolean("isMale", isMale);
+                if (isMale) bundle.putString("title", maleCategoriesName[position]);
+                else bundle.putString("title", femaleCategoriesName[position]);
+                intent.putExtras(bundle);
+                startActivity(intent);
+
+                /*System.out.println("onClick");
 
                 // 分类信息尚未获取，调用BookService去获取
                 if(classificationObj2 == null) {
@@ -198,7 +210,7 @@ public class MaleInCategoryFragment extends Fragment {
 
 
 
-                }
+                }*/
             }
 
             @Override

@@ -18,8 +18,8 @@ import fte.finalproject.Fragment.TabFragmentPagerAdapter;
 
 //这个Activity可用于榜单和具体分类
 public class CategoryActivity extends AppCompatActivity {
-    private boolean isRanking;
-    private boolean isMale;
+    private boolean isRanking;          //排行榜/分类
+    private boolean isMale;             //男生/女生
 
     private TextView title;
     private ImageView backImage;
@@ -84,6 +84,7 @@ public class CategoryActivity extends AppCompatActivity {
                 DetailCategoryFragment fragment = new DetailCategoryFragment();
                 Bundle bundle1 = new Bundle();
                 bundle1.putString("title", bundle.getString("title"));
+                bundle1.putBoolean("isRanking", isRanking);
                 bundle1.putBoolean("isMale", isMale);
                 if (i == 0) bundle1.putString("type", "周榜");
                 else if (i == 1) bundle1.putString("type", "月榜");
@@ -98,6 +99,7 @@ public class CategoryActivity extends AppCompatActivity {
                 DetailCategoryFragment fragment = new DetailCategoryFragment();
                 Bundle bundle1 = new Bundle();
                 bundle1.putString("title", bundle.getString("title"));
+                bundle1.putBoolean("isRanking", isRanking);
                 bundle1.putBoolean("isMale", isMale);
                 if (i == 0) bundle1.putString("type", "热门");
                 else if (i == 1) bundle1.putString("type", "留存");
