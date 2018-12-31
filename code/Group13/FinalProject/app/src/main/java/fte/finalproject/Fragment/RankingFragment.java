@@ -1,5 +1,6 @@
 package fte.finalproject.Fragment;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -21,6 +22,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import fte.finalproject.CategoryActivity;
+import fte.finalproject.MainActivity;
 import fte.finalproject.R;
 import fte.finalproject.myRecyclerview.MyRecyclerViewAdapter;
 import fte.finalproject.myRecyclerview.MyViewHolder;
@@ -111,7 +114,14 @@ public class RankingFragment extends Fragment {
         adapter.setOnItemClickListener(new MyRecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void onClick(int position) {
-
+                //跳转到对应榜单界面
+                Intent intent = new Intent(getActivity(), CategoryActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("isRanking", true);
+                bundle.putBoolean("isMale", isMale);
+                bundle.putString("title", list.get(position));
+                intent.putExtras(bundle);
+                startActivity(intent);
             }
 
             @Override

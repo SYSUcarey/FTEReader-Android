@@ -24,6 +24,7 @@
             <RadioButton
                 android:id="@+id/category_RB_female"
                 style="@style/BottomRB"
+                android:layout_height="40dp"
                 android:text="女生"/>
         </RadioGroup>
 
