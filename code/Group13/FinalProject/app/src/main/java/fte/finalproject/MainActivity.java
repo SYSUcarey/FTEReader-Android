@@ -48,21 +48,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                BookService bookService = BookService.getBookService();
-                FuzzySearchResultObj fuzzySearchResultObj = bookService.getFuzzySearchResult("盗墓笔记");
-                Log.d("code", String.valueOf(fuzzySearchResultObj.getCode()));
-                Log.d("msg", fuzzySearchResultObj.getMsg());
-                for (int i = 0; i < fuzzySearchResultObj.getData().length; i++) {
-                    Log.d("data", fuzzySearchResultObj.getData()[i]);
-                }
-            }
-        });
-
-        thread.start();
-
         //初始化控件
         radioGroup = findViewById(R.id.main_top_RG);
         title = findViewById(R.id.main_title);
