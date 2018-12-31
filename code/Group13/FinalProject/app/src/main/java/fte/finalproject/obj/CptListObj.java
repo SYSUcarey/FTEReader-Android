@@ -38,7 +38,7 @@ public class CptListObj {
         private int chaptersCount;
         // 章节列表
         @SerializedName("chapters")
-        public ChapterLinks chapterLinks;
+        public List<ChapterLinkObj> chapterLinks;
         // 更新时间
         @SerializedName("updated")
         private String updated;
@@ -55,7 +55,7 @@ public class CptListObj {
             return chaptersCount;
         }
 
-        public ChapterLinks getChapterLinks() {
+        public List<ChapterLinkObj> getChapterLinks() {
             return chapterLinks;
         }
 

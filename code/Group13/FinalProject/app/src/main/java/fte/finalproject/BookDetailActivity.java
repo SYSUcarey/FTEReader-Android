@@ -25,7 +25,7 @@ public class BookDetailActivity extends AppCompatActivity {
 
     private String bookid;
 
-    private ChapterLinks linkList;
+    private List<ChapterLinkObj> linkList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +61,7 @@ public class BookDetailActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(BookDetailActivity.this, ReadPageActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("links", linkList);
+                bundle.putString("bookid", bookid);
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
