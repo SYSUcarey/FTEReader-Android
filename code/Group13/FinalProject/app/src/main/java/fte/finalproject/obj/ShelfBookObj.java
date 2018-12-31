@@ -3,7 +3,7 @@ package fte.finalproject.obj;
 import android.graphics.Bitmap;
 
 public class ShelfBookObj {
-    int bookId;
+    String bookId;
     private Bitmap icon;
     private String name;
     private String description;
@@ -11,7 +11,7 @@ public class ShelfBookObj {
     private String address;
     private int readChapter;
 
-    public ShelfBookObj(int bookId, String name, Bitmap icon, int readChapter, String address,int type,String description) {
+    public ShelfBookObj(String bookId, String name, Bitmap icon, int readChapter, String address,int type,String description) {
         this.bookId = bookId;
         this.name = name;
         this.icon = icon;
@@ -69,11 +69,11 @@ public class ShelfBookObj {
         this.type = type;
     }
 
-    public int getBookId() {
+    public String getBookId() {
         return bookId;
     }
 
-    public void setBookId(int bookId) {
+    public void setBookId(String bookId) {
         this.bookId = bookId;
     }
 }

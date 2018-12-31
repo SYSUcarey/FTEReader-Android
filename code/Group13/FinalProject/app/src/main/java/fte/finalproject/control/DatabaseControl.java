@@ -8,13 +8,14 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import fte.finalproject.obj.ShelfBookObj;
 
 public class DatabaseControl extends SQLiteOpenHelper {
-    private static final String DB_NAME= "readerBase";
+    private static final String DB_NAME= "readerBase.db";
     private static final String TABLE_NAME1 = "shelfbook_table";
     private static final String TABLE_NAME2 = "categorybook_table";
     private static final int DB_VERSION = 1;
@@ -28,14 +29,19 @@ public class DatabaseControl extends SQLiteOpenHelper {
         return instance;
     }
     //byte[] 转 Bitmap
-    public Bitmap bytesToBimap(byte[] b) {
+    public Bitmap bytesToBitmap(byte[] b) {
         if (b.length != 0) {
             return BitmapFactory.decodeByteArray(b, 0, b.length);
         } else {
             return null;
         }
     }
-
+    //Bitmap → byte[]
+    public byte[] bitmapToBytes(Bitmap bm) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        return baos.toByteArray();
+    }
     //这个list用于保存所有英雄信息
     private List<ShelfBookObj> allShelfBook = null;
     public List<ShelfBookObj> getAllShelfBook() {
@@ -51,18 +57,38 @@ public class DatabaseControl extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME1, null);
         List<ShelfBookObj> list = new ArrayList<>();
         while (cursor.moveToNext()) {
-            int id = cursor.getInt(cursor.getColumnIndex("_id"));
+            String id = cursor.getString(cursor.getColumnIndex("_id"));
             int readChapter = cursor.getInt(cursor.getColumnIndex("progress"));
             int type = cursor.getInt(cursor.getColumnIndex("type"));
             String name = cursor.getString(cursor.getColumnIndex("name"));
             String address = cursor.getString(cursor.getColumnIndex("address"));
             String description = cursor.getString(cursor.getColumnIndex("description"));
             byte[] imageByte = cursor.getBlob(cursor.getColumnIndex("hero_icon"));
-            list.add(new ShelfBookObj(id,name,bytesToBimap(imageByte),readChapter,address,type,description));
+            list.add(new ShelfBookObj(id,name, bytesToBitmap(imageByte),readChapter,address,type,description));
         }
         cursor.close();
         db.close();
         return list;
+    }
+    //根据book id删除数据
+    public void deleteShelfBook(String id) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(TABLE_NAME1, "_id = ?", new String[] { id });
+    }
+
+    public void addShelfBook(ShelfBookObj book) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        //开始添加第一条数据_id INTEGER PRIMARY KEY, name TEXT, type INTEGER ,progress INTEGER, address TEXT,image BLOB, description TEXT
+        values.put("name",book.getName());
+        values.put("description",book.getDescription());
+        values.put("type",book.getType());
+        values.put("_id",book.getBookId());
+        values.put("address",book.getAddress());
+        values.put("progress",book.getReadChapter());
+        values.put("price",bitmapToBytes(book.getIcon()));
+        db.insert(TABLE_NAME1,null,values);
+        db.close();
     }
 
     //获取多少条搜索历史
