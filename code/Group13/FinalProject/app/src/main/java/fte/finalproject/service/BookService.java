@@ -7,11 +7,13 @@ import java.util.Observable;
 import java.util.concurrent.TimeUnit;
 
 import fte.finalproject.obj.AllRankingObj;
+import fte.finalproject.obj.BookObj;
 import fte.finalproject.obj.CategoryObj;
 import fte.finalproject.obj.ChapterObj;
 import fte.finalproject.obj.ClassificationObj1;
 import fte.finalproject.obj.ClassificationObj2;
 import fte.finalproject.obj.CptListObj;
+import fte.finalproject.obj.FuzzySearchResultObj;
 import fte.finalproject.obj.SearchResultObj;
 import fte.finalproject.obj.SingleRankingObj;
 import okhttp3.OkHttpClient;
@@ -28,7 +30,7 @@ public class BookService {
     private static String ApiUrl = "http://api.zhuishushenqi.com";
     private static String StaticsUrl = "http://statics.zhuishushenqi.com";
     private static String ChapterUrl = "http://chapter2.zhuishushenqi.com";
-    private static String SearchUrl = "https://www.apiopen.top";
+    private static String FuzzySearchUrl = "https://www.apiopen.top";
 
     private static BookService bookService = new BookService();
 
@@ -72,6 +74,13 @@ public class BookService {
             .client(build)
             .build();
 
+    Retrofit retrofitForFuzzySearch = new Retrofit.Builder()
+            .baseUrl(FuzzySearchUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+            .client(build)
+            .build();
+
     // 用于访问api
     private UrlService ApiService = retrofitForApi.create(UrlService.class);
 
@@ -80,6 +89,9 @@ public class BookService {
 
     // 用于访问章节
     private UrlService ChapterService = retrofitForChapter.create(UrlService.class);
+
+    // 用于模糊搜索
+    private UrlService FuzzySearchService = retrofitForFuzzySearch.create(UrlService.class);
 
     // 所有排行榜
     private AllRankingObj allRankingObj;
@@ -96,6 +108,9 @@ public class BookService {
     // 书籍列表
     private CategoryObj categoryObj;
 
+    // 书籍详情
+    private BookObj bookObj;
+
     // 章节列表
     private CptListObj cptListObj;
 
@@ -104,6 +119,9 @@ public class BookService {
 
     // 书籍搜索结果
     private SearchResultObj searchResultObj;
+
+    // 模糊搜索结果
+    private FuzzySearchResultObj fuzzySearchResultObj;
 
     /*
      * 获取所有排行榜
@@ -195,6 +213,17 @@ public class BookService {
         return categoryObj;
     }
 
+    public BookObj getBookById(String bookid) {
+        Response<BookObj> response = null;
+        try {
+            response = ApiService.getBookById(bookid).execute();
+            bookObj = response.body();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bookObj;
+    }
+
     /*
      * 获取章节列表
      * @param String bookid 书籍id，可从CategoryObj中获得
@@ -245,6 +274,22 @@ public class BookService {
             e.printStackTrace();
         }
         return searchResultObj;
+    }
+
+    /*
+     * 获取书籍模糊搜索结果
+     * @param name String 关键词
+     * @return FuzzyResultObjs 模糊搜索结果对象
+     */
+    public FuzzySearchResultObj getFuzzySearchResult(String name) {
+        Response<FuzzySearchResultObj> response = null;
+        try {
+            response = FuzzySearchService.getFuzzySearchResult(name).execute();
+            fuzzySearchResultObj = response.body();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return fuzzySearchResultObj;
     }
 
 }

@@ -16,7 +16,11 @@ public class BookObj {
     @SerializedName("author")
     private String author;
 
-    // 书籍简短介绍
+    // 书籍介绍
+    @SerializedName("longIntro")
+    private String longIntro;
+
+    // 书籍简介
     @SerializedName("shortIntro")
     private String shortIntro;
 
@@ -58,6 +62,10 @@ public class BookObj {
     // 最新章节
     @SerializedName("lastChapter")
     private String lastChapter;
+
+    // 性别
+    @SerializedName("gender")
+    private String[] gender;
 
     // 标签
     @SerializedName("tags")
@@ -105,6 +113,14 @@ public class BookObj {
 
     public boolean isAllowMonthly() {
         return allowMonthly;
+    }
+
+    public String getLongIntro() {
+        return longIntro;
+    }
+
+    public String[] getGender() {
+        return gender;
     }
 
     public int getBanned() {

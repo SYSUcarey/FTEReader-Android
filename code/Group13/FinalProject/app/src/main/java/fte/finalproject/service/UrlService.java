@@ -1,11 +1,13 @@
 package fte.finalproject.service;
 
 import fte.finalproject.obj.AllRankingObj;
+import fte.finalproject.obj.BookObj;
 import fte.finalproject.obj.CategoryObj;
 import fte.finalproject.obj.ChapterObj;
 import fte.finalproject.obj.ClassificationObj1;
 import fte.finalproject.obj.ClassificationObj2;
 import fte.finalproject.obj.CptListObj;
+import fte.finalproject.obj.FuzzySearchResultObj;
 import fte.finalproject.obj.SearchResultObj;
 import fte.finalproject.obj.SingleRankingObj;
 import retrofit2.Call;
@@ -60,6 +62,14 @@ public interface UrlService {
     Call<CategoryObj> getBooksByCategory(@Query("type") String type, @Query("major") String major, @Query("start") int start, @Query("limit") int limit,  @Query("gender") String gender);
 
     /*
+     * 获取书籍详情
+     * @param bookid String 书籍id
+     * @return Call<BookObj> 书籍对象
+     */
+    @GET("/book/{bookid}")
+    Call<BookObj> getBookById(@Path("bookid") String bookid);
+
+    /*
      * 获取章节列表
      * @param bookid 书籍id
      * @return Call<CptListObj>
@@ -78,9 +88,19 @@ public interface UrlService {
     /*
      * 获取书籍搜索结果
      * @param name String 书名
+     *        start int 结果开始位置
+     *        limit int 结果数量限制
      * @return Call<SearchResultObj> 搜索结果对象
      */
     @GET("/book/fuzzy-search")
     Call<SearchResultObj> getSearchResult(@Query("query") String query, @Query("start") int start, @Query("limit") int limit);
+
+    /*
+     * 获取模糊搜索结果
+     * @param name 关键字
+     * @return Call<FuzzySearchResultObj> 模糊搜索结果对象
+     */
+    @GET("/novelSearchApi")
+    Call<FuzzySearchResultObj> getFuzzySearchResult(@Query("name") String name);
 
 }

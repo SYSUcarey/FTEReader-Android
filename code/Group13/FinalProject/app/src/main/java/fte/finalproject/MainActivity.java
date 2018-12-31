@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RadioButton;
@@ -18,6 +19,10 @@ import fte.finalproject.Fragment.BookShelfFragment;
 import fte.finalproject.Fragment.CategoryFragment;
 import fte.finalproject.Fragment.RankingFragment;
 import fte.finalproject.Fragment.TabFragmentStatePagerAdapter;
+import fte.finalproject.obj.BookObj;
+import fte.finalproject.obj.FuzzySearchResultObj;
+import fte.finalproject.obj.SearchResultObj;
+import fte.finalproject.service.BookService;
 
 //总体界面，包含书架、排行榜、分类
 public class MainActivity extends AppCompatActivity {
@@ -42,6 +47,21 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                BookService bookService = BookService.getBookService();
+                FuzzySearchResultObj fuzzySearchResultObj = bookService.getFuzzySearchResult("盗墓笔记");
+                Log.d("code", String.valueOf(fuzzySearchResultObj.getCode()));
+                Log.d("msg", fuzzySearchResultObj.getMsg());
+                for (int i = 0; i < fuzzySearchResultObj.getData().length; i++) {
+                    Log.d("data", fuzzySearchResultObj.getData()[i]);
+                }
+            }
+        });
+
+        thread.start();
 
         //初始化控件
         radioGroup = findViewById(R.id.main_top_RG);

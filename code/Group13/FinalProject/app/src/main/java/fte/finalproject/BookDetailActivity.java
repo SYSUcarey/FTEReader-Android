@@ -59,21 +59,5 @@ public class BookDetailActivity extends AppCompatActivity {
 
             }
         });
-
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                BookService bookService = BookService.getBookService();
-                SearchResultObj searchResultObj = bookService.getSearchResultObj("一念", 0, 10);
-                Log.d("ok", String.valueOf(searchResultObj.isOk()));
-                Log.d("tag", String.valueOf(searchResultObj.getTotal()));
-                for (int i = 0; i < searchResultObj.getBookList().size(); i++) {
-                    Log.d("title", searchResultObj.getBookList().get(i).getTitle());
-                }
-            }
-        });
-
-        thread.start();
-
     }
 }
