@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/detail_topLL"
         android:orientation="vertical"
-        android:layout_margin="5dp">
+        android:layout_margin="10dp">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
@@ -60,106 +60,128 @@
 
         </android.support.constraint.ConstraintLayout>
 
-        <android.support.v7.widget.CardView
+
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/detail_CV"
+            android:layout_height="match_parent"
+            android:background="@drawable/card_edge"
             android:layout_marginTop="15dp"
             android:layout_marginBottom="15dp">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/detail_follower1"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:text="人数: "
+                android:textColor="@color/colorGrey"
+                android:textSize="12sp"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/detail_follower1"
-                    android:layout_alignParentLeft="true"
-                    android:layout_centerVertical="true"
-                    android:text="人数: "
-                    android:textColor="@color/colorGrey"
-                    android:textSize="12sp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/detail_follower2"
+                android:text="17万人+"
+                android:textSize="16sp"
+                android:textColor="@color/colorBlack"
+                android:layout_toRightOf="@id/detail_follower1"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="5dp"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/detail_follower2"
-                    android:text="17万人+"
-                    android:textSize="18sp"
-                    android:textColor="@color/colorBlack"
-                    android:layout_toRightOf="@id/detail_follower1"
-                    android:layout_centerVertical="true"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/detail_retentionRatio1"
+                android:layout_toLeftOf="@id/detail_retentionRatio2"
+                android:layout_centerVertical="true"
+                android:text="读者留存率: "
+                android:textColor="@color/colorGrey"
+                android:textSize="12sp"
+                android:layout_marginRight="5dp"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/detail_retentionRatio1"
-                    android:layout_toLeftOf="@id/detail_retentionRatio2"
-                    android:layout_centerVertical="true"
-                    android:text="读者留存率: "
-                    android:textColor="@color/colorGrey"
-                    android:textSize="12sp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/detail_retentionRatio2"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:text="52.68%"
+                android:textSize="16sp"
+                android:textColor="@color/colorBlack"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/detail_retentionRatio2"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:text="52.68%"
-                    android:textSize="18sp"
-                    android:textColor="@color/colorBlack"/>
+        </RelativeLayout>
 
-            </RelativeLayout>
 
-        </android.support.v7.widget.CardView>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/detail_longIntro"
             app:layout_constraintTop_toBottomOf="@+id/detail_CV"
-            android:textSize="10sp"
+            android:textSize="12sp"
+            android:layout_marginBottom="10dp"
             android:text="在破败中崛起，在寂灭中复苏。沧海成尘，雷电枯竭，那一缕幽雾又一次临近大地，世间的枷锁被打开了，一个全新的世界就此揭开神秘的一角……"/>
 
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@color/colorGrey"
+        app:layout_constraintTop_toBottomOf="@id/detail_topLL"
+        app:layout_constraintBottom_toTopOf="@id/detail_midRL"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/detail_midRL"
         app:layout_constraintTop_toBottomOf="@id/detail_topLL"
-        android:layout_margin="5dp">
+        android:layout_margin="10dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/detail_recomTitle"
-            android:text="同类推荐"/>
+            android:text="同类推荐"
+            android:textSize="18sp"
+            android:textColor="@color/colorBlack"
+            android:layout_marginTop="5dp"/>
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/detail_recomRL"
-            android:layout_below="@+id/detail_recomTitle">
+            android:layout_below="@+id/detail_recomTitle"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            android:layout_marginTop="10dp">
 
-            <ImageView
+            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/detail_recom1"/>
+                android:drawableTop="@mipmap/bookcover"
+                android:text="圣墟"
+                android:background="@null"
+                android:layout_weight="1"/>
 
-            <ImageView
+            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/detail_recom2"/>
+                android:drawableTop="@mipmap/bookcover"
+                android:text="圣墟"
+                android:background="@null"
+                android:layout_weight="1"/>
 
-            <ImageView
+            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/detail_recom3"/>
+                android:drawableTop="@mipmap/bookcover"
+                android:text="圣墟"
+                android:background="@null"
+                android:layout_weight="1"/>
 
-        </RelativeLayout>
+        </LinearLayout>
 
     </RelativeLayout>
 
@@ -178,7 +200,8 @@
             android:button="@null"
             android:gravity="center"
             android:text="加入书架"
-            android:textColor="@color/colorRed" />
+            android:textSize="16sp"
+            android:textColor="@color/colorRed"/>
 
         <RadioButton
             android:id="@+id/main_bottom_ranking"
@@ -189,6 +212,7 @@
             android:button="@null"
             android:gravity="center"
             android:text="免费阅读"
+            android:textSize="16sp"
             android:textColor="@color/colorWhite" />
 
         <RadioButton
@@ -199,6 +223,7 @@
             android:button="@null"
             android:gravity="center"
             android:text="全本缓存"
+            android:textSize="16sp"
             android:textColor="@color/colorRed" />
     </RadioGroup>
 
