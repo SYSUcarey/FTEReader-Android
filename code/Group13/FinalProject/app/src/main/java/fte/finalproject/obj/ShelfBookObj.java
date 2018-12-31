@@ -7,11 +7,13 @@ public class ShelfBookObj {
     private Bitmap icon;
     private String name;
     private String description;
+    private String author;
+    private String major;
     int type;
     private String address;
     private int readChapter;
 
-    public ShelfBookObj(String bookId, String name, Bitmap icon, int readChapter, String address,int type,String description) {
+    public ShelfBookObj(String bookId, String name, Bitmap icon, int readChapter, String address,int type,String description,String author, String major) {
         this.bookId = bookId;
         this.name = name;
         this.icon = icon;
@@ -19,6 +21,8 @@ public class ShelfBookObj {
         this.address = address;
         this.type = type;
         this.description = description;
+        this.author = author;
+        this.major = major;
     }
 
     public String getDescription() {
@@ -75,5 +79,21 @@ public class ShelfBookObj {
 
     public void setBookId(String bookId) {
         this.bookId = bookId;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getMajor() {
+        return major;
+    }
+
+    public void setMajor(String major) {
+        this.major = major;
     }
 }

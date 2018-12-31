@@ -2,6 +2,7 @@ package fte.finalproject.control;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -12,6 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import fte.finalproject.R;
 import fte.finalproject.obj.ShelfBookObj;
 
 public class DatabaseControl extends SQLiteOpenHelper {
@@ -28,6 +30,13 @@ public class DatabaseControl extends SQLiteOpenHelper {
         }
         return instance;
     }
+    private Resources getResources() {
+    //TODO Auto-generated method stub
+        Resources mResources = null;
+        mResources = getResources();
+        return mResources;
+    }
+
     //byte[] 转 Bitmap
     public Bitmap bytesToBitmap(byte[] b) {
         if (b.length != 0) {
@@ -58,13 +67,15 @@ public class DatabaseControl extends SQLiteOpenHelper {
         List<ShelfBookObj> list = new ArrayList<>();
         while (cursor.moveToNext()) {
             String id = cursor.getString(cursor.getColumnIndex("_id"));
+            String major = cursor.getString(cursor.getColumnIndex("major"));
+            String author = cursor.getString(cursor.getColumnIndex("author"));
             int readChapter = cursor.getInt(cursor.getColumnIndex("progress"));
             int type = cursor.getInt(cursor.getColumnIndex("type"));
             String name = cursor.getString(cursor.getColumnIndex("name"));
             String address = cursor.getString(cursor.getColumnIndex("address"));
             String description = cursor.getString(cursor.getColumnIndex("description"));
             byte[] imageByte = cursor.getBlob(cursor.getColumnIndex("image"));
-            list.add(new ShelfBookObj(id,name, bytesToBitmap(imageByte),readChapter,address,type,description));
+            list.add(new ShelfBookObj(id,name, bytesToBitmap(imageByte),readChapter,address,type,description,author,major));
         }
         cursor.close();
         db.close();
@@ -84,6 +95,8 @@ public class DatabaseControl extends SQLiteOpenHelper {
         values.put("description",book.getDescription());
         values.put("type",book.getType());
         values.put("_id",book.getBookId());
+        values.put("author",book.getAuthor());
+        values.put("major",book.getMajor());
         values.put("address",book.getAddress());
         values.put("progress",book.getReadChapter());
         values.put("image",bitmapToBytes(book.getIcon()));
@@ -139,13 +152,17 @@ public class DatabaseControl extends SQLiteOpenHelper {
         //书架上的书，含书名、类型（本地还是网络）、阅读进度、资源地址、书的封面
         String CREATE_TABLE1 = "CREATE TABLE if not exists "
                 + TABLE_NAME1
-                + " (_id TEXT PRIMARY KEY, name TEXT, type INTEGER ,progress INTEGER, address TEXT,image BLOB, description TEXT)";
+                + " (_id TEXT PRIMARY KEY, name TEXT, type INTEGER ,progress INTEGER, address TEXT,image BLOB, description TEXT, author TEXT, major TEXT)";
         //搜索历史
         String CREATE_TABLE2 = "CREATE TABLE if not exists "
                 + TABLE_NAME2
                 + " (_id INTEGER PRIMARY KEY, content TEXT)";
         sqLiteDatabase.execSQL(CREATE_TABLE1);
         sqLiteDatabase.execSQL(CREATE_TABLE2);
+        Resources res = getResources();
+        Bitmap bitmap = BitmapFactory.decodeResource(res, R.mipmap.bookcover);
+        addShelfBook(new ShelfBookObj("5816b415b06d1d32157790b1","圣墟",bitmap,0,"default",0,"在破败中崛起，在寂灭中复苏。沧海成尘，雷电枯竭，那一缕幽雾又一次临近大地，世间的枷锁被打开了，一个全新的世界就此揭开神秘的一角……","辰东","玄幻"));
+        addShelfBook(new ShelfBookObj("59ba0dbb017336e411085a4e","元尊",bitmap,0,"default",0,"《斗破苍穹》《武动乾坤》之后全新力作，朝堂太子踏上了荆棘重生之路…","天蚕土豆","玄幻"));
     }
 
     @Override

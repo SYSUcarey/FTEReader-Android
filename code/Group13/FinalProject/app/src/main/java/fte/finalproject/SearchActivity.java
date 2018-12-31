@@ -1,17 +1,23 @@
 package fte.finalproject;
 
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
+import fte.finalproject.myRecyclerview.MyRecyclerViewAdapter;
+import fte.finalproject.myRecyclerview.MyViewHolder;
 import fte.finalproject.obj.SearchResultObj;
 
 import static fte.finalproject.control.DatabaseControl.getInstance;
@@ -21,20 +27,27 @@ public class SearchActivity extends AppCompatActivity {
     private SearchView searchView;
     private ImageView deleteView;
     private ListView historyList;
+    private ListView fuzzyList;
     private RecyclerView resultList;
     private List<String> histories;
     private List<String> tempFuzzy;
     private List<SearchResultObj.book> results;
+    private MyRecyclerViewAdapter recyclerViewAdapter;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+        //初始化列表
+        histories = new ArrayList<>();
+        tempFuzzy = new ArrayList<>();
+        results = new ArrayList<>();
         //获取控件
         searchView = findViewById(R.id.search_search_searchView);
         deleteView = findViewById(R.id.search_delete_image);
         historyList = findViewById(R.id.search_history_list);
+        fuzzyList = findViewById(R.id.search_fuzzy_list);
         resultList = findViewById(R.id.search_result_list);
         TextView text1 = findViewById(R.id.search_pop_text1);
         TextView text2 = findViewById(R.id.search_pop_text2);
@@ -92,8 +105,30 @@ public class SearchActivity extends AppCompatActivity {
         //设置搜索函数
 
         //设置历史列表adapter
-
+        ArrayAdapter<String> historyAdapter = new ArrayAdapter<>(this,R.layout.item_listview,histories);
+        historyList.setAdapter(historyAdapter);
         //设置结果列表adapter
+        recyclerViewAdapter = new MyRecyclerViewAdapter<SearchResultObj.book>(SearchActivity.this,R.layout.item_searchresult,results) {
+            @Override
+            public void convert(MyViewHolder holder, SearchResultObj.book o) {
 
+            }
+        };
+        recyclerViewAdapter.setOnItemClickListener(new MyRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int position) {
+
+            }
+
+            @Override
+            public void onLongClick(int position) {
+
+            }
+        });
+        resultList.setAdapter(recyclerViewAdapter);
+        resultList.setLayoutManager(new LinearLayoutManager(this));
+        //设置模糊关联列表adapter
+        ArrayAdapter<String> fuzzyAdapter = new ArrayAdapter<>(this,R.layout.item_listview,tempFuzzy);
+        fuzzyList.setAdapter(fuzzyAdapter);
     }
 }
