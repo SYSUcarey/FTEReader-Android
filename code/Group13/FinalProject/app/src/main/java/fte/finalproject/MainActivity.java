@@ -1,5 +1,8 @@
 package fte.finalproject;
 
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -22,7 +25,10 @@ import fte.finalproject.Fragment.TabFragmentStatePagerAdapter;
 import fte.finalproject.obj.BookObj;
 import fte.finalproject.obj.FuzzySearchResultObj;
 import fte.finalproject.obj.SearchResultObj;
+import fte.finalproject.obj.ShelfBookObj;
 import fte.finalproject.service.BookService;
+
+import static fte.finalproject.control.DatabaseControl.getInstance;
 
 //总体界面，包含书架、排行榜、分类
 public class MainActivity extends AppCompatActivity {
