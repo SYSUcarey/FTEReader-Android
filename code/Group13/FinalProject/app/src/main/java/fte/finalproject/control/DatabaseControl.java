@@ -86,7 +86,7 @@ public class DatabaseControl extends SQLiteOpenHelper {
         values.put("_id",book.getBookId());
         values.put("address",book.getAddress());
         values.put("progress",book.getReadChapter());
-        values.put("price",bitmapToBytes(book.getIcon()));
+        values.put("image",bitmapToBytes(book.getIcon()));
         db.insert(TABLE_NAME1,null,values);
         db.close();
     }
@@ -115,7 +115,7 @@ public class DatabaseControl extends SQLiteOpenHelper {
         if (getHistoryCount() > 9){
             Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME2, null);
             String name = cursor.getString(cursor.getColumnIndex("name"));
-            db.delete(TABLE_NAME2, "content=?", new String[] {  });
+            db.delete(TABLE_NAME2, "content=?", new String[] {name});
         }
         ContentValues cv = new ContentValues();
         cv.put("content", s);
