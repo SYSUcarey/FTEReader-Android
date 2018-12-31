@@ -45,7 +45,7 @@
                 android:textColor="@color/colorGrey"
                 app:layout_constraintLeft_toLeftOf="@id/detail_bookTitle"
                 app:layout_constraintTop_toBottomOf="@id/detail_bookTitle"
-                app:layout_constraintBottom_toTopOf="@id/detail_update"/>
+                app:layout_constraintBottom_toTopOf="@+id/detail_update"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -94,7 +94,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/detail_retentionRatio1"
-                android:layout_toLeftOf="@id/detail_retentionRatio2"
+                android:layout_toLeftOf="@+id/detail_retentionRatio2"
                 android:layout_centerVertical="true"
                 android:text="读者留存率: "
                 android:textColor="@color/colorGrey"
@@ -131,7 +131,7 @@
         android:layout_height="5dp"
         android:background="@color/colorGrey"
         app:layout_constraintTop_toBottomOf="@id/detail_topLL"
-        app:layout_constraintBottom_toTopOf="@id/detail_midRL"/>
+        app:layout_constraintBottom_toTopOf="@+id/detail_midRL"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -154,7 +154,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/detail_more"
             android:layout_alignParentRight="true"
-            android:layout_above="@id/detail_recomRL"
+            android:layout_above="@+id/detail_recomRL"
             android:background="@null"
             android:text="更多"
             android:textSize="11sp"

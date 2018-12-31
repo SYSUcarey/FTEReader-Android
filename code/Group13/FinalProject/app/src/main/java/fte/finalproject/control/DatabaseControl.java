@@ -42,7 +42,7 @@ public class DatabaseControl extends SQLiteOpenHelper {
         bm.compress(Bitmap.CompressFormat.PNG, 100, baos);
         return baos.toByteArray();
     }
-    //这个list用于保存所有英雄信息
+    //这个list用于保存所有书架书籍信息
     private List<ShelfBookObj> allShelfBook = null;
     public List<ShelfBookObj> getAllShelfBook() {
         if (allShelfBook == null) {
@@ -63,7 +63,7 @@ public class DatabaseControl extends SQLiteOpenHelper {
             String name = cursor.getString(cursor.getColumnIndex("name"));
             String address = cursor.getString(cursor.getColumnIndex("address"));
             String description = cursor.getString(cursor.getColumnIndex("description"));
-            byte[] imageByte = cursor.getBlob(cursor.getColumnIndex("hero_icon"));
+            byte[] imageByte = cursor.getBlob(cursor.getColumnIndex("image"));
             list.add(new ShelfBookObj(id,name, bytesToBitmap(imageByte),readChapter,address,type,description));
         }
         cursor.close();
@@ -79,7 +79,7 @@ public class DatabaseControl extends SQLiteOpenHelper {
     public void addShelfBook(ShelfBookObj book) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
-        //开始添加第一条数据_id INTEGER PRIMARY KEY, name TEXT, type INTEGER ,progress INTEGER, address TEXT,image BLOB, description TEXT
+        //开始添加第一条数据_id TEXT PRIMARY KEY, name TEXT, type INTEGER ,progress INTEGER, address TEXT,image BLOB, description TEXT
         values.put("name",book.getName());
         values.put("description",book.getDescription());
         values.put("type",book.getType());
@@ -101,7 +101,7 @@ public class DatabaseControl extends SQLiteOpenHelper {
     }
 
     //更新阅读进度
-    public void updateLamp(int progress, int id) {
+    public void updateProgress(int progress, int id) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues value = new ContentValues();
         value.put("progress", progress);
@@ -139,7 +139,7 @@ public class DatabaseControl extends SQLiteOpenHelper {
         //书架上的书，含书名、类型（本地还是网络）、阅读进度、资源地址、书的封面
         String CREATE_TABLE1 = "CREATE TABLE if not exists "
                 + TABLE_NAME1
-                + " (_id INTEGER PRIMARY KEY, name TEXT, type INTEGER ,progress INTEGER, address TEXT,image BLOB, description TEXT)";
+                + " (_id TEXT PRIMARY KEY, name TEXT, type INTEGER ,progress INTEGER, address TEXT,image BLOB, description TEXT)";
         //搜索历史
         String CREATE_TABLE2 = "CREATE TABLE if not exists "
                 + TABLE_NAME2
