@@ -19,6 +19,14 @@ public class DatabaseControl extends SQLiteOpenHelper {
     private static final String TABLE_NAME2 = "categorybook_table";
     private static final int DB_VERSION = 1;
 
+
+    private static DatabaseControl instance = null;
+    public static DatabaseControl getInstance(Context context) {
+        if (instance == null) {
+            instance = new DatabaseControl(context);
+        }
+        return instance;
+    }
     //byte[] 转 Bitmap
     public Bitmap bytesToBimap(byte[] b) {
         if (b.length != 0) {
@@ -48,8 +56,9 @@ public class DatabaseControl extends SQLiteOpenHelper {
             int type = cursor.getInt(cursor.getColumnIndex("type"));
             String name = cursor.getString(cursor.getColumnIndex("name"));
             String address = cursor.getString(cursor.getColumnIndex("address"));
+            String description = cursor.getString(cursor.getColumnIndex("description"));
             byte[] imageByte = cursor.getBlob(cursor.getColumnIndex("hero_icon"));
-            list.add(new ShelfBookObj(id,name,bytesToBimap(imageByte),readChapter,address,type));
+            list.add(new ShelfBookObj(id,name,bytesToBimap(imageByte),readChapter,address,type,description));
         }
         cursor.close();
         db.close();
@@ -88,6 +97,12 @@ public class DatabaseControl extends SQLiteOpenHelper {
         db.close();
     }
 
+    //删除搜索历史
+    public void deleteHistory() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("DELETE FROM " + TABLE_NAME2);
+    }
+
 
     public DatabaseControl(Context context) {
         super(context, DB_NAME, null, DB_VERSION );
@@ -98,7 +113,7 @@ public class DatabaseControl extends SQLiteOpenHelper {
         //书架上的书，含书名、类型（本地还是网络）、阅读进度、资源地址、书的封面
         String CREATE_TABLE1 = "CREATE TABLE if not exists "
                 + TABLE_NAME1
-                + " (_id INTEGER PRIMARY KEY, name TEXT, type INTEGER ,progress INTEGER, address TEXT,image BLOB)";
+                + " (_id INTEGER PRIMARY KEY, name TEXT, type INTEGER ,progress INTEGER, address TEXT,image BLOB, description TEXT)";
         //搜索历史
         String CREATE_TABLE2 = "CREATE TABLE if not exists "
                 + TABLE_NAME2

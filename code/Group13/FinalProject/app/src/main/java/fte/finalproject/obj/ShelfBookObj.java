@@ -6,17 +6,27 @@ public class ShelfBookObj {
     int bookId;
     private Bitmap icon;
     private String name;
+    private String description;
     int type;
     private String address;
     private int readChapter;
 
-    public ShelfBookObj(int bookId, String name, Bitmap icon, int readChapter, String address,int type) {
+    public ShelfBookObj(int bookId, String name, Bitmap icon, int readChapter, String address,int type,String description) {
         this.bookId = bookId;
         this.name = name;
         this.icon = icon;
         this.readChapter = readChapter;
         this.address = address;
         this.type = type;
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getName() {
