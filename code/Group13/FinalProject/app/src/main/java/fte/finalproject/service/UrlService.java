@@ -1,5 +1,7 @@
 package fte.finalproject.service;
 
+import android.graphics.Bitmap;
+
 import fte.finalproject.obj.AllRankingObj;
 import fte.finalproject.obj.BookObj;
 import fte.finalproject.obj.CategoryObj;

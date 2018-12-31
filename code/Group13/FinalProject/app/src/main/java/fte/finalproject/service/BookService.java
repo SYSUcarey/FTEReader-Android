@@ -1,5 +1,6 @@
 package fte.finalproject.service;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import java.io.IOException;
@@ -291,5 +292,4 @@ public class BookService {
         }
         return fuzzySearchResultObj;
     }
-
 }
