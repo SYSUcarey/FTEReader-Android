@@ -1,5 +1,6 @@
 package fte.finalproject;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -7,6 +8,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 
+import java.util.List;
+
+import fte.finalproject.obj.ChapterLinkObj;
+import fte.finalproject.obj.ChapterLinks;
+import fte.finalproject.obj.CptListObj;
 import fte.finalproject.obj.SearchResultObj;
 import fte.finalproject.service.BookService;
 
@@ -16,6 +22,10 @@ public class BookDetailActivity extends AppCompatActivity {
     RadioButton readButton;
     RadioButton downloadButton;
     Button moreButton;
+
+    private String bookid;
+
+    private ChapterLinks linkList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +37,15 @@ public class BookDetailActivity extends AppCompatActivity {
         readButton = findViewById(R.id.detail_bottom_read);
         downloadButton = findViewById(R.id.detail_bottom_download);
         moreButton = findViewById(R.id.detail_more);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                BookService bookService = BookService.getBookService();
+                CptListObj cptListObj = bookService.getChaptersByBookId(bookid);
+                linkList = cptListObj.getImixToc().getChapterLinks();
+            }
+        }).start();
 
         // 加入书架
         addButton.setOnClickListener(new View.OnClickListener() {
@@ -40,7 +59,11 @@ public class BookDetailActivity extends AppCompatActivity {
         readButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(BookDetailActivity.this, ReadPageActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("links", linkList);
+                intent.putExtras(bundle);
+                startActivity(intent);
             }
         });
 

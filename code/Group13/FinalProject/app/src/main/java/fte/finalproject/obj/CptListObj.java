@@ -1,5 +1,8 @@
 package fte.finalproject.obj;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -35,7 +38,7 @@ public class CptListObj {
         private int chaptersCount;
         // 章节列表
         @SerializedName("chapters")
-        public List<Chapter> chapters;
+        public ChapterLinks chapterLinks;
         // 更新时间
         @SerializedName("updated")
         private String updated;
@@ -52,38 +55,12 @@ public class CptListObj {
             return chaptersCount;
         }
 
-        public List<Chapter> getChapterObjs() {
-            return chapters;
+        public ChapterLinks getChapterLinks() {
+            return chapterLinks;
         }
 
         public String getUpdated() {
             return updated;
-        }
-
-        public class Chapter {
-            // 章节链接
-            @SerializedName("link")
-            private String link;
-
-            // 章节标题
-            @SerializedName("title")
-            private String title;
-
-            // 是否不可读
-            @SerializedName("unreadable")
-            private boolean unreadable;
-
-            public String getLink() {
-                return link;
-            }
-
-            public String getTitle() {
-                return title;
-            }
-
-            public boolean isUnreadable() {
-                return unreadable;
-            }
         }
 
     }
