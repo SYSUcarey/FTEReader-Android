@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +19,7 @@ import java.util.List;
 
 import fte.finalproject.R;
 import fte.finalproject.ReadPageActivity;
+import fte.finalproject.control.DatabaseControl;
 import fte.finalproject.myRecyclerview.MyRecyclerViewAdapter;
 import fte.finalproject.myRecyclerview.MyViewHolder;
 import fte.finalproject.obj.ShelfBookObj;
@@ -58,13 +60,18 @@ public class BookShelfFragment extends Fragment {
 
     // 获取书籍数据
     private void getMyBooks() {
-        myBooks = new ArrayList<>();
+
         Bitmap bitmap = ((BitmapDrawable)getResources().getDrawable(R.mipmap.bookcover)).getBitmap();
-        for(int i = 0; i < 10; i++) {
+        ShelfBookObj test = new ShelfBookObj("5816b415b06d1d32157790b1", "圣墟", bitmap, 0, "testAddress", 0, "testDescription");
+        DatabaseControl.getInstance(getActivity()).addShelfBook(test);
+        myBooks = DatabaseControl.getInstance(getActivity()).getAllShelfBook();
+
+        /*for(int i = 0; i < 10; i++) {
             ShelfBookObj s = new ShelfBookObj(0, "圣墟", bitmap, 0, "df", 0, " ");
             myBooks.add(s);
-        }
+        }*/
         System.out.println("getBookSize: " + myBooks.size());
+        //DatabaseControl.getInstance(getActivity()).
     }
 
     // 设置页面的 RecyclerView
