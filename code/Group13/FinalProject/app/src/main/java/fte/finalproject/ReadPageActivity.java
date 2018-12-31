@@ -1,6 +1,10 @@
 package fte.finalproject;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -10,6 +14,7 @@ import android.util.Log;
 import android.view.DisplayCutout;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -19,14 +24,20 @@ import java.util.List;
 
 import fte.finalproject.Fragment.ReadPageFragment;
 import fte.finalproject.Fragment.TabFragmentStatePagerAdapter;
+import fte.finalproject.obj.ChapterLinkObj;
+import fte.finalproject.obj.ChapterLinks;
 import fte.finalproject.obj.CptListObj;
+import fte.finalproject.service.BookService;
 
 
 public class ReadPageActivity extends AppCompatActivity {
     private List<Fragment> fragmentList = new ArrayList<>();        //存储所有页面Fragment
     private TabFragmentStatePagerAdapter fragmentAdapter;
     private ViewPager viewPager;
-    private CptListObj chatperList;            //章节列表
+
+    private String bookid;                      // 书籍id
+    private CptListObj cptListObj;            //章节列表
+    ChapterLinks chapterLinks;
     private int currChapter;                   //当前阅读到的章节
     private int currPage;                      //当前阅读到的页面(对一个章节而言)[0, currTotalPage - 1]
     private int currTotalPage;                 //当前章节总页数
@@ -37,6 +48,7 @@ public class ReadPageActivity extends AppCompatActivity {
     private RadioButton setting_rb_control;
     private RadioButton download_rb_control;
     private RadioButton catalog_rb_control;
+    private ProgressBar progressBar;
 
     float SCREEN_HEIGHT;
     float SCREEN_WIDTH;
@@ -48,7 +60,11 @@ public class ReadPageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_read_page);
         //从传递的参数中获取章节相关信息
-        //todo
+        Intent intent = this.getIntent();
+        Bundle bundle = intent.getExtras();
+        bookid = bundle.getString("bookid");
+        System.out.println(bookid);
+
 
         // 获取页面控件
         init_page_control();
@@ -59,31 +75,75 @@ public class ReadPageActivity extends AppCompatActivity {
         // 设置功能按键
         set_functional_button();
 
-        //初始化Fragment
+        //初始化 Fragment
         init_fragment();
     }
 
+
     private void init_fragment() {
-        //需要获取到:章节总页数totalPage、章节title、每页的内容content
-        //todo
-        int totalPage = 10;
-        String title = "todo";
-        String content = "todo";
-        for (int i = 0; i < totalPage; ++i) {
-            ReadPageFragment fragment = new ReadPageFragment();
-            Bundle bundle = new Bundle();
-            bundle.putString("title", title);
-            bundle.putString("content", content);
-            bundle.putInt("totalPage", totalPage);
-            fragment.setArguments(bundle);
-            fragmentList.add(fragment);
-            fragmentAdapter = new TabFragmentStatePagerAdapter(getSupportFragmentManager(), fragmentList);
-            viewPager.setOnPageChangeListener(new MyPagerChangeListener());
-            viewPager.setAdapter(fragmentAdapter);
-            viewPager.setCurrentItem(0);
-            viewPager.setOffscreenPageLimit(totalPage - 1);
+        // 判断是否联网了
+        Boolean isNetworkConnected = isNetWorkConnected(this);
+        // 未联网的响应处理
+        if(!isNetworkConnected) {
+            // 弹出Toast提示
+            Toast.makeText(ReadPageActivity.this, "网络连接状况：未连接", Toast.LENGTH_SHORT).show();
+            // ProgressBar等待框消失
+            progressBar.setVisibility(View.GONE);
         }
+        // 已经联网，获取书籍信息进行阅读
+        else {
+            //获取到:章节总页数totalPage、章节title、每页的内容content
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    /*cptListObj = BookService.getBookService().getChaptersByBookId(bookid);
+                    chapterLinks = cptListObj.getImixToc().getChapterLinks();
+                    for(int i = 0; i < cptListObj.getImixToc().getChaptersCount(); i++) {
+                        System.out.println(chapterLinks.getChapterLinkList().get(i).getTitle());
+                    }*/
+
+                    //todo
+                    // 根据内容适配各帧
+
+                    int totalPage = 10;
+                    String title = "todo";
+                    String content = "todo";
+                    for (int i = 0; i < totalPage; ++i) {
+                        ReadPageFragment fragment = new ReadPageFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putString("title", title);
+                        bundle.putString("content", content);
+                        bundle.putInt("totalPage", totalPage);
+                        fragment.setArguments(bundle);
+                        fragmentList.add(fragment);
+                        fragmentAdapter = new TabFragmentStatePagerAdapter(getSupportFragmentManager(), fragmentList);
+                        viewPager.setOnPageChangeListener(new MyPagerChangeListener());
+                        viewPager.setAdapter(fragmentAdapter);
+                        viewPager.setCurrentItem(0);
+                        viewPager.setOffscreenPageLimit(totalPage - 1);
+                    }
+
+                    // 适配完毕，取消ProgressBar, 隐藏功能按键
+                    progressBar.setVisibility(View.GONE);
+                    rg_control.setVisibility(View.GONE);
+                }
+            }).start();
+
+        }
+
+
+        // 获取书本的章节信息：
+        /*Thread get_chapter_thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                chatperList = BookService.getBookService().getChaptersByBookId("5816b415b06d1d32157790b1");
+            }
+        });
+        get_chapter_thread.start();*/
+
+
     }
+
 
     private void get_screen_info() {
         DisplayMetrics dm = getResources().getDisplayMetrics();
@@ -188,6 +248,7 @@ public class ReadPageActivity extends AppCompatActivity {
         download_rb_control = findViewById(R.id.read_page_download_rb);
         catalog_rb_control = findViewById(R.id.read_page_catalog_rb);
         viewPager = findViewById(R.id.read_page_viewPager);
+        progressBar = findViewById(R.id.read_page_progressbar);
     }
 
     //设置一个ViewPager的监听事件，左右滑动ViewPager时进行处理
@@ -240,5 +301,19 @@ public class ReadPageActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+
+    // 辅助函数：判断网络是否连接
+    public boolean isNetWorkConnected(Context context) {
+        if (context != null) {
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) context
+                    .getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
+            if (mNetworkInfo != null) {
+                return mNetworkInfo.isConnected();
+            }
+        }
+        return false;
     }
 }

@@ -60,18 +60,11 @@ public class BookShelfFragment extends Fragment {
 
     // 获取书籍数据
     private void getMyBooks() {
-
         Bitmap bitmap = ((BitmapDrawable)getResources().getDrawable(R.mipmap.bookcover)).getBitmap();
-        ShelfBookObj test = new ShelfBookObj("5816b415b06d1d32157790b1", "圣墟", bitmap, 0, "testAddress", 0, "testDescription");
-        DatabaseControl.getInstance(getActivity()).addShelfBook(test);
+        /*ShelfBookObj test = new ShelfBookObj("5816b415b06d1d32157790b1", "圣墟", bitmap, 0, "testAddress", 0, "testDescription");
+        DatabaseControl.getInstance(getActivity()).addShelfBook(test);*/
         myBooks = DatabaseControl.getInstance(getActivity()).getAllShelfBook();
-
-        /*for(int i = 0; i < 10; i++) {
-            ShelfBookObj s = new ShelfBookObj(0, "圣墟", bitmap, 0, "df", 0, " ");
-            myBooks.add(s);
-        }*/
-        System.out.println("getBookSize: " + myBooks.size());
-        //DatabaseControl.getInstance(getActivity()).
+        //System.out.println("getBookSize: " + myBooks.size());
     }
 
     // 设置页面的 RecyclerView
@@ -95,6 +88,7 @@ public class BookShelfFragment extends Fragment {
             public void onClick(int position) {
                 Intent intent = new Intent(getActivity(), ReadPageActivity.class);
                 Bundle bundle = new Bundle();
+                bundle.putString("bookid", myBooks.get(position).getBookId());
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
