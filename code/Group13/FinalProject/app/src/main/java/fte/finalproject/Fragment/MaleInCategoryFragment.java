@@ -6,10 +6,12 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -128,16 +130,15 @@ public class MaleInCategoryFragment extends Fragment {
                             @Override
                             public void run() {
                                 classificationObj2 = bookService.getClassification2();
+                                Looper.prepare();
+                                if(classificationObj2 == null) {
+                                    Toast.makeText(getActivity(), "还是获取失败啊啊啊啊", Toast.LENGTH_SHORT).show();
+                                }
+                                Looper.loop();
                             }
                         });
-                        if(classificationObj2 == null) {
-                            Toast.makeText(getActivity(), "获取失败", Toast.LENGTH_SHORT).show();
-                        }
-                        else {
-                            for (int i = 0; i < classificationObj2.getMaleList().size(); i++) {
-                                System.out.println(classificationObj2.getMaleList().get(i).getMajor());
-                            }
-                        }
+                        thread.start();
+
                     }
                     // 无网络
                     else {
@@ -164,19 +165,37 @@ public class MaleInCategoryFragment extends Fragment {
                     }
                     // 获取数据成功
                     else {
+                        //Toast.makeText(getActivity(), major + "二级分类框弹出", Toast.LENGTH_SHORT).show();
                         // 弹出一个二级分类框
                         Dialog dialog = new Dialog(getActivity());
                         dialog.setContentView(R.layout.dialog_category);
                         // 二级分类RecyclerView
                         RecyclerView dialog_recyclerview = dialog.findViewById(R.id.dialog_category_recyclerview);
+                        // 二级分类数据初始化
                         List<CategoryRecyObj> dialog_categories = new ArrayList<>();
+                        for(int i = 0; i < mins.length; i++)
+                            dialog_categories.add(new CategoryRecyObj(mins[i], ""));
+
+                        // 设置 Adapter
                         MyRecyclerViewAdapter<CategoryRecyObj> dialog_adapter = new MyRecyclerViewAdapter<CategoryRecyObj>(getActivity(), R.layout.item_category, dialog_categories) {
                             @Override
                             public void convert(MyViewHolder holder, CategoryRecyObj categoryRecyObj) {
-
+                                TextView categoryName = holder.getView(R.id.item_category_name);
+                                categoryName.setText(categoryRecyObj.getCategoryName());
+                                TextView categoryBookCount = holder.getView(R.id.item_category_count);
+                                categoryBookCount.setVisibility(View.GONE);
                             }
                         };
+                        // 适配 Adapter
+                        dialog_recyclerview.setAdapter(dialog_adapter);
+                        // 设置 RecyclerView 布局
+                        dialog_recyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+                        // 设置 dialog 属性并显示
+                        dialog.setCancelable(true);
+                        dialog.show();
                     }
+
 
 
                 }
@@ -204,14 +223,11 @@ public class MaleInCategoryFragment extends Fragment {
                 @Override
                 public void run() {
                     classificationObj2 = bookService.getClassification2();
+                    Looper.prepare();
                     if(classificationObj2 == null) {
                         Toast.makeText(getActivity(), "获取失败", Toast.LENGTH_SHORT).show();
                     }
-                    else {
-                        for (int i = 0; i < classificationObj2.getMaleList().size(); i++) {
-                            System.out.println(classificationObj2.getMaleList().get(i).getMajor());
-                        }
-                    }
+                    Looper.loop();
                 }
             });
             thread.start();
