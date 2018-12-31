@@ -8,6 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,8 @@ public class RankingFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle bundle = getArguments();
+        this.isMale = bundle.getBoolean("isMale");
     }
 
     @Override
@@ -37,6 +41,9 @@ public class RankingFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_ranking, null);
         recyclerView = view.findViewById(R.id.ranking_recycler);
+        TextView textView = view.findViewById(R.id.test);
+        if (isMale) textView.setText("男生");
+        else textView.setText("女生");
         return view;
     }
 }

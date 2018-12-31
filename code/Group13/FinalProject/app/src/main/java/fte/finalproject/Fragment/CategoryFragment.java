@@ -12,7 +12,6 @@ import android.widget.RadioGroup;
 import java.util.ArrayList;
 import java.util.List;
 
-import fte.finalproject.MainActivity;
 import fte.finalproject.R;
 
 //分类的界面
@@ -36,6 +35,7 @@ public class CategoryFragment extends Fragment {
         femaleRB = view.findViewById(R.id.category_RB_female);
 
         //初始化Fragment
+        fragmentList.clear();
         MaleInCategoryFragment maleFragment = new MaleInCategoryFragment();
         MaleInCategoryFragment femaleFragment = new MaleInCategoryFragment();
         Bundle bundle1 = new Bundle();
@@ -44,7 +44,7 @@ public class CategoryFragment extends Fragment {
         fragmentList.add(maleFragment);
         Bundle bundle2 = new Bundle();
         bundle2.putBoolean("isMale", false);
-        maleFragment.setArguments(bundle2);
+        femaleFragment.setArguments(bundle2);
         fragmentList.add(femaleFragment);
 
         viewPager.setOnPageChangeListener(new MyPagerChangeListener());

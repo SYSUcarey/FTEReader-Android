@@ -17,7 +17,7 @@ import java.util.List;
 import fte.finalproject.Fragment.BookShelfFragment;
 import fte.finalproject.Fragment.CategoryFragment;
 import fte.finalproject.Fragment.RankingFragment;
-import fte.finalproject.Fragment.TabFragmentPagerAdapter;
+import fte.finalproject.Fragment.TabFragmentStatePagerAdapter;
 
 //总体界面，包含书架、排行榜、分类
 public class MainActivity extends AppCompatActivity {
@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ViewPager viewPager;
     private List<Fragment> fragmentList = new ArrayList<>();
-    private TabFragmentPagerAdapter fragmentPagerAdapter;
+    private TabFragmentStatePagerAdapter fragmentPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,13 +58,16 @@ public class MainActivity extends AppCompatActivity {
         //初始化Fragment
         BookShelfFragment bookShelfFragment = new BookShelfFragment();
         RankingFragment rankingFragment = new RankingFragment();
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("isMale", true);
+        rankingFragment.setArguments(bundle);
         CategoryFragment categoryFragment = new CategoryFragment();
         fragmentList.add(bookShelfFragment);
         fragmentList.add(rankingFragment);
         fragmentList.add(categoryFragment);
 
         viewPager.setOnPageChangeListener(new MyPagerChangeListener());
-        fragmentPagerAdapter = new TabFragmentPagerAdapter(getSupportFragmentManager(), fragmentList);
+        fragmentPagerAdapter = new TabFragmentStatePagerAdapter(getSupportFragmentManager(), fragmentList);
         viewPager.setAdapter(fragmentPagerAdapter);
         viewPager.setCurrentItem(0);
         viewPager.setOffscreenPageLimit(2);
@@ -100,6 +103,12 @@ public class MainActivity extends AppCompatActivity {
                         drawable = getResources().getDrawable(R.mipmap.female_black);
                         drawable.setBounds(0, 0, 70, 70);
                         femaleRB.setCompoundDrawables(null, drawable, null, null);
+                        RankingFragment rankingFragment1 = new RankingFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putBoolean("isMale", true);
+                        rankingFragment1.setArguments(bundle);
+                        fragmentList.set(1, rankingFragment1);
+                        fragmentPagerAdapter.refresh(fragmentList);
                         break;
                     case R.id.main_top_female:
                         drawable = getResources().getDrawable(R.mipmap.male_black);
@@ -108,6 +117,12 @@ public class MainActivity extends AppCompatActivity {
                         drawable = getResources().getDrawable(R.mipmap.female_red);
                         drawable.setBounds(0, 0, 70, 70);
                         femaleRB.setCompoundDrawables(null, drawable, null, null);
+                        RankingFragment rankingFragment2 = new RankingFragment();
+                        bundle = new Bundle();
+                        bundle.putBoolean("isMale", false);
+                        rankingFragment2.setArguments(bundle);
+                        fragmentList.set(1, rankingFragment2);
+                        fragmentPagerAdapter.refresh(fragmentList);
                         break;
                 }
             }
