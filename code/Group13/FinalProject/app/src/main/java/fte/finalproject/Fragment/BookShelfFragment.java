@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,7 +62,7 @@ public class BookShelfFragment extends Fragment {
 
     // 获取书籍数据
     private void getMyBooks() {
-        Bitmap bitmap = ((BitmapDrawable)getResources().getDrawable(R.mipmap.bookcover)).getBitmap();
+        //Bitmap bitmap = ((BitmapDrawable)getResources().getDrawable(R.mipmap.bookcover)).getBitmap();
         /*ShelfBookObj test = new ShelfBookObj("5816b415b06d1d32157790b1", "圣墟", bitmap, 0, "testAddress", 0, "testDescription");
         DatabaseControl.getInstance(getActivity()).addShelfBook(test);*/
         myBooks = DatabaseControl.getInstance(getActivity()).getAllShelfBook();
@@ -79,8 +81,21 @@ public class BookShelfFragment extends Fragment {
         adapter = new MyRecyclerViewAdapter<ShelfBookObj>(getActivity(), R.layout.item_book, myBooks) {
             @Override
             public void convert(MyViewHolder holder, ShelfBookObj shelfBookObj) {
+                // 书名
                 TextView bookName = holder.getView(R.id.item_book_name);
                 bookName.setText(shelfBookObj.getName());
+                // 封面
+                ImageView imageView = holder.getView(R.id.item_book_cover);
+                imageView.setImageBitmap(shelfBookObj.getIcon());
+                // 作者
+                TextView author = holder.getView(R.id.item_book_author);
+                author.setText(shelfBookObj.getAuthor());
+                // 类型
+                TextView major = holder.getView(R.id.item_book_type);
+                major.setText(shelfBookObj.getMajor());
+                // 简介
+                TextView intro = holder.getView(R.id.item_book_intro);
+                intro.setText(shelfBookObj.getDescription());
             }
         };
         adapter.setOnItemClickListener(new MyRecyclerViewAdapter.OnItemClickListener() {
@@ -100,6 +115,4 @@ public class BookShelfFragment extends Fragment {
         });
         recyclerView.setAdapter(adapter);
     }
-
-
 }

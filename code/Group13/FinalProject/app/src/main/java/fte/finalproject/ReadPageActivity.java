@@ -37,7 +37,7 @@ public class ReadPageActivity extends AppCompatActivity {
 
     private String bookid;                      // 书籍id
     private CptListObj cptListObj;            //章节列表
-    ChapterLinks chapterLinks;
+    List<ChapterLinkObj> chapterLinks;
     private int currChapter;                   //当前阅读到的章节
     private int currPage;                      //当前阅读到的页面(对一个章节而言)[0, currTotalPage - 1]
     private int currTotalPage;                 //当前章节总页数
@@ -96,38 +96,37 @@ public class ReadPageActivity extends AppCompatActivity {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    /*cptListObj = BookService.getBookService().getChaptersByBookId(bookid);
+                    cptListObj = BookService.getBookService().getChaptersByBookId(bookid);
                     chapterLinks = cptListObj.getImixToc().getChapterLinks();
-                    for(int i = 0; i < cptListObj.getImixToc().getChaptersCount(); i++) {
-                        System.out.println(chapterLinks.getChapterLinkList().get(i).getTitle());
-                    }*/
-
-                    //todo
-                    // 根据内容适配各帧
-
-                    int totalPage = 10;
-                    String title = "todo";
-                    String content = "todo";
-                    for (int i = 0; i < totalPage; ++i) {
-                        ReadPageFragment fragment = new ReadPageFragment();
-                        Bundle bundle = new Bundle();
-                        bundle.putString("title", title);
-                        bundle.putString("content", content);
-                        bundle.putInt("totalPage", totalPage);
-                        fragment.setArguments(bundle);
-                        fragmentList.add(fragment);
-                        fragmentAdapter = new TabFragmentStatePagerAdapter(getSupportFragmentManager(), fragmentList);
-                        viewPager.setOnPageChangeListener(new MyPagerChangeListener());
-                        viewPager.setAdapter(fragmentAdapter);
-                        viewPager.setCurrentItem(0);
-                        viewPager.setOffscreenPageLimit(totalPage - 1);
+                    for(int i = 0; i < chapterLinks.size(); i++) {
+                        System.out.println(chapterLinks.get(i).getTitle());
                     }
-
-                    // 适配完毕，取消ProgressBar, 隐藏功能按键
-                    progressBar.setVisibility(View.GONE);
-                    rg_control.setVisibility(View.GONE);
                 }
             }).start();
+
+            // 根据内容适配各帧
+            //todo
+            int totalPage = 10;
+            String title = "todo";
+            String content = "todo";
+            for (int i = 0; i < totalPage; ++i) {
+                ReadPageFragment fragment = new ReadPageFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("title", title);
+                bundle.putString("content", content);
+                bundle.putInt("totalPage", totalPage);
+                fragment.setArguments(bundle);
+                fragmentList.add(fragment);
+                fragmentAdapter = new TabFragmentStatePagerAdapter(getSupportFragmentManager(), fragmentList);
+                viewPager.setOnPageChangeListener(new MyPagerChangeListener());
+                viewPager.setAdapter(fragmentAdapter);
+                viewPager.setCurrentItem(0);
+                viewPager.setOffscreenPageLimit(totalPage - 1);
+            }
+
+            // 适配完毕，取消ProgressBar, 隐藏功能按键
+            progressBar.setVisibility(View.GONE);
+            rg_control.setVisibility(View.GONE);
 
         }
 
