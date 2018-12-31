@@ -57,7 +57,7 @@ public interface UrlService {
      * @return Call<CategoryObj>
      */
     @GET("/book/by-categories")
-    Call<CategoryObj> getBooksByCategory(@Query("type") String type, @Query("major") String major, @Query("start") String start, @Query("limit") String limit,  @Query("gender") String gender);
+    Call<CategoryObj> getBooksByCategory(@Query("type") String type, @Query("major") String major, @Query("start") int start, @Query("limit") int limit,  @Query("gender") String gender);
 
     /*
      * 获取章节列表
@@ -80,7 +80,7 @@ public interface UrlService {
      * @param name String 书名
      * @return Call<SearchResultObj> 搜索结果对象
      */
-    @GET("/novelSearchApi")
-    Call<SearchResultObj> getSearchResult(@Query("name") String name);
+    @GET("/book/fuzzy-search")
+    Call<SearchResultObj> getSearchResult(@Query("query") String query, @Query("start") int start, @Query("limit") int limit);
 
 }

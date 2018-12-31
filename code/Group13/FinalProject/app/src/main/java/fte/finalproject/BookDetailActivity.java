@@ -2,9 +2,13 @@ package fte.finalproject;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
+
+import fte.finalproject.obj.SearchResultObj;
+import fte.finalproject.service.BookService;
 
 public class BookDetailActivity extends AppCompatActivity {
 
@@ -55,6 +59,21 @@ public class BookDetailActivity extends AppCompatActivity {
 
             }
         });
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                BookService bookService = BookService.getBookService();
+                SearchResultObj searchResultObj = bookService.getSearchResultObj("一念", 0, 10);
+                Log.d("ok", String.valueOf(searchResultObj.isOk()));
+                Log.d("tag", String.valueOf(searchResultObj.getTotal()));
+                for (int i = 0; i < searchResultObj.getBookList().size(); i++) {
+                    Log.d("title", searchResultObj.getBookList().get(i).getTitle());
+                }
+            }
+        });
+
+        thread.start();
 
     }
 }

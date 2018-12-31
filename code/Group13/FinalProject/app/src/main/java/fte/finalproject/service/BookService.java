@@ -72,14 +72,6 @@ public class BookService {
             .client(build)
             .build();
 
-    // 用于书籍搜索
-    Retrofit retrofitForSearch = new Retrofit.Builder()
-            .baseUrl(SearchUrl)
-            .addConverterFactory(GsonConverterFactory.create())
-            .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-            .client(build)
-            .build();
-
     // 用于访问api
     private UrlService ApiService = retrofitForApi.create(UrlService.class);
 
@@ -88,9 +80,6 @@ public class BookService {
 
     // 用于访问章节
     private UrlService ChapterService = retrofitForChapter.create(UrlService.class);
-
-    // 用于搜索书籍
-    private UrlService SearchService = retrofitForSearch.create(UrlService.class);
 
     // 所有排行榜
     private AllRankingObj allRankingObj;
@@ -195,7 +184,7 @@ public class BookService {
      * 示例 bookService.getBooksByCategoty("hot", "玄幻", "0", "20", "male");
      */
 
-    public CategoryObj getBooksByCategoty(String type, String major, String start, String limit, String gender) {
+    public CategoryObj getBooksByCategoty(String type, String major, int start, int limit, String gender) {
         Response<CategoryObj> response = null;
         try {
             response = ApiService.getBooksByCategory(type, major, start, limit, gender).execute();
@@ -242,13 +231,15 @@ public class BookService {
 
     /*
      * 获取书籍搜索结果
-     * @param name String 书名
+     * @param query String 关键词
+     *        start 结果开始位置
+     *        limit 结果最大数量
      * @return SearchResultObj 搜索结果对象
      */
-    public SearchResultObj getSearchResultObj(String name) {
+    public SearchResultObj getSearchResultObj(String query, int start, int limit) {
         Response<SearchResultObj> response = null;
         try {
-            response = SearchService.getSearchResult(name).execute();
+            response = ApiService.getSearchResult(query, start, limit).execute();
             searchResultObj = response.body();
         } catch (IOException e) {
             e.printStackTrace();
