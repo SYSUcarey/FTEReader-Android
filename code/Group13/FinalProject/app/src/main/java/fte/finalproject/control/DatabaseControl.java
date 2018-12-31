@@ -13,6 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import fte.finalproject.MainActivity;
 import fte.finalproject.R;
 import fte.finalproject.obj.ShelfBookObj;
 
@@ -29,12 +30,6 @@ public class DatabaseControl extends SQLiteOpenHelper {
             instance = new DatabaseControl(context);
         }
         return instance;
-    }
-    private Resources getResources() {
-    //TODO Auto-generated method stub
-        Resources mResources = null;
-        mResources = getResources();
-        return mResources;
     }
 
     //byte[] 转 Bitmap
@@ -159,10 +154,34 @@ public class DatabaseControl extends SQLiteOpenHelper {
                 + " (_id INTEGER PRIMARY KEY, content TEXT)";
         sqLiteDatabase.execSQL(CREATE_TABLE1);
         sqLiteDatabase.execSQL(CREATE_TABLE2);
-        Resources res = getResources();
+        Resources res = MainActivity.getContext().getResources();
         Bitmap bitmap = BitmapFactory.decodeResource(res, R.mipmap.bookcover);
-        addShelfBook(new ShelfBookObj("5816b415b06d1d32157790b1","圣墟",bitmap,0,"default",0,"在破败中崛起，在寂灭中复苏。沧海成尘，雷电枯竭，那一缕幽雾又一次临近大地，世间的枷锁被打开了，一个全新的世界就此揭开神秘的一角……","辰东","玄幻"));
-        addShelfBook(new ShelfBookObj("59ba0dbb017336e411085a4e","元尊",bitmap,0,"default",0,"《斗破苍穹》《武动乾坤》之后全新力作，朝堂太子踏上了荆棘重生之路…","天蚕土豆","玄幻"));
+        ContentValues values = new ContentValues();
+        ShelfBookObj book = new ShelfBookObj("5816b415b06d1d32157790b1","圣墟",bitmap,0,"default",0,"在破败中崛起，在寂灭中复苏。沧海成尘，雷电枯竭，那一缕幽雾又一次临近大地，世间的枷锁被打开了，一个全新的世界就此揭开神秘的一角……","辰东","玄幻");
+        //开始添加第一条数据_id TEXT PRIMARY KEY, name TEXT, type INTEGER ,progress INTEGER, address TEXT,image BLOB, description TEXT
+        values.put("name",book.getName());
+        values.put("description",book.getDescription());
+        values.put("type",book.getType());
+        values.put("_id",book.getBookId());
+        values.put("author",book.getAuthor());
+        values.put("major",book.getMajor());
+        values.put("address",book.getAddress());
+        values.put("progress",book.getReadChapter());
+        values.put("image",bitmapToBytes(book.getIcon()));
+        sqLiteDatabase.insert(TABLE_NAME1,null,values);
+        values.clear();
+        bitmap = BitmapFactory.decodeResource(res, R.mipmap.bookcover2);
+        book = new ShelfBookObj("59ba0dbb017336e411085a4e","元尊",bitmap,0,"default",0,"《斗破苍穹》《武动乾坤》之后全新力作，朝堂太子踏上了荆棘重生之路…","天蚕土豆","玄幻");
+        values.put("name",book.getName());
+        values.put("description",book.getDescription());
+        values.put("type",book.getType());
+        values.put("_id",book.getBookId());
+        values.put("author",book.getAuthor());
+        values.put("major",book.getMajor());
+        values.put("address",book.getAddress());
+        values.put("progress",book.getReadChapter());
+        values.put("image",bitmapToBytes(book.getIcon()));
+        sqLiteDatabase.insert(TABLE_NAME1,null,values);
     }
 
     @Override
