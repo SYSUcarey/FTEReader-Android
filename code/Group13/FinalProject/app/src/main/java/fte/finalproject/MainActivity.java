@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         //初始化控件
         radioGroup = findViewById(R.id.main_top_RG);
         title = findViewById(R.id.main_title);
+        search = findViewById(R.id.main_search);
         bottomRG = findViewById(R.id.main_bottomRG);
         bookshelfRB = findViewById(R.id.main_bottom_bookshelf);
         rankingRB = findViewById(R.id.main_bottom_ranking);
