@@ -262,7 +262,7 @@ public class DetailCategoryFragment extends Fragment {
             public void run() {
                 String gender = (isMale == true) ? "male" : "female";
                 Log.d("type:", "" + type);
-                CategoryObj categoryObj = bookService.getBooksByCategoty(type, title, 0, 1000, gender);
+                final CategoryObj categoryObj = bookService.getBooksByCategoty(type, title, 0, 30000, gender);
                 if (categoryObj.isOk() == false) {
                     Toast.makeText(getContext(), "网络错误", Toast.LENGTH_LONG).show();
                     Log.d("error", "获取主题书单列表失败");
@@ -275,12 +275,13 @@ public class DetailCategoryFragment extends Fragment {
                         intro = intro.substring(0, 50);
                         intro += "...";
                         bookObj.setShortIntro(intro);
-                        bookObjList.add(bookObj);
                     }
+                    bookObjList.add(bookObj);
                 }
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
+                        //Toast.makeText(getActivity(), "" + bookObjList.size() + " | " + total + " | " + categoryObj.getBooks().size(), Toast.LENGTH_SHORT).show();
                         updateRecyclerView(0, PAGE_COUNT);
                         progressBar.setVisibility(View.GONE);
                         //数据加载完毕时取消动画

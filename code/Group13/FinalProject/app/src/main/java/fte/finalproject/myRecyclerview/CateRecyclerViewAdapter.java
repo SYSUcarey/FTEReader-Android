@@ -135,13 +135,6 @@ public class CateRecyclerViewAdapter extends RecyclerView.Adapter<MyViewHolder> 
                     // 如果查询数据发现增加之后，就显示正在加载更多数据
                     tips.setText("正在加载更多数据...");
                     progressBar.setVisibility(View.VISIBLE);
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            tips.setVisibility(View.GONE);
-                            progressBar.setVisibility(View.GONE);
-                        }
-                    }, 500);
                 }
             } else {
                 if (data.size() > 0) {

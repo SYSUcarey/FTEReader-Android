@@ -77,28 +77,28 @@ public class RankingFragment extends Fragment {
                 int color = color1;
                 switch (type) {
                     case "最热榜":
-                        if (isMale) bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.hot, null);
-                        else bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.hot, null);
+                        if (isMale) bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.male_icon1, null);
+                        else bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.female_icon1, null);
                         color = color1;
                         break;
                     case "热搜榜":
-                        if (isMale) bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.hot, null);
-                        else bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.hot, null);
+                        if (isMale) bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.male_icon2, null);
+                        else bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.female_icon2, null);
                         color = color2;
                         break;
                     case "潜力榜":
-                        if (isMale) bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.hot, null);
-                        else bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.hot, null);
+                        if (isMale) bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.male_icon3, null);
+                        else bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.female_icon3, null);
                         color = color3;
                         break;
                     case "留存榜":
-                        if (isMale) bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.hot, null);
-                        else bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.hot, null);
+                        if (isMale) bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.male_icon4, null);
+                        else bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.female_icon4, null);
                         color = color4;
                         break;
                     case "完结榜":
-                        if (isMale) bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.hot, null);
-                        else bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.hot, null);
+                        if (isMale) bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.male_icon5, null);
+                        else bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.female_icon5, null);
                         color = color5;
                         break;
                 }
