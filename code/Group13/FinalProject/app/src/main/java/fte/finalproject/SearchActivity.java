@@ -411,15 +411,15 @@ public class SearchActivity extends AppCompatActivity {
         Random ra =new Random();
         int t = ra.nextInt(29);
         text1.setText(hotBooks[t]);
-        t = ra.nextInt(29);
+        t = (t+1)%30;
         text2.setText(hotBooks[t]);
-        t = ra.nextInt(29);
+        t = (t+1)%30;
         text3.setText(hotBooks[t]);
-        t = ra.nextInt(29);
+        t = (t+1)%30;
         text4.setText(hotBooks[t]);
-        t = ra.nextInt(29);
+        t = (t+1)%30;
         text5.setText(hotBooks[t]);
-        t = ra.nextInt(29);
+        t = (t+1)%30;
         text6.setText(hotBooks[t]);
     }
 }

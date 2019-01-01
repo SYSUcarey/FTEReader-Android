@@ -144,6 +144,12 @@ public class DatabaseControl extends SQLiteOpenHelper {
         db.close();
     }
 
+    public boolean judgeBookExist(String id) {
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cursor = db.query(TABLE_NAME1, null, "_id=?", new String[] { id }, null, null, null);
+        return cursor.moveToFirst();
+    }
+
     //删除搜索历史
     public void deleteHistory() {
         SQLiteDatabase db = getWritableDatabase();
