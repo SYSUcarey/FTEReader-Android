@@ -85,6 +85,7 @@ public class DetailCategoryFragment extends Fragment {
                         rankingImg.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.third, null));
                         rankingImg.setVisibility(View.VISIBLE);
                     }
+                    else rankingImg.setVisibility(View.GONE);
                 }
                 final ImageView imageView = holder.getView(R.id.item_book_cover);
                 TextView bookName = holder.getView(R.id.item_book_name);
