@@ -1,5 +1,7 @@
 package fte.finalproject.Fragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -66,6 +68,7 @@ public class BookShelfFragment extends Fragment {
         getMyBooks();
         setRecyclerView();
         //Toast.makeText(getActivity(), "进入Fragment" + " | " + myBooks.size(), Toast.LENGTH_SHORT).show();
+        System.out.println("onResume: " + myBooks.get(0).getReadChapter());
         super.onResume();
     }
 
@@ -117,13 +120,30 @@ public class BookShelfFragment extends Fragment {
                 Intent intent = new Intent(getActivity(), ReadPageActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putString("bookid", myBooks.get(position).getBookId());
+                bundle.putInt("currentChapter", myBooks.get(position).getReadChapter());
+                System.out.println("传进去当前阅读章节数为：" + myBooks.get(position).getReadChapter());
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
 
             @Override
-            public void onLongClick(int position) {
+            public void onLongClick(final int position) {
+                // 长按弹出对话框
+                AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+                dialog.setMessage("确定要从书架移除" + myBooks.get(position).getName() + "吗？");
+                dialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
 
+                    }
+                });
+                dialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        DatabaseControl.getInstance(getActivity()).deleteShelfBook(myBooks.get(position).getBookId());
+                    }
+                });
+                dialog.show();
             }
         });
         recyclerView.setAdapter(adapter);

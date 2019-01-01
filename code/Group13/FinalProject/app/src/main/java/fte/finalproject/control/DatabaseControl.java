@@ -109,7 +109,7 @@ public class DatabaseControl extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues value = new ContentValues();
         value.put("progress", progress);
-        db.update("product", value, "_id=?", new String[] { id });
+        db.update(TABLE_NAME1, value, "_id=?", new String[] { id });
         db.close();
     }
 

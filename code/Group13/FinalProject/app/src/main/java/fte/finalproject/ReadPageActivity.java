@@ -6,6 +6,8 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Looper;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +27,7 @@ import java.util.List;
 
 import fte.finalproject.Fragment.ReadPageFragment;
 import fte.finalproject.Fragment.TabFragmentStatePagerAdapter;
+import fte.finalproject.control.DatabaseControl;
 import fte.finalproject.obj.ChapterLinkObj;
 import fte.finalproject.obj.ChapterLinks;
 import fte.finalproject.obj.ChapterObj;
@@ -84,7 +87,8 @@ public class ReadPageActivity extends AppCompatActivity {
         Intent intent = this.getIntent();
         Bundle bundle = intent.getExtras();
         bookid = bundle.getString("bookid");
-        //System.out.println(bookid);
+        currChapter = bundle.getInt("currentChapter");
+        System.out.println("bookid: " + bookid + "  currentChapter: " + currChapter);
 
 
         // 获取页面控件
@@ -115,8 +119,10 @@ public class ReadPageActivity extends AppCompatActivity {
                 Boolean isNetworkConnected = isNetWorkConnected(context);
                 // 未联网的响应处理
                 if(!isNetworkConnected) {
+                    Looper.prepare();
                     // 弹出Toast提示
                     Toast.makeText(ReadPageActivity.this, "网络连接状况：未连接", Toast.LENGTH_SHORT).show();
+                    Looper.loop();
                     // ProgressBar等待框消失
                     progressBar.setVisibility(View.GONE);
                 }
@@ -135,10 +141,11 @@ public class ReadPageActivity extends AppCompatActivity {
                             }*/
                             chaptersContent = new ArrayList<>(totalChapter);
 
-                            // 缓存当前章节以及上下共五章的数据
-                            chapterObjs = new ArrayList<>(totalChapter);
-                            cache_chapter_range_min = currChapter - 2;
-                            cache_chapter_range_max = currChapter + 2;
+                            // 缓存当前章节以及上下10章的数据
+                            System.out.println(totalChapter);
+                            chapterObjs = new ArrayList<ChapterObj>(totalChapter){};
+                            cache_chapter_range_min = currChapter - 10;
+                            cache_chapter_range_max = currChapter + 10;
                             for(int i = cache_chapter_range_min; i <= cache_chapter_range_max; i++) {
                                 //超出章节范围
                                 if(i > totalChapter-1) {
@@ -151,7 +158,8 @@ public class ReadPageActivity extends AppCompatActivity {
                                 }
                                 ChapterObj c = BookService.getBookService().getChapterByLink(chapterLinks.get(i).getLink());
                                 System.out.println(chapterLinks.get(i).getLink());
-                                chapterObjs.add(i, c);
+                                chapterObjs.add(i-cache_chapter_range_min, c);
+                                System.out.println(i);
                             }
                             System.out.println(cache_chapter_range_min + "----" + cache_chapter_range_max);
                             System.out.println(chapterLinks.size());
@@ -195,7 +203,11 @@ public class ReadPageActivity extends AppCompatActivity {
                         // 解析章节内容
                         //String title = chapterObjs.get(0).getIchapter().getTitle(); // 这种获取Title的内容错误的（API问题）
                         String title = chapterLinks.get(i).getTitle();
-                        String content = chapterObjs.get(i).getIchapter().getBody();
+                        String content;
+                        if(chapterObjs.get(i-cache_chapter_range_min) == null) {
+                            content = "章节获取失败了呢！客官";
+                        }
+                        else content = chapterObjs.get(i-cache_chapter_range_min).getIchapter().getBody();
                         // 为段首添加缩进
                         content = "\u3000\u3000" + content;
                         content = content.replaceAll("\n", "\n\u3000\u3000");
@@ -235,6 +247,26 @@ public class ReadPageActivity extends AppCompatActivity {
         Toast.makeText(ReadPageActivity.this, str, Toast.LENGTH_SHORT).show();*/
     }
 
+    /*@Override
+    protected void onPause() {
+        System.out.println("onPause");
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        System.out.println("onStop");
+        super.onStop();
+    }*/
+
+    @Override
+    protected void onDestroy() {
+        System.out.println("onDestroy");
+        // 将阅读到的当前章节存入数据库
+        System.out.println("阅读到：" + currChapter);
+        DatabaseControl.getInstance(this).updateProgress(currChapter, bookid);
+        super.onDestroy();
+    }
 
     /*@Override
     public boolean dispatchTouchEvent(MotionEvent event) {
@@ -334,7 +366,7 @@ public class ReadPageActivity extends AppCompatActivity {
     }
 
     //设置一个ViewPager的监听事件，左右滑动ViewPager时进行处理
-    //当滑动到当前缓存的最后一页时
+    //当滑动到当前缓存的倒数第M章的时候，进行网络资源访问，获取新的N章的资源
     //当滑动到当前缓存的第一页时
     //需要添加新的Fragment
     public class MyPagerChangeListener implements ViewPager.OnPageChangeListener {
@@ -347,60 +379,93 @@ public class ReadPageActivity extends AppCompatActivity {
         public void onPageScrolled(int arg0, float arg1, int arg2) {
             from = arg0;
         }
+
         @Override
-        public void onPageSelected(int arg0) {
+        public void onPageSelected(final int arg0) {
             Log.d("跳转", arg0 + ", " + from);
-            // 向右滑动了一章
+
+            int cache_left = 5;         // 设置当缓存剩余多少章节时，重新开始进行资源获取
+            final int cache_num = 10;         // 设置一次获取资源的章节数
+            // 帧界面向右滑动了一次
             if (arg0 == from + 1) {
-                //Toast.makeText(ReadPageActivity.this, "向右滑动了一页", Toast.LENGTH_LONG).show();
-                // 滑动到当前缓存的最后一章
-                if(arg0 == cache_chapter_range_max) {
-                    // 已经是网络上的最后一章，没有更新了
-                    if(arg0 == totalChapter) {
-                        Toast.makeText(ReadPageActivity.this, "已经是最后一章了", Toast.LENGTH_LONG).show();
+                // 当前章节数+1
+                currChapter++;
+                // 滑动到当前缓存剩余量不多时，当前再访问剩余量设置是五章节(不包括当前章节)
+                if(arg0 == (cache_chapter_range_max-cache_chapter_range_min) - cache_left) {
+
+                    // 已经缓存到网络上的最后一章了，没有更新
+                    if(cache_chapter_range_max == totalChapter) {
+                        Toast.makeText(ReadPageActivity.this, "已经是最后一章了！客官", Toast.LENGTH_LONG).show();
                     }
                     else {
-                        // 使用子线程进行网络访问，获取下一章节的内容
-                        final int newChapterNum = arg0 + 1;
-                        Thread getNewChapterThread = new Thread(new Runnable() {
+                        // 隐藏ViewPager避免添加帧的时候滑动ViewPager报错
+                        rxjava_update_page(2);
+                        //使用子线程进行缓存更新
+                        Thread update_cache_thread = new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                ChapterObj c = BookService.getBookService().getChapterByLink(chapterLinks.get(newChapterNum).getLink());
-                                System.out.println(chapterLinks.get(newChapterNum).getLink());
-                                chapterObjs.add(newChapterNum, c);
+                                // 再使用子线程进行网络访问，获取下面N个章节的内容（当前N设置为10）
+                                /*final int newChapterNum = arg0 + 1;*/
+                                Thread getNewChapterThread = new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        for(int i = 1; i <= cache_num; i++) {
+                                            int newChapterNum = cache_chapter_range_max + i;
+                                            // 非法章节数(已超出网络给出的章节数)
+                                            if(newChapterNum > totalChapter) continue;
+                                            // 合法章节则获取新章节
+                                            ChapterObj c = BookService.getBookService().getChapterByLink(chapterLinks.get(newChapterNum).getLink());
+                                            System.out.println(chapterLinks.get(newChapterNum).getLink());
+                                            chapterObjs.add(newChapterNum-cache_chapter_range_min, c);
+                                        }
+                                    }
+                                });
+                                getNewChapterThread.start();
+
+                                // 等待网络访问子线程完成
+                                try {
+                                    getNewChapterThread.join();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+
+
+                                // 新增N个帧
+                                for(int i = 1; i <= cache_num; i++) {
+                                    int newChapterNum = cache_chapter_range_max + 1;
+                                    // 已经超出总章节数
+                                    if(newChapterNum > totalChapter) continue;
+                                    // 合法的章节数
+                                    cache_chapter_range_max++;
+                                    // 解析章节内容
+                                    //String title = chapterObjs.get(0).getIchapter().getTitle(); // 这种获取Title的内容错误的（API问题）
+                                    String title = chapterLinks.get(newChapterNum).getTitle();
+                                    String content;
+                                    if(chapterObjs.get(newChapterNum-cache_chapter_range_min) == null) {
+                                        content = "章节获取失败了呢！客官";
+                                    }
+                                    else content = chapterObjs.get(newChapterNum-cache_chapter_range_min).getIchapter().getBody();
+                                    // 为段首添加缩进
+                                    content = "\u3000\u3000" + content;
+                                    content = content.replaceAll("\n", "\n\u3000\u3000");
+                                    // 新建对应章节内容帧
+                                    ReadPageFragment fragment = new ReadPageFragment();
+                                    // 给帧传数据
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("title", title);
+                                    bundle.putString("content", content);
+                                    bundle.putInt("currentChapter", newChapterNum);
+                                    bundle.putInt("totalChapter", totalChapter);
+                                    fragment.setArguments(bundle);
+                                    // 将新加的帧放入队列中
+                                    fragmentList.add(fragment);
+                                }
+                                // 使用rxjava进行主界面UI更新
+                                rxjava_update_page(1);
+                                System.out.println("更新章节: ");
                             }
                         });
-                        getNewChapterThread.start();
-
-                        // 等待网络访问子线程完成
-                        try {
-                            getNewChapterThread.join();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        // 新增一个帧
-                        cache_chapter_range_max++;  // 注意max是等于newChapterNum的
-                        // 解析章节内容
-                        //String title = chapterObjs.get(0).getIchapter().getTitle(); // 这种获取Title的内容错误的（API问题）
-                        String title = chapterLinks.get(newChapterNum).getTitle();
-                        String content = chapterObjs.get(newChapterNum).getIchapter().getBody();
-                        // 为段首添加缩进
-                        content = "\u3000\u3000" + content;
-                        content = content.replaceAll("\n", "\n\u3000\u3000");
-                        // 新建对应章节内容帧
-                        ReadPageFragment fragment = new ReadPageFragment();
-                        // 给帧传数据
-                        Bundle bundle = new Bundle();
-                        bundle.putString("title", title);
-                        bundle.putString("content", content);
-                        bundle.putInt("currentChapter", newChapterNum);
-                        bundle.putInt("totalChapter", totalChapter);
-                        fragment.setArguments(bundle);
-                        // 将新加的帧放入队列中
-                        fragmentList.add(fragment);
-                        // 使用rxjava进行主界面UI更新
-                        rxjava_update_page(1);
-                        System.out.println("更新章节: " + title);
+                        update_cache_thread.start();
                     }
 
                 }
@@ -451,7 +516,7 @@ public class ReadPageActivity extends AppCompatActivity {
         return false;
     }
 
-    // 更新主界面UI
+    // RXJAVA2 更新主界面UI
     private void rxjava_update_page(final int type) {
         final Observable<Integer> observable = Observable.create(new ObservableOnSubscribe<Integer>() {
 
@@ -474,17 +539,24 @@ public class ReadPageActivity extends AppCompatActivity {
                     // 初始化适配阅读帧
                     fragmentAdapter.notifyDataSetChanged();
                     viewPager.setAdapter(fragmentAdapter);
-                    viewPager.setCurrentItem(0);
+                    // 跳到上次阅读到的章节
+                    viewPager.setCurrentItem(currChapter-cache_chapter_range_min);
                     viewPager.setOffscreenPageLimit(currTotalPage - 1);
                     // 适配完毕，取消ProgressBar, 隐藏功能按键
                     progressBar.setVisibility(View.GONE);
                     rg_control.setVisibility(View.GONE);
                 }
                 // type == 1 界面获取下一章节更新
-                if(type == 1) {
+                else if(type == 1) {
                     fragmentAdapter.notifyDataSetChanged();
-                    System.out.println("下一章节更新");
-                    System.out.println("当前章节数：" + fragmentList.size());
+                    // 适配完毕，取消ProgressBar, 隐藏功能按键
+                    progressBar.setVisibility(View.GONE);
+                    viewPager.setVisibility(View.VISIBLE);
+                }
+                else if(type == 2) {
+                    // 等待后台适配阅读帧
+                    viewPager.setVisibility(View.GONE);
+                    progressBar.setVisibility(View.VISIBLE);
                 }
             }
 
