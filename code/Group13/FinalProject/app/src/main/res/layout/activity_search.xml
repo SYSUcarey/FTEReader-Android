@@ -28,8 +28,10 @@
             android:id="@+id/search_result_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="52dp"
             android:layout_marginTop="5dp"
             android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </android.support.constraint.ConstraintLayout>
 
@@ -69,6 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="10dp"
+            android:textSize="15sp"
             android:text="天骄战纪"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView8" />
@@ -79,6 +82,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="10dp"
+            android:textSize="15sp"
             android:text="最强狂兵"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/search_pop_text1" />
@@ -89,6 +93,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="10dp"
+            android:textSize="15sp"
             android:text="九星霸体诀"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/search_pop_text2" />
@@ -99,6 +104,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="10dp"
+            android:textSize="15sp"
             android:text="官梯"
             app:layout_constraintStart_toStartOf="@+id/guideline3"
             app:layout_constraintTop_toBottomOf="@+id/textView8" />
@@ -109,6 +115,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="10dp"
+            android:textSize="15sp"
             android:text="剑来"
             app:layout_constraintStart_toEndOf="@+id/guideline3"
             app:layout_constraintTop_toBottomOf="@+id/search_pop_text4" />
@@ -119,6 +126,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="10dp"
+            android:textSize="15sp"
             android:text="一世倾城"
             app:layout_constraintStart_toEndOf="@+id/guideline3"
             app:layout_constraintTop_toBottomOf="@+id/search_pop_text5" />
@@ -128,6 +136,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
+            android:textSize="18sp"
             android:text="大家都在搜"
             app:layout_constraintBottom_toBottomOf="@+id/search_popular_image"
             app:layout_constraintStart_toEndOf="@+id/search_popular_image"
@@ -135,10 +144,10 @@
 
         <ImageView
             android:id="@+id/search_history_image"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="23dp"
+            android:layout_height="23dp"
             android:layout_marginStart="15dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="32dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/search_pop_text3"
             app:srcCompat="@mipmap/history" />
@@ -149,6 +158,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_marginTop="30dp"
+            android:textSize="18sp"
             android:text="搜索历史"
             app:layout_constraintStart_toEndOf="@+id/search_history_image"
             app:layout_constraintTop_toBottomOf="@+id/search_pop_text3" />

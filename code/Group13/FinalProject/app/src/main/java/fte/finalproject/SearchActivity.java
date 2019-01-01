@@ -1,6 +1,9 @@
 package fte.finalproject;
 
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,12 +11,17 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,6 +29,7 @@ import java.util.List;
 import fte.finalproject.myRecyclerview.MyRecyclerViewAdapter;
 import fte.finalproject.myRecyclerview.MyViewHolder;
 import fte.finalproject.obj.SearchResultObj;
+import fte.finalproject.service.BookService;
 
 import static fte.finalproject.control.DatabaseControl.getInstance;
 import static fte.finalproject.service.BookService.getBookService;
@@ -28,6 +37,7 @@ import static fte.finalproject.service.BookService.getBookService;
 public class SearchActivity extends AppCompatActivity {
 
     private SearchView searchView;
+    private TextView cancelView;
     private ImageView deleteView;
     private ListView historyList;
     private ListView fuzzyList;
@@ -39,6 +49,7 @@ public class SearchActivity extends AppCompatActivity {
     private List<SearchResultObj.book> results;
     private MyRecyclerViewAdapter recyclerViewAdapter;
     private boolean isSubmit;
+    public Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +61,7 @@ public class SearchActivity extends AppCompatActivity {
         tempFuzzy = new ArrayList<>();
         results = new ArrayList<>();
         //获取控件
+        cancelView = findViewById(R.id.search_cancel_text);
         searchView = findViewById(R.id.search_search_searchView);
         deleteView = findViewById(R.id.search_delete_image);
         historyList = findViewById(R.id.search_history_list);
@@ -57,12 +69,12 @@ public class SearchActivity extends AppCompatActivity {
         resultList = findViewById(R.id.search_result_list);
         initialLayout = findViewById(R.id.search_initial_layout);
         searchLayout = findViewById(R.id.search_afters_layout);
-        TextView text1 = findViewById(R.id.search_pop_text1);
-        TextView text2 = findViewById(R.id.search_pop_text2);
-        TextView text3 = findViewById(R.id.search_pop_text3);
-        TextView text4 = findViewById(R.id.search_pop_text4);
-        TextView text5 = findViewById(R.id.search_pop_text5);
-        TextView text6 = findViewById(R.id.search_pop_text6);
+        final TextView text1 = findViewById(R.id.search_pop_text1);
+        final TextView text2 = findViewById(R.id.search_pop_text2);
+        final TextView text3 = findViewById(R.id.search_pop_text3);
+        final TextView text4 = findViewById(R.id.search_pop_text4);
+        final TextView text5 = findViewById(R.id.search_pop_text5);
+        final TextView text6 = findViewById(R.id.search_pop_text6);
 
         //设置历史列表adapter
         final ArrayAdapter<String> historyAdapter = new ArrayAdapter<>(this,R.layout.item_listview,histories);
@@ -78,12 +90,33 @@ public class SearchActivity extends AppCompatActivity {
                 TextView major = holder.getView(R.id.item_book_type);
                 major.setText(book.getContentType());
                 TextView intro = holder.getView(R.id.item_book_intro);
-                intro.setText(book.getShortIntro());
+                String introString = book.getShortIntro();
+                if (introString.length() > 50){
+                    introString = introString.substring(0,49)+"……";
+                }
+                intro.setText(introString);
                 final ImageView cover = holder.getView(R.id.item_book_cover);
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        cover.setImageBitmap(getBookService().getImg(book.getCover()));
+                        try {
+                            URL url = new URL( BookService.StaticsUrl + book.getCover());
+                            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                            connection.setRequestMethod("GET");
+                            connection.setConnectTimeout(10000);
+                            if (connection.getResponseCode() == 200) {
+                                InputStream inputStream = connection.getInputStream();
+                                final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        cover.setImageBitmap(bitmap);
+                                    }
+                                });
+                            }
+                        } catch (Exception e) {
+                            System.err.println(e.getMessage());
+                        }
                     }
                 }).start();
             }
@@ -102,7 +135,7 @@ public class SearchActivity extends AppCompatActivity {
         resultList.setAdapter(recyclerViewAdapter);
         resultList.setLayoutManager(new LinearLayoutManager(this));
         //设置模糊关联列表adapter
-        final ArrayAdapter<String> fuzzyAdapter = new ArrayAdapter<>(this,R.layout.item_listview,tempFuzzy);
+        final ArrayAdapter<String> fuzzyAdapter = new ArrayAdapter<>(this,R.layout.item_listview2,tempFuzzy);
         fuzzyList.setAdapter(fuzzyAdapter);
 
 
@@ -110,37 +143,43 @@ public class SearchActivity extends AppCompatActivity {
         text1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                String s = text1.getText().toString();
+                recordClick(s);
             }
         });
         text2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                String s = text2.getText().toString();
+                recordClick(s);
             }
         });
         text3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                String s = text3.getText().toString();
+                recordClick(s);
             }
         });
         text4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                String s = text4.getText().toString();
+                recordClick(s);
             }
         });
         text5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                String s = text5.getText().toString();
+                recordClick(s);
             }
         });
         text6.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                String s = text6.getText().toString();
+                recordClick(s);
             }
         });
 
@@ -163,7 +202,16 @@ public class SearchActivity extends AppCompatActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        results = getBookService().getSearchResultObj(s,0,8).getBookList();
+                        List<SearchResultObj.book> t = getBookService().getSearchResultObj(s,0,8).getBookList();
+                        results.clear();
+                        if (t.size() > 0)
+                            results.addAll(t);
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                recyclerViewAdapter.notifyDataSetChanged();
+                            }
+                        });
                     }
                 }).start();
                 recyclerViewAdapter.notifyDataSetChanged();
@@ -200,7 +248,20 @@ public class SearchActivity extends AppCompatActivity {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            tempFuzzy = Arrays.asList(getBookService().getFuzzySearchResult(s).getData());
+                            String[] tss = getBookService().getFuzzySearchResult(s).getData();
+                            List<String> t;
+                            if (tss != null)
+                                t = Arrays.asList(tss);
+                            else t = new ArrayList<>();
+                            tempFuzzy.clear();
+                            if (t.size() > 0)
+                                tempFuzzy.addAll(t);
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    fuzzyAdapter.notifyDataSetChanged();
+                                }
+                            });
                         }
                     }).start();
                     fuzzyAdapter.notifyDataSetChanged();
@@ -218,5 +279,89 @@ public class SearchActivity extends AppCompatActivity {
                 historyAdapter.notifyDataSetChanged();
             }
         });
+
+        //设置历史点击函数
+        historyList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final String s = histories.get(position);
+                recordClick(s);
+            }
+        });
+
+        //模糊搜索点击函数
+        fuzzyList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final String s = tempFuzzy.get(position);
+                isSubmit = true;
+                //添加历史
+                if (!histories.contains(s)){
+                    histories.add(s);
+                    getInstance(getBaseContext()).addSearchHistory(s);
+                }
+                //设置可见
+                initialLayout.setVisibility(View.INVISIBLE);
+                searchLayout.setVisibility(View.VISIBLE);
+                fuzzyList.setVisibility(View.INVISIBLE);
+                resultList.setVisibility(View.VISIBLE);
+                //填充数据
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<SearchResultObj.book> t = getBookService().getSearchResultObj(s,0,8).getBookList();
+                        results.clear();
+                        if (t.size() > 0)
+                            results.addAll(t);
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                recyclerViewAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
+                }).start();
+                recyclerViewAdapter.notifyDataSetChanged();
+                searchView.setQuery(s,true);
+            }
+        });
+        //取消按钮点击事件
+        cancelView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+    }
+    public void recordClick(final String s) {
+        isSubmit = true;
+        //设置可见
+        initialLayout.setVisibility(View.INVISIBLE);
+        searchLayout.setVisibility(View.VISIBLE);
+        fuzzyList.setVisibility(View.INVISIBLE);
+        resultList.setVisibility(View.VISIBLE);
+        //添加历史
+        if (!histories.contains(s)){
+            histories.add(s);
+            getInstance(getBaseContext()).addSearchHistory(s);
+        }
+        //填充数据
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<SearchResultObj.book> t = getBookService().getSearchResultObj(s,0,8).getBookList();
+                results.clear();
+                if (t.size() > 0)
+                    results.addAll(t);
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        recyclerViewAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        }).start();
+        recyclerViewAdapter.notifyDataSetChanged();
+        searchView.setQuery(s,true);
     }
 }
