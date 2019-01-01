@@ -30,6 +30,13 @@ import fte.finalproject.obj.ChapterLinks;
 import fte.finalproject.obj.ChapterObj;
 import fte.finalproject.obj.CptListObj;
 import fte.finalproject.service.BookService;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 
 
 public class ReadPageActivity extends AppCompatActivity {
@@ -60,6 +67,9 @@ public class ReadPageActivity extends AppCompatActivity {
 
     boolean show_functional_button = false;
 
+    // 活动上下文
+    Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +78,7 @@ public class ReadPageActivity extends AppCompatActivity {
         Intent intent = this.getIntent();
         Bundle bundle = intent.getExtras();
         bookid = bundle.getString("bookid");
-        System.out.println(bookid);
+        //System.out.println(bookid);
 
 
         // 获取页面控件
@@ -80,76 +90,91 @@ public class ReadPageActivity extends AppCompatActivity {
         // 设置功能按键
         set_functional_button();
 
+        // 获取上下文
+        context = this;
+        // 全屏阅读，去除手机状态栏
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         //初始化 Fragment
         init_fragment();
     }
 
 
     private void init_fragment() {
-        // 判断是否联网了
-        Boolean isNetworkConnected = isNetWorkConnected(this);
-        // 未联网的响应处理
-        if(!isNetworkConnected) {
-            // 弹出Toast提示
-            Toast.makeText(ReadPageActivity.this, "网络连接状况：未连接", Toast.LENGTH_SHORT).show();
-            // ProgressBar等待框消失
-            progressBar.setVisibility(View.GONE);
-        }
-        // 已经联网，获取书籍信息进行阅读
-        else {
-            //获取到:章节总页数totalPage、章节title、每页的内容content
-            Thread initContentThread  = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    cptListObj = BookService.getBookService().getChaptersByBookId(bookid);
-                    chapterLinks = cptListObj.getImixToc().getChapterLinks();
+        // 用线程进行帧初始化，避免进入阅读界面阻塞
+        Thread init_fragment_thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // 判断是否联网了
+                Boolean isNetworkConnected = isNetWorkConnected(context);
+                // 未联网的响应处理
+                if(!isNetworkConnected) {
+                    // 弹出Toast提示
+                    Toast.makeText(ReadPageActivity.this, "网络连接状况：未连接", Toast.LENGTH_SHORT).show();
+                    // ProgressBar等待框消失
+                    progressBar.setVisibility(View.GONE);
+                }
+                // 已经联网，获取书籍信息进行阅读
+                else {
+                    //获取到:章节总页数totalPage、章节title、每页的内容content
+                    Thread initContentThread  = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            cptListObj = BookService.getBookService().getChaptersByBookId(bookid);
+                            chapterLinks = cptListObj.getImixToc().getChapterLinks();
                     /*for(int i = 0; i < chapterLinks.size(); i++) {
                         System.out.println(chapterLinks.get(i).getTitle() + ": " + chapterLinks.get(i).getLink());
                     }*/
-                    // 获得上下三章的数据
-                    ChapterObj c = BookService.getBookService().getChapterByLink(chapterLinks.get(currChapter).getLink());
-                    System.out.println(chapterLinks.get(currChapter).getLink());
-                    currentChapterContent.append(c.getIchapter().getBody());
-                    //System.out.println(c.getIchapter().getTitle() + "\n" + c.getIchapter().getBody());
+                            // 获得上下三章的数据
+                            ChapterObj c = BookService.getBookService().getChapterByLink(chapterLinks.get(currChapter).getLink());
+                            //System.out.println(chapterLinks.get(currChapter).getLink());
+                            currentChapterContent.append(c.getIchapter().getBody());
+                            //System.out.println(c.getIchapter().getTitle() + "\n" + c.getIchapter().getBody());
+                        }
+                    });
+                    initContentThread.start();
+
+                    try {
+                        initContentThread.join();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    // 根据内容适配各帧
+                    //todo
+                    currTotalPage = 10;
+                    String title = "todo";
+                    String content = "todo";
+                    for (int i = 0; i < currTotalPage; ++i) {
+                        ReadPageFragment fragment = new ReadPageFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putString("title", title);
+                        bundle.putString("content", content);
+                        bundle.putInt("totalPage", currTotalPage);
+                        fragment.setArguments(bundle);
+                        fragmentList.add(fragment);
+                        fragmentAdapter = new TabFragmentStatePagerAdapter(getSupportFragmentManager(), fragmentList);
+                        viewPager.setOnPageChangeListener(new MyPagerChangeListener());
+
+                    }
+
+                    // 用rxjava更新主线程
+                    rxjava_update_page(0);
+
                 }
-            });
-            initContentThread.start();
-
-            try {
-                initContentThread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
+        });
+        init_fragment_thread.start();
 
-            // 全屏阅读，去除手机状态栏
-            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-
-            // 根据内容适配各帧
-            //todo
-            int totalPage = 10;
-            String title = "todo";
-            String content = "todo";
-            for (int i = 0; i < totalPage; ++i) {
-                ReadPageFragment fragment = new ReadPageFragment();
-                Bundle bundle = new Bundle();
-                bundle.putString("title", title);
-                bundle.putString("content", content);
-                bundle.putInt("totalPage", totalPage);
-                fragment.setArguments(bundle);
-                fragmentList.add(fragment);
-                fragmentAdapter = new TabFragmentStatePagerAdapter(getSupportFragmentManager(), fragmentList);
-                viewPager.setOnPageChangeListener(new MyPagerChangeListener());
-                viewPager.setAdapter(fragmentAdapter);
-                viewPager.setCurrentItem(0);
-                viewPager.setOffscreenPageLimit(totalPage - 1);
-            }
-
-            // 适配完毕，取消ProgressBar, 隐藏功能按键
-            progressBar.setVisibility(View.GONE);
-            rg_control.setVisibility(View.GONE);
-
-        }
+        /*try {
+            init_fragment_thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
+        // 用rxjava更新主线程
+        /*viewPager.setAdapter(fragmentAdapter);
+        viewPager.setCurrentItem(0);
+        viewPager.setOffscreenPageLimit(currTotalPage - 1);*/
 
 
         // 获取书本的章节信息：
@@ -160,8 +185,6 @@ public class ReadPageActivity extends AppCompatActivity {
             }
         });
         get_chapter_thread.start();*/
-
-
     }
 
 
@@ -335,5 +358,50 @@ public class ReadPageActivity extends AppCompatActivity {
             }
         }
         return false;
+    }
+
+    // 更新主界面UI
+    private void rxjava_update_page(final int type) {
+        final Observable<Integer> observable = Observable.create(new ObservableOnSubscribe<Integer>() {
+
+            @Override
+            public void subscribe(ObservableEmitter<Integer> e) throws Exception {
+                e.onNext(type);
+                e.onComplete();
+            }
+
+        });
+
+        CompositeDisposable mCompositeDisposable = new CompositeDisposable();
+
+        DisposableObserver<Integer> disposableObserver = new DisposableObserver<Integer>() {
+            @Override
+            public void onNext(Integer value) {
+                Log.d("BackgroundActivity", "onNext");
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.d("BackgroundActivity", "onError=" + e);
+            }
+
+            @Override
+            public void onComplete() {
+                Log.d("BackgroundActivity", "onComplete");
+                // 适配阅读帧
+                fragmentAdapter.notifyDataSetChanged();
+                viewPager.setAdapter(fragmentAdapter);
+                viewPager.setCurrentItem(0);
+                viewPager.setOffscreenPageLimit(currTotalPage - 1);
+
+                // 适配完毕，取消ProgressBar, 隐藏功能按键
+                progressBar.setVisibility(View.GONE);
+                rg_control.setVisibility(View.GONE);
+            }
+        };
+
+        observable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(disposableObserver);
+        mCompositeDisposable.add(disposableObserver);
+
     }
 }
