@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.DisplayCutout;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -26,6 +27,7 @@ import fte.finalproject.Fragment.ReadPageFragment;
 import fte.finalproject.Fragment.TabFragmentStatePagerAdapter;
 import fte.finalproject.obj.ChapterLinkObj;
 import fte.finalproject.obj.ChapterLinks;
+import fte.finalproject.obj.ChapterObj;
 import fte.finalproject.obj.CptListObj;
 import fte.finalproject.service.BookService;
 
@@ -41,6 +43,9 @@ public class ReadPageActivity extends AppCompatActivity {
     private int currChapter;                   //当前阅读到的章节
     private int currPage;                      //当前阅读到的页面(对一个章节而言)[0, currTotalPage - 1]
     private int currTotalPage;                 //当前章节总页数
+    List<ChapterObj> chapterObjs;
+    StringBuffer showContent = new StringBuffer();
+    StringBuffer currentChapterContent = new StringBuffer();
 
     private RadioGroup rg_control;
     private RadioButton day_and_night_rb_control;
@@ -93,16 +98,32 @@ public class ReadPageActivity extends AppCompatActivity {
         // 已经联网，获取书籍信息进行阅读
         else {
             //获取到:章节总页数totalPage、章节title、每页的内容content
-            new Thread(new Runnable() {
+            Thread initContentThread  = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     cptListObj = BookService.getBookService().getChaptersByBookId(bookid);
                     chapterLinks = cptListObj.getImixToc().getChapterLinks();
-                    for(int i = 0; i < chapterLinks.size(); i++) {
-                        System.out.println(chapterLinks.get(i).getTitle());
-                    }
+                    /*for(int i = 0; i < chapterLinks.size(); i++) {
+                        System.out.println(chapterLinks.get(i).getTitle() + ": " + chapterLinks.get(i).getLink());
+                    }*/
+                    // 获得上下三章的数据
+                    ChapterObj c = BookService.getBookService().getChapterByLink(chapterLinks.get(currChapter).getLink());
+                    System.out.println(chapterLinks.get(currChapter).getLink());
+                    currentChapterContent.append(c.getIchapter().getBody());
+                    //System.out.println(c.getIchapter().getTitle() + "\n" + c.getIchapter().getBody());
                 }
-            }).start();
+            });
+            initContentThread.start();
+
+            try {
+                initContentThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            // 全屏阅读，去除手机状态栏
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
 
             // 根据内容适配各帧
             //todo
