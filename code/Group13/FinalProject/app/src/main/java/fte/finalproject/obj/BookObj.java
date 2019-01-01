@@ -57,6 +57,10 @@ public class BookObj implements Serializable {
     @SerializedName("latelyFollower")
     private int latelyFollower;
 
+    // 字数
+    @SerializedName("wordCount")
+    private int wordCount;
+
     // 留存率
     @SerializedName("retentionRatio")
     private float retentionRatio;
@@ -64,6 +68,9 @@ public class BookObj implements Serializable {
     // 最新章节
     @SerializedName("lastChapter")
     private String lastChapter;
+
+    @SerializedName("updated")
+    private String updated;
 
     // 性别
     @SerializedName("gender")
@@ -147,5 +154,13 @@ public class BookObj implements Serializable {
 
     public String[] getTags() {
         return tags;
+    }
+
+    public int getWordCount() {
+        return wordCount;
+    }
+
+    public String getUpdated() {
+        return updated;
     }
 }

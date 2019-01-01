@@ -154,16 +154,16 @@
             android:layout_height="wrap_content"
             android:id="@+id/detail_more"
             android:layout_alignParentRight="true"
-            android:layout_above="@+id/detail_recomRL"
+            android:layout_above="@+id/detail_recomRG"
             android:background="@null"
             android:text="更多"
             android:textSize="11sp"
             android:textColor="@color/colorGrey"/>
 
-        <LinearLayout
+        <RadioGroup
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/detail_recomRL"
+            android:id="@+id/detail_recomRG"
             android:layout_below="@+id/detail_recomTitle"
             android:orientation="horizontal"
             android:weightSum="3"
@@ -193,7 +193,7 @@
                 android:background="@null"
                 android:layout_weight="1"/>
 
-        </LinearLayout>
+        </RadioGroup>
 
     </RelativeLayout>
 
