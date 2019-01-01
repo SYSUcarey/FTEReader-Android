@@ -30,9 +30,4 @@ public class TabFragmentStatePagerAdapter extends android.support.v4.app.Fragmen
     public int getCount() {
         return list.size();
     }
-
-    public void refresh(List<Fragment> list) {
-        this.list = list;
-        notifyDataSetChanged();
-    }
 }

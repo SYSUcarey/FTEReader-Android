@@ -131,7 +131,8 @@ public class MainActivity extends AppCompatActivity {
                         bundle.putBoolean("isMale", true);
                         rankingFragment1.setArguments(bundle);
                         fragmentList.set(1, rankingFragment1);
-                        fragmentPagerAdapter.refresh(fragmentList);
+                        fragmentPagerAdapter.notifyDataSetChanged();
+                        viewPager.setCurrentItem(1);
                         break;
                     case R.id.main_top_female:
                         drawable = getResources().getDrawable(R.mipmap.male_black);
@@ -145,7 +146,8 @@ public class MainActivity extends AppCompatActivity {
                         bundle.putBoolean("isMale", false);
                         rankingFragment2.setArguments(bundle);
                         fragmentList.set(1, rankingFragment2);
-                        fragmentPagerAdapter.refresh(fragmentList);
+                        fragmentPagerAdapter.notifyDataSetChanged();
+                        viewPager.setCurrentItem(1);
                         break;
                 }
             }

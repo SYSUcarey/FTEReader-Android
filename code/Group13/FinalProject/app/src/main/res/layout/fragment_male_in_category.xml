@@ -11,7 +11,8 @@
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/fragment_male_in_category_recyclerview">
+        android:id="@+id/fragment_male_in_category_recyclerview"
+        android:overScrollMode="never">
 
     </android.support.v7.widget.RecyclerView>
 

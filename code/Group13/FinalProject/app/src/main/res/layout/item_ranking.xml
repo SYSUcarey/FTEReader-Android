@@ -19,7 +19,7 @@
                 android:id="@+id/ranking_item_image"
                 android:layout_width="50dp"
                 android:layout_height="70dp"
-                android:src="@mipmap/hot"
+                android:src="@mipmap/male_icon1"
                 android:layout_centerInParent="true"/>
         </RelativeLayout>
         <RelativeLayout
