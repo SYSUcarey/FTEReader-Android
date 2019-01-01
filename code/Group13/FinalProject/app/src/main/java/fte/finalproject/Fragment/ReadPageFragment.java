@@ -13,9 +13,9 @@ import fte.finalproject.R;
 public class ReadPageFragment extends Fragment {
     // 页面数据
     private String title;       //章节名
-    private String content;     //本页内容
-    int currPage;               //当前页数
-    int totalPage;              //当前章节总页数
+    private String content;     //本章内容
+    int currentChapter;         //当前章节数
+    int totalChapter;           //总共章节数
 
     // 帧页面View
     View view;
@@ -28,8 +28,8 @@ public class ReadPageFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.currPage = 0;
-        this.totalPage = getArguments().getInt("totalPage");
+        this.currentChapter = getArguments().getInt("currentChapter");
+        this.totalChapter = getArguments().getInt("totalChapter");
         this.content = getArguments().getString("content");
         this.title = getArguments().getString("title");
     }
@@ -53,7 +53,7 @@ public class ReadPageFragment extends Fragment {
     private void init_page_info() {
         titile_control.setText(title);      // 设置标题
         content_control.setText(content);   // 设置阅读页内容
-
+        progress_control.setText(Integer.toString(currentChapter+1) + "/" + Integer.toString(totalChapter+1));
     }
 
     private void init_page_control() {

@@ -191,11 +191,11 @@ public class ReadPageActivity extends AppCompatActivity {
                     // 根据内容适配各帧
                     int count =(cache_chapter_range_max-cache_chapter_range_min+1);
                     System.out.println(count);
-                    for (int i = 0; i < count; ++i) {
+                    for (int i = cache_chapter_range_min; i <= cache_chapter_range_max; ++i) {
                         // 解析章节内容
                         //String title = chapterObjs.get(0).getIchapter().getTitle(); // 这种获取Title的内容错误的（API问题）
-                        String title = chapterLinks.get(cache_chapter_range_min+i).getTitle();
-                        String content = chapterObjs.get(cache_chapter_range_min+i).getIchapter().getBody();
+                        String title = chapterLinks.get(i).getTitle();
+                        String content = chapterObjs.get(i).getIchapter().getBody();
                         // 为段首添加缩进
                         content = "\u3000\u3000" + content;
                         content = content.replaceAll("\n", "\n\u3000\u3000");
@@ -205,12 +205,14 @@ public class ReadPageActivity extends AppCompatActivity {
                         Bundle bundle = new Bundle();
                         bundle.putString("title", title);
                         bundle.putString("content", content);
-                        bundle.putInt("totalPage", currTotalPage);
+                        bundle.putInt("currentChapter", i);
+                        bundle.putInt("totalChapter", totalChapter);
                         fragment.setArguments(bundle);
+                        // 将新加的帧放入队列中
                         fragmentList.add(fragment);
-                        viewPager.setOnPageChangeListener(new MyPagerChangeListener());
                     }
 
+                    viewPager.setOnPageChangeListener(new MyPagerChangeListener());
                     fragmentAdapter = new TabFragmentStatePagerAdapter(getSupportFragmentManager(), fragmentList);
 
                     // 用rxjava更新主线程
@@ -347,10 +349,62 @@ public class ReadPageActivity extends AppCompatActivity {
         }
         @Override
         public void onPageSelected(int arg0) {
-            Log.d("", arg0 + ", " + from);
+            Log.d("跳转", arg0 + ", " + from);
+            // 向右滑动了一章
             if (arg0 == from + 1) {
                 //Toast.makeText(ReadPageActivity.this, "向右滑动了一页", Toast.LENGTH_LONG).show();
-                currPage++;
+                // 滑动到当前缓存的最后一章
+                if(arg0 == cache_chapter_range_max) {
+                    // 已经是网络上的最后一章，没有更新了
+                    if(arg0 == totalChapter) {
+                        Toast.makeText(ReadPageActivity.this, "已经是最后一章了", Toast.LENGTH_LONG).show();
+                    }
+                    else {
+                        // 使用子线程进行网络访问，获取下一章节的内容
+                        final int newChapterNum = arg0 + 1;
+                        Thread getNewChapterThread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ChapterObj c = BookService.getBookService().getChapterByLink(chapterLinks.get(newChapterNum).getLink());
+                                System.out.println(chapterLinks.get(newChapterNum).getLink());
+                                chapterObjs.add(newChapterNum, c);
+                            }
+                        });
+                        getNewChapterThread.start();
+
+                        // 等待网络访问子线程完成
+                        try {
+                            getNewChapterThread.join();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        // 新增一个帧
+                        cache_chapter_range_max++;  // 注意max是等于newChapterNum的
+                        // 解析章节内容
+                        //String title = chapterObjs.get(0).getIchapter().getTitle(); // 这种获取Title的内容错误的（API问题）
+                        String title = chapterLinks.get(newChapterNum).getTitle();
+                        String content = chapterObjs.get(newChapterNum).getIchapter().getBody();
+                        // 为段首添加缩进
+                        content = "\u3000\u3000" + content;
+                        content = content.replaceAll("\n", "\n\u3000\u3000");
+                        // 新建对应章节内容帧
+                        ReadPageFragment fragment = new ReadPageFragment();
+                        // 给帧传数据
+                        Bundle bundle = new Bundle();
+                        bundle.putString("title", title);
+                        bundle.putString("content", content);
+                        bundle.putInt("currentChapter", newChapterNum);
+                        bundle.putInt("totalChapter", totalChapter);
+                        fragment.setArguments(bundle);
+                        // 将新加的帧放入队列中
+                        fragmentList.add(fragment);
+                        // 使用rxjava进行主界面UI更新
+                        rxjava_update_page(1);
+                        System.out.println("更新章节: " + title);
+                    }
+
+                }
+                /*currPage++;
                 //当前章节阅读页数超过章节总页数
                 //代表阅读到了下一章的第一页
                 if (currPage >= currTotalPage) {
@@ -362,7 +416,7 @@ public class ReadPageActivity extends AppCompatActivity {
                 //阅读到缓存的最后一页时，增加下一章节内容到FragmentList
                 if (arg0 == fragmentList.size() - 1) {
                     //todo
-                }
+                }*/
             }
             else if (arg0 == from) {
                 //Toast.makeText(ReadPageActivity.this, "向左滑动了一页", Toast.LENGTH_LONG).show();
@@ -415,6 +469,7 @@ public class ReadPageActivity extends AppCompatActivity {
             @Override
             public void onNext(Integer value) {
                 Log.d("BackgroundActivity", "onNext");
+                // type = 0 界面初始化更新
                 if(type == 0) {
                     // 初始化适配阅读帧
                     fragmentAdapter.notifyDataSetChanged();
@@ -424,6 +479,12 @@ public class ReadPageActivity extends AppCompatActivity {
                     // 适配完毕，取消ProgressBar, 隐藏功能按键
                     progressBar.setVisibility(View.GONE);
                     rg_control.setVisibility(View.GONE);
+                }
+                // type == 1 界面获取下一章节更新
+                if(type == 1) {
+                    fragmentAdapter.notifyDataSetChanged();
+                    System.out.println("下一章节更新");
+                    System.out.println("当前章节数：" + fragmentList.size());
                 }
             }
 
