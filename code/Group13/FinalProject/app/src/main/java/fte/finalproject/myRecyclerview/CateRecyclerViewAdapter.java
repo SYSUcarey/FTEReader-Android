@@ -92,6 +92,19 @@ public class CateRecyclerViewAdapter extends RecyclerView.Adapter<MyViewHolder> 
             TextView bookAuthor = holder.getView(R.id.item_book_author);
             TextView bookType = holder.getView(R.id.item_book_type);
             TextView bookIntro = holder.getView(R.id.item_book_intro);
+            TextView followers = holder.getView(R.id.item_book_followers);
+            TextView retention = holder.getView(R.id.item_book_retention);
+            int num = bookObj.getLatelyFollower();
+            if (num < 10000) {
+                followers.setText(bookObj.getLatelyFollower() + "人追");
+            }
+            else {
+                num /= 10000;
+                followers.setText(num + "万人追");
+            }
+            followers.setVisibility(View.VISIBLE);
+            retention.setText(bookObj.getRetentionRatio() + "%留存率");
+            retention.setVisibility(View.VISIBLE);
             bookName.setText(bookObj.getTitle());
             bookType.setText(bookObj.getMajorCate());
             bookAuthor.setText(bookObj.getAuthor());

@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="20sp">
+    android:layout_margin="20sp"
+    android:background="#FFFFFF">
     <ImageView
         android:layout_width="70sp"
         android:layout_height="100sp"
@@ -70,6 +71,32 @@
             android:textSize="12sp"
             android:layout_marginTop="5sp"
             android:text="在破败中崛起，在寂灭中复苏。沧海成尘，雷电枯竭，那一缕幽雾有一次临近大地，..."/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/item_book_followers"
+            android:text="12万人追"
+            android:textSize="10sp"
+            android:layout_marginTop="5dp"
+            android:layout_below="@id/item_book_intro"
+            android:textColor="#4fa5d5"
+            android:background="@drawable/textview_border_blue"
+            android:visibility="gone"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/item_book_retention"
+            android:text="48.72%留存率"
+            android:textSize="10sp"
+            android:layout_toRightOf="@id/item_book_followers"
+            android:layout_below="@id/item_book_intro"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:textColor="#90F790"
+            android:background="@drawable/textview_border_green"
+            android:visibility="gone"/>
 
     </RelativeLayout>
 
