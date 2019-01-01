@@ -409,17 +409,17 @@ public class SearchActivity extends AppCompatActivity {
 
     public void freshPopBook() {
         Random ra =new Random();
-        int t = ra.nextInt(30)-1;
+        int t = ra.nextInt(29);
         text1.setText(hotBooks[t]);
-        t = ra.nextInt(30)-1;
+        t = ra.nextInt(29);
         text2.setText(hotBooks[t]);
-        t = ra.nextInt(30)-1;
+        t = ra.nextInt(29);
         text3.setText(hotBooks[t]);
-        t = ra.nextInt(30)-1;
+        t = ra.nextInt(29);
         text4.setText(hotBooks[t]);
-        t = ra.nextInt(30)-1;
+        t = ra.nextInt(29);
         text5.setText(hotBooks[t]);
-        t = ra.nextInt(30)-1;
+        t = ra.nextInt(29);
         text6.setText(hotBooks[t]);
     }
 }
