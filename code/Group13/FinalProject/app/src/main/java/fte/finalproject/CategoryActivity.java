@@ -102,8 +102,8 @@ public class CategoryActivity extends AppCompatActivity {
                 bundle1.putBoolean("isRanking", isRanking);
                 bundle1.putBoolean("isMale", isMale);
                 if (i == 0) bundle1.putString("type", "热门");
-                else if (i == 1) bundle1.putString("type", "留存");
-                else if (i == 2) bundle1.putString("type", "连载");
+                else if (i == 1) bundle1.putString("type", "新书");
+                else if (i == 2) bundle1.putString("type", "好评");
                 else bundle1.putString("type", "完结");
                 fragment.setArguments(bundle1);
                 fragmentList.add(fragment);

@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +29,7 @@ import fte.finalproject.myRecyclerview.MyRecyclerViewAdapter;
 import fte.finalproject.myRecyclerview.MyViewHolder;
 import fte.finalproject.obj.AllRankingObj;
 import fte.finalproject.obj.BookObj;
+import fte.finalproject.obj.CategoryObj;
 import fte.finalproject.obj.SingleRankingObj;
 import fte.finalproject.service.BookService;
 
@@ -40,22 +41,40 @@ public class DetailCategoryFragment extends Fragment {
     private String type;            //具体榜单/具体类型
 
     private RecyclerView recyclerView;
+    private ProgressBar progressBar;
     private List<BookObj> bookObjList = new ArrayList<>();
     private MyRecyclerViewAdapter recyclerViewAdapter;
 
-    //各种榜单/分类的id
+    //具体榜单的id
     private String rankingid = "";
-    private String hotid = "", newid = "", reputationid = "", overid = "";
 
     public Handler handler = new Handler();
+    BookService bookService = BookService.getBookService();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.isRanking = getArguments().getBoolean("isRanking");
         this.isMale = getArguments().getBoolean("isMale");
+        if (isRanking == false) {
+            Log.d("type in args:", getArguments().getString("type"));
+            switch (getArguments().getString("type")) {
+                case "热门":
+                    this.type = "hot";
+                    break;
+                case "新书":
+                    this.type = "new";
+                    break;
+                case "好评":
+                    this.type = "reputation";
+                    break;
+                case "完结":
+                    this.type = "over";
+                    break;
+            }
+        }
+        else this.type = getArguments().getString("type");
         this.title = getArguments().getString("title");
-        this.type = getArguments().getString("type");
     }
 
     @Override
@@ -66,6 +85,8 @@ public class DetailCategoryFragment extends Fragment {
         //获取书籍列表
         getBookList();
 
+        progressBar = view.findViewById(R.id.detail_category_progressBar);
+        progressBar.setVisibility(View.VISIBLE);
         recyclerView = view.findViewById(R.id.detail_category_recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerViewAdapter = new MyRecyclerViewAdapter<BookObj>(getActivity(), R.layout.item_book, bookObjList) {
@@ -143,7 +164,12 @@ public class DetailCategoryFragment extends Fragment {
     }
 
     void getBookList() {
-        final BookService bookService = BookService.getBookService();
+        if (isRanking) getRankingBookList();
+        else getCateBookList();
+    }
+
+    //获取排行榜书单
+    void getRankingBookList() {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -153,80 +179,103 @@ public class DetailCategoryFragment extends Fragment {
                     Log.d("error", "获取全部排行榜失败");
                     return;
                 }
-                if (isRanking) {        //排行榜
-                    //获取具体榜单的id
-                    if (isMale) {   //男生
-                        for (AllRankingObj.subClass subClass : allRankingObj.getMaleList()) {
-                            if (subClass.getShortTitle().equals(title)) {
-                                if (title.equals("热搜榜")) rankingid = subClass.getId();
+                //获取具体榜单的id
+                if (isMale) {   //男生
+                    for (AllRankingObj.subClass subClass : allRankingObj.getMaleList()) {
+                        if (subClass.getShortTitle().equals(title)) {
+                            if (title.equals("热搜榜")) rankingid = subClass.getId();
+                            else {
+                                if (type.equals("周榜")) rankingid = subClass.getId();
+                                else if (type.equals("月榜")) rankingid = subClass.getMonthRank();
+                                else if (type.equals("总榜")) rankingid = subClass.getTotalRank();
                                 else {
-                                    if (type.equals("周榜")) rankingid = subClass.getId();
-                                    else if (type.equals("月榜")) rankingid = subClass.getMonthRank();
-                                    else if (type.equals("总榜")) rankingid = subClass.getTotalRank();
-                                    else {
-                                        System.exit(1);
-                                        Log.d("error", "榜单名错误！");
-                                    }
+                                    System.exit(1);
+                                    Log.d("error", "榜单名错误！");
                                 }
-                                break;
                             }
+                            break;
                         }
-                    }
-                    else {          //女生
-                        for (AllRankingObj.subClass subClass : allRankingObj.getFemaleList()) {
-                            if (subClass.getShortTitle().equals(title)) {
-                                if (title.equals("热搜榜")) rankingid = subClass.getId();
-                                else {
-                                    if (type.equals("周榜")) rankingid = subClass.getId();
-                                    else if (type.equals("月榜")) rankingid = subClass.getMonthRank();
-                                    else if (type.equals("总榜")) rankingid = subClass.getTotalRank();
-                                    else {
-                                        System.exit(1);
-                                        Log.d("error", "榜单名不符！");
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                    }
-                    Log.d("21", "rankingid" + rankingid);
-                    //得到id后再获取具体榜单的书籍信息
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            SingleRankingObj singleRankingObj = bookService.getSingleRankingObj(rankingid);
-                            if (singleRankingObj.isOk() == false) {
-                                Toast.makeText(getContext(), "网络错误", Toast.LENGTH_LONG).show();
-                                Log.d("error", "获取单一排行榜失败");
-                                return;
-                            }
-                            List<BookObj> objList = singleRankingObj.getRanking().getBookList();
-                            //取排行榜前15名
-                            for (int i = 0; i < 15 && i < objList.size(); ++i) {
-                                BookObj bookObj = objList.get(i);
-                                String intro = bookObj.getShortIntro();
-                                if (intro.length() > 50) intro = intro.substring(0, 50);
-                                intro += "...";
-                                bookObj.setShortIntro(intro);
-                                bookObjList.add(bookObj);
-                            }
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    recyclerViewAdapter.refresh(bookObjList);
-                                }
-                            });
-                        }
-                    }).start();
-                }
-                else {                  //具体分类
-                    if (isMale) {   //男生
-
-                    }
-                    else {          //女生
-
                     }
                 }
+                else {          //女生
+                    for (AllRankingObj.subClass subClass : allRankingObj.getFemaleList()) {
+                        if (subClass.getShortTitle().equals(title)) {
+                            if (title.equals("热搜榜")) rankingid = subClass.getId();
+                            else {
+                                if (type.equals("周榜")) rankingid = subClass.getId();
+                                else if (type.equals("月榜")) rankingid = subClass.getMonthRank();
+                                else if (type.equals("总榜")) rankingid = subClass.getTotalRank();
+                                else {
+                                    System.exit(1);
+                                    Log.d("error", "榜单名不符！");
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+                //得到id后再获取具体榜单的书籍信息
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        SingleRankingObj singleRankingObj = bookService.getSingleRankingObj(rankingid);
+                        if (singleRankingObj.isOk() == false) {
+                            Toast.makeText(getContext(), "网络错误", Toast.LENGTH_LONG).show();
+                            Log.d("error", "获取单一排行榜失败");
+                            return;
+                        }
+                        List<BookObj> objList = singleRankingObj.getRanking().getBookList();
+                        //取排行榜前15名
+                        for (int i = 0; i < 15 && i < objList.size(); ++i) {
+                            BookObj bookObj = objList.get(i);
+                            String intro = bookObj.getShortIntro();
+                            if (intro.length() > 50) intro = intro.substring(0, 50);
+                            intro += "...";
+                            bookObj.setShortIntro(intro);
+                            bookObjList.add(bookObj);
+                        }
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                recyclerViewAdapter.refresh(bookObjList);
+                                progressBar.setVisibility(View.GONE);
+                            }
+                        });
+                    }
+                }).start();
+            }
+        }).start();
+    }
+
+    //获取具体分类书单
+    void getCateBookList() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String gender = (isMale == true) ? "male" : "female";
+                Log.d("type:", "" + type);
+                CategoryObj categoryObj = bookService.getBooksByCategoty(type, title, 0, 100, gender);
+                if (categoryObj.isOk() == false) {
+                    Toast.makeText(getContext(), "网络错误", Toast.LENGTH_LONG).show();
+                    Log.d("error", "获取主题书单列表失败");
+                    return;
+                }
+                for (BookObj bookObj : categoryObj.getBooks()) {
+                    if (bookObj.getShortIntro().length() > 50){
+                        String intro = bookObj.getShortIntro();
+                        intro = intro.substring(0, 50);
+                        intro += "...";
+                        bookObj.setShortIntro(intro);
+                        bookObjList.add(bookObj);
+                    }
+                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        recyclerViewAdapter.refresh(bookObjList);
+                        progressBar.setVisibility(View.GONE);
+                    }
+                });
             }
         }).start();
     }

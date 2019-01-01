@@ -5,9 +5,24 @@
     android:layout_height="match_parent"
     tools:context=".Fragment.DetailCategoryFragment">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/detail_category_recyclerView"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="match_parent">
+        <ProgressBar
+            android:id="@+id/detail_category_progressBar"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerInParent="true"
+            android:visibility="visible"
+            style="?android:attr/progressBarStyleLargeInverse"
+            />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/detail_category_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </RelativeLayout>
+
+
 
 </FrameLayout>
