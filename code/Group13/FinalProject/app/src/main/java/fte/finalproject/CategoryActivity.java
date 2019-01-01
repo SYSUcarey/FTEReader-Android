@@ -64,8 +64,8 @@ public class CategoryActivity extends AppCompatActivity {
         }
         else {
             RB1.setText("热门");
-            RB2.setText("留存");
-            RB3.setText("连载");
+            RB2.setText("新书");
+            RB3.setText("好评");
             RB4.setVisibility(View.VISIBLE);
         }
 

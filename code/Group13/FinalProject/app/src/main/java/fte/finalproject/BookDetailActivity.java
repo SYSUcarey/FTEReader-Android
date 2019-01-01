@@ -70,7 +70,7 @@ public class BookDetailActivity extends AppCompatActivity {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatabaseControl.getInstance(BookDetailActivity.this).addShelfBook(new ShelfBookObj(bookid, bookObj.getTitle(), cover, 0, "online", 0, bookObj.getLongIntro(), bookObj.getAuthor(), bookObj.getMajorCate()));
+                DatabaseControl.getInstance(BookDetailActivity.this).addShelfBook(new ShelfBookObj(bookid, bookObj.getTitle(), cover, "",0, "online", 0, bookObj.getLongIntro(), bookObj.getAuthor(), bookObj.getMajorCate()));
             }
         });
 

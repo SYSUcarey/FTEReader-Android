@@ -70,7 +70,7 @@ public class DatabaseControl extends SQLiteOpenHelper {
             String address = cursor.getString(cursor.getColumnIndex("address"));
             String description = cursor.getString(cursor.getColumnIndex("description"));
             byte[] imageByte = cursor.getBlob(cursor.getColumnIndex("image"));
-            list.add(new ShelfBookObj(id,name, bytesToBitmap(imageByte),readChapter,address,type,description,author,major));
+            list.add(new ShelfBookObj(id,name, bytesToBitmap(imageByte), "",readChapter,address,type,description,author,major));
         }
         cursor.close();
         db.close();
@@ -157,7 +157,7 @@ public class DatabaseControl extends SQLiteOpenHelper {
         Resources res = MainActivity.getContext().getResources();
         Bitmap bitmap = BitmapFactory.decodeResource(res, R.mipmap.bookcover);
         ContentValues values = new ContentValues();
-        ShelfBookObj book = new ShelfBookObj("5816b415b06d1d32157790b1","圣墟",bitmap,0,"default",0,"在破败中崛起，在寂灭中复苏。沧海成尘，雷电枯竭，那一缕幽雾又一次临近大地，世间的枷锁被打开了，一个全新的世界就此揭开神秘的一角……","辰东","玄幻");
+        ShelfBookObj book = new ShelfBookObj("5816b415b06d1d32157790b1","圣墟",bitmap, "", 0,"default",0,"在破败中崛起，在寂灭中复苏。沧海成尘，雷电枯竭，那一缕幽雾又一次临近大地，世间的枷锁被打开了，一个全新的世界就此揭开神秘的一角……","辰东","玄幻");
         //开始添加第一条数据_id TEXT PRIMARY KEY, name TEXT, type INTEGER ,progress INTEGER, address TEXT,image BLOB, description TEXT
         values.put("name",book.getName());
         values.put("description",book.getDescription());
@@ -171,7 +171,7 @@ public class DatabaseControl extends SQLiteOpenHelper {
         sqLiteDatabase.insert(TABLE_NAME1,null,values);
         values.clear();
         bitmap = BitmapFactory.decodeResource(res, R.mipmap.bookcover2);
-        book = new ShelfBookObj("59ba0dbb017336e411085a4e","元尊",bitmap,0,"default",0,"《斗破苍穹》《武动乾坤》之后全新力作，朝堂太子踏上了荆棘重生之路…","天蚕土豆","玄幻");
+        book = new ShelfBookObj("59ba0dbb017336e411085a4e","元尊",bitmap, "", 0,"default",0,"《斗破苍穹》《武动乾坤》之后全新力作，朝堂太子踏上了荆棘重生之路…","天蚕土豆","玄幻");
         values.put("name",book.getName());
         values.put("description",book.getDescription());
         values.put("type",book.getType());

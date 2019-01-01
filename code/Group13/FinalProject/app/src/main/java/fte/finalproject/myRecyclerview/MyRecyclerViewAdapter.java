@@ -64,4 +64,9 @@ public abstract class MyRecyclerViewAdapter<T> extends RecyclerView.Adapter<MyVi
     public void setOnItemClickListener(OnItemClickListener _onItemClickListener) {
         this.onItemClickListener = _onItemClickListener;
     }
+
+    public void refresh(List list) {
+        this.data = list;
+        notifyDataSetChanged();
+    }
 }

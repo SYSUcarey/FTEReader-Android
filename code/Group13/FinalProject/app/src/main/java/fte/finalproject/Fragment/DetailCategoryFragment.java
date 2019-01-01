@@ -1,13 +1,37 @@
 package fte.finalproject.Fragment;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import fte.finalproject.BookDetailActivity;
 import fte.finalproject.R;
+import fte.finalproject.myRecyclerview.MyRecyclerViewAdapter;
+import fte.finalproject.myRecyclerview.MyViewHolder;
+import fte.finalproject.obj.AllRankingObj;
+import fte.finalproject.obj.BookObj;
+import fte.finalproject.obj.ShelfBookObj;
+import fte.finalproject.obj.SingleRankingObj;
+import fte.finalproject.service.BookService;
 
 //具体分类和榜单的Fragment
 public class DetailCategoryFragment extends Fragment {
@@ -15,6 +39,16 @@ public class DetailCategoryFragment extends Fragment {
     private boolean isMale;         //男生/女生
     private String title;           //榜单名/类型名
     private String type;            //具体榜单/具体类型
+
+    private RecyclerView recyclerView;
+    private List<ShelfBookObj> bookObjList = new ArrayList<>();
+    private MyRecyclerViewAdapter recyclerViewAdapter;
+
+    //各种榜单/分类的id
+    private String rankingid = "";
+    private String hotid = "", newid = "", reputationid = "", overid = "";
+
+    public Handler handler = new Handler();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -29,14 +63,172 @@ public class DetailCategoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detail_category, null);
-        TextView test = view.findViewById(R.id.test_textView);
-        String str = "";
-        if (isMale) str += "男生,";
-        else str += "女生,";
-        if (isRanking) str += "排行榜,";
-        else str += "分类,";
-        str += "title:" + title + ",type:" + type;
-        test.setText(str);
+
+        //获取书籍列表
+        getBookList();
+
+        recyclerView = view.findViewById(R.id.detail_category_recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerViewAdapter = new MyRecyclerViewAdapter<ShelfBookObj>(getActivity(), R.layout.item_book, bookObjList) {
+            @Override
+            public void convert(MyViewHolder holder, ShelfBookObj shelfBookObj) {
+                if (isRanking && !bookObjList.isEmpty()) {
+                    Log.d("id", bookObjList.get(0).getName());
+                    ImageView rankingImg = holder.getView(R.id.item_book_rankingImg);
+                    if (shelfBookObj.getBookId().equals(bookObjList.get(0).getBookId())) {//排行榜第一名
+                        rankingImg.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.first, null));
+                        rankingImg.setVisibility(View.VISIBLE);
+                    } else if (shelfBookObj.getBookId().equals(bookObjList.get(1).getBookId())) {//排行榜第二名
+                        rankingImg.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.second, null));
+                        rankingImg.setVisibility(View.VISIBLE);
+                    } else if (shelfBookObj.getBookId().equals(bookObjList.get(2).getBookId())) {//排行榜第三名
+                        rankingImg.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.third, null));
+                        rankingImg.setVisibility(View.VISIBLE);
+                    }
+                }
+                final ImageView imageView = holder.getView(R.id.item_book_cover);
+                TextView bookName = holder.getView(R.id.item_book_name);
+                TextView bookAuthor = holder.getView(R.id.item_book_author);
+                TextView bookType = holder.getView(R.id.item_book_type);
+                TextView bookIntro = holder.getView(R.id.item_book_intro);
+                imageView.setImageBitmap(shelfBookObj.getIcon());
+                bookName.setText(shelfBookObj.getName());
+                bookType.setText(shelfBookObj.getMajor());
+                bookAuthor.setText(shelfBookObj.getAuthor());
+                bookIntro.setText(shelfBookObj.getDescription());
+
+                //通过网络获取书籍图标
+                final String iconURL = BookService.StaticsUrl +  shelfBookObj.getIconURL();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            URL url = new URL(iconURL);
+                            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                            connection.setRequestMethod("GET");
+                            connection.setConnectTimeout(10000);
+                            if (connection.getResponseCode() == 200) {
+                                InputStream inputStream = connection.getInputStream();
+                                final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        imageView.setImageBitmap(bitmap);
+                                    }
+                                });
+                            }
+                        } catch (Exception e) {
+                            System.err.println(e.getMessage());
+                        }
+                    }}).start();
+            }
+        };
+        recyclerViewAdapter.setOnItemClickListener(new MyRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int position) {
+                //跳转到书籍详情界面
+                Intent intent = new Intent(getActivity(), BookDetailActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("id", bookObjList.get(position).getBookId());
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onLongClick(int position) {
+
+            }
+        });
+        recyclerView.setAdapter(recyclerViewAdapter);
         return view;
+    }
+
+    void getBookList() {
+        final BookService bookService = BookService.getBookService();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                AllRankingObj allRankingObj = bookService.getAllRankingObj();
+                if (allRankingObj.isOk() == false) {
+                    Toast.makeText(getContext(), "网络错误", Toast.LENGTH_LONG).show();
+                    Log.d("error", "获取全部排行榜失败");
+                    return;
+                }
+                if (isRanking) {        //排行榜
+                    //获取具体榜单的id
+                    if (isMale) {   //男生
+                        for (AllRankingObj.subClass subClass : allRankingObj.getMaleList()) {
+                            if (subClass.getShortTitle().equals(title)) {
+                                if (title.equals("热搜榜")) rankingid = subClass.getId();
+                                else {
+                                    if (type.equals("周榜")) rankingid = subClass.getId();
+                                    else if (type.equals("月榜")) rankingid = subClass.getMonthRank();
+                                    else if (type.equals("总榜")) rankingid = subClass.getTotalRank();
+                                    else {
+                                        System.exit(1);
+                                        Log.d("error", "榜单名错误！");
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    else {          //女生
+                        for (AllRankingObj.subClass subClass : allRankingObj.getFemaleList()) {
+                            if (subClass.getShortTitle().equals(title)) {
+                                if (title.equals("热搜榜")) rankingid = subClass.getId();
+                                else {
+                                    if (type.equals("周榜")) rankingid = subClass.getId();
+                                    else if (type.equals("月榜")) rankingid = subClass.getMonthRank();
+                                    else if (type.equals("总榜")) rankingid = subClass.getTotalRank();
+                                    else {
+                                        System.exit(1);
+                                        Log.d("error", "榜单名不符！");
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    Log.d("21", "rankingid" + rankingid);
+                    //得到id后再获取具体榜单的书籍信息
+                    Thread thread2 = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            SingleRankingObj singleRankingObj = bookService.getSingleRankingObj(rankingid);
+                            if (singleRankingObj.isOk() == false) {
+                                Toast.makeText(getContext(), "网络错误", Toast.LENGTH_LONG).show();
+                                Log.d("error", "获取单一排行榜失败");
+                                return;
+                            }
+                            List<BookObj> objList = singleRankingObj.getRanking().getBookList();
+                            //取排行榜前15名
+                            for (int i = 0; i < 15 && i < objList.size(); ++i) {
+                                BookObj bookObj = objList.get(i);
+                                String intro = bookObj.getShortIntro();
+                                if (intro.length() > 40) intro = intro.substring(0, 40);
+                                intro += "...";
+                                bookObjList.add(new ShelfBookObj(bookObj.getId(), bookObj.getTitle(), null, bookObj.getCover(), 0, "", 0, intro, bookObj.getAuthor(), bookObj.getMajorCate()));
+                            }
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    recyclerViewAdapter.refresh(bookObjList);
+                                }
+                            });
+                        }
+                    });
+                    thread2.start();
+                }
+                else {                  //具体分类
+                    if (isMale) {   //男生
+
+                    }
+                    else {          //女生
+
+                    }
+                }
+            }
+        }).start();
     }
 }

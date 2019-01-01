@@ -30,10 +30,10 @@ import retrofit2.http.Url;
 
 
 public class BookService {
-    private static String ApiUrl = "http://api.zhuishushenqi.com";
-    private static String StaticsUrl = "http://statics.zhuishushenqi.com";
-    private static String ChapterUrl = "http://chapter2.zhuishushenqi.com";
-    private static String FuzzySearchUrl = "https://www.apiopen.top";
+    public static String ApiUrl = "http://api.zhuishushenqi.com";
+    public static String StaticsUrl = "http://statics.zhuishushenqi.com";
+    public static String ChapterUrl = "http://chapter2.zhuishushenqi.com";
+    public static String FuzzySearchUrl = "https://www.apiopen.top";
 
     private static BookService bookService = new BookService();
 
