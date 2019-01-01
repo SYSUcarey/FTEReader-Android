@@ -1,6 +1,7 @@
 package fte.finalproject;
 
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
@@ -25,9 +26,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import fte.finalproject.myRecyclerview.MyRecyclerViewAdapter;
 import fte.finalproject.myRecyclerview.MyViewHolder;
+import fte.finalproject.obj.BookObj;
 import fte.finalproject.obj.SearchResultObj;
 import fte.finalproject.service.BookService;
 
@@ -38,7 +41,14 @@ public class SearchActivity extends AppCompatActivity {
 
     private SearchView searchView;
     private TextView cancelView;
+    private TextView text1;
+    private TextView text2;
+    private TextView text3;
+    private TextView text4;
+    private TextView text5;
+    private TextView text6;
     private ImageView deleteView;
+    private ImageView freshView;
     private ListView historyList;
     private ListView fuzzyList;
     private ConstraintLayout initialLayout;
@@ -50,6 +60,13 @@ public class SearchActivity extends AppCompatActivity {
     private MyRecyclerViewAdapter recyclerViewAdapter;
     private boolean isSubmit;
     public Handler handler = new Handler();
+    private String[] hotBooks = {"一品娇宠","剑来","逆天邪神","神医嫡女","官梯",
+            "最强狂兵","无敌剑域","一世倾城","天骄战纪","元尊",
+            "天行","修罗武神","永夜君王","家有王妃初长成","神级奶爸",
+            "神医毒妃","战神狂飙","逆天邪神","神医嫡女","江山美色",
+            "圣墟","极品透视学生","正道潜龙","斗罗大陆","雪中悍刀行",
+            "枭臣","将夜","校花的贴身高手","大刁民","偷香高手",};
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +78,7 @@ public class SearchActivity extends AppCompatActivity {
         tempFuzzy = new ArrayList<>();
         results = new ArrayList<>();
         //获取控件
+        freshView = findViewById(R.id.search_fresh_image);
         cancelView = findViewById(R.id.search_cancel_text);
         searchView = findViewById(R.id.search_search_searchView);
         deleteView = findViewById(R.id.search_delete_image);
@@ -69,12 +87,12 @@ public class SearchActivity extends AppCompatActivity {
         resultList = findViewById(R.id.search_result_list);
         initialLayout = findViewById(R.id.search_initial_layout);
         searchLayout = findViewById(R.id.search_afters_layout);
-        final TextView text1 = findViewById(R.id.search_pop_text1);
-        final TextView text2 = findViewById(R.id.search_pop_text2);
-        final TextView text3 = findViewById(R.id.search_pop_text3);
-        final TextView text4 = findViewById(R.id.search_pop_text4);
-        final TextView text5 = findViewById(R.id.search_pop_text5);
-        final TextView text6 = findViewById(R.id.search_pop_text6);
+        text1 = findViewById(R.id.search_pop_text1);
+        text2 = findViewById(R.id.search_pop_text2);
+        text3 = findViewById(R.id.search_pop_text3);
+        text4 = findViewById(R.id.search_pop_text4);
+        text5 = findViewById(R.id.search_pop_text5);
+        text6 = findViewById(R.id.search_pop_text6);
 
         //设置历史列表adapter
         final ArrayAdapter<String> historyAdapter = new ArrayAdapter<>(this,R.layout.item_listview,histories);
@@ -123,8 +141,24 @@ public class SearchActivity extends AppCompatActivity {
         };
         recyclerViewAdapter.setOnItemClickListener(new MyRecyclerViewAdapter.OnItemClickListener() {
             @Override
-            public void onClick(int position) {
-
+            public void onClick(final int position) {
+                final Intent intent = new Intent(SearchActivity.this, BookDetailActivity.class);
+                final Bundle bundle = new Bundle();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final BookObj t = getBookService().getBookById(results.get(position).get_id());
+                        if (t != null)
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                bundle.putSerializable("bookobj",t);
+                                intent.putExtras(bundle);
+                                startActivity(intent);
+                            }
+                        });
+                    }
+                }).start();
             }
 
             @Override
@@ -332,6 +366,14 @@ public class SearchActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        //更换热门图书函数
+        freshView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                freshPopBook();
+            }
+        });
     }
     public void recordClick(final String s) {
         isSubmit = true;
@@ -363,5 +405,21 @@ public class SearchActivity extends AppCompatActivity {
         }).start();
         recyclerViewAdapter.notifyDataSetChanged();
         searchView.setQuery(s,true);
+    }
+
+    public void freshPopBook() {
+        Random ra =new Random();
+        int t = ra.nextInt(30)-1;
+        text1.setText(hotBooks[t]);
+        t = ra.nextInt(30)-1;
+        text2.setText(hotBooks[t]);
+        t = ra.nextInt(30)-1;
+        text3.setText(hotBooks[t]);
+        t = ra.nextInt(30)-1;
+        text4.setText(hotBooks[t]);
+        t = ra.nextInt(30)-1;
+        text5.setText(hotBooks[t]);
+        t = ra.nextInt(30)-1;
+        text6.setText(hotBooks[t]);
     }
 }

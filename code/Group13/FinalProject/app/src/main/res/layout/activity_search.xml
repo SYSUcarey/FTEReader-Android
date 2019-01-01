@@ -41,6 +41,76 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/guideline">
 
+        <ImageView
+            android:id="@+id/search_n1_image"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="15dp"
+            app:layout_constraintBottom_toBottomOf="@+id/search_pop_text1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/search_pop_text1"
+            app:srcCompat="@mipmap/number1" />
+
+        <ImageView
+            android:id="@+id/search_n2_image"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="15dp"
+            app:layout_constraintBottom_toBottomOf="@+id/search_pop_text1"
+            app:layout_constraintStart_toEndOf="@+id/guideline3"
+            app:layout_constraintTop_toTopOf="@+id/search_pop_text1"
+            app:srcCompat="@mipmap/number2" />
+
+        <ImageView
+            android:id="@+id/search_n3_image"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="15dp"
+            app:layout_constraintBottom_toBottomOf="@+id/search_pop_text2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/search_pop_text2"
+            app:srcCompat="@mipmap/number3" />
+
+        <ImageView
+            android:id="@+id/search_n4_image"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="15dp"
+            app:layout_constraintBottom_toBottomOf="@+id/search_pop_text2"
+            app:layout_constraintStart_toEndOf="@+id/guideline3"
+            app:layout_constraintTop_toTopOf="@+id/search_pop_text2"
+            app:srcCompat="@mipmap/number4" />
+
+        <ImageView
+            android:id="@+id/search_n5_image"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="15dp"
+            app:layout_constraintBottom_toBottomOf="@+id/search_pop_text3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/search_pop_text3"
+            app:srcCompat="@mipmap/number5" />
+
+        <ImageView
+            android:id="@+id/search_n6_image"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="15dp"
+            app:layout_constraintBottom_toBottomOf="@+id/search_pop_text3"
+            app:layout_constraintStart_toEndOf="@+id/guideline3"
+            app:layout_constraintTop_toTopOf="@+id/search_pop_text3"
+            app:srcCompat="@mipmap/number6" />
+
+        <ImageView
+            android:id="@+id/search_fresh_image"
+            android:layout_width="23dp"
+            android:layout_height="23dp"
+            android:layout_marginEnd="10dp"
+            app:layout_constraintBottom_toBottomOf="@+id/textView8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/textView8"
+            app:srcCompat="@mipmap/fresh" />
+
         <android.support.constraint.Guideline
             android:id="@+id/guideline2"
             android:layout_width="wrap_content"
@@ -69,66 +139,66 @@
             android:id="@+id/search_pop_text1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
+            android:layout_marginStart="5dp"
             android:layout_marginTop="10dp"
-            android:textSize="15sp"
             android:text="天骄战纪"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textSize="15sp"
+            app:layout_constraintStart_toEndOf="@+id/search_n1_image"
             app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
         <TextView
             android:id="@+id/search_pop_text2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
+            android:layout_marginStart="5dp"
             android:layout_marginTop="10dp"
-            android:textSize="15sp"
             android:text="最强狂兵"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textSize="15sp"
+            app:layout_constraintStart_toEndOf="@+id/search_n3_image"
             app:layout_constraintTop_toBottomOf="@+id/search_pop_text1" />
 
         <TextView
             android:id="@+id/search_pop_text3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
+            android:layout_marginStart="5dp"
             android:layout_marginTop="10dp"
-            android:textSize="15sp"
             android:text="九星霸体诀"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textSize="15sp"
+            app:layout_constraintStart_toEndOf="@+id/search_n5_image"
             app:layout_constraintTop_toBottomOf="@+id/search_pop_text2" />
 
         <TextView
             android:id="@+id/search_pop_text4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
+            android:layout_marginStart="5dp"
             android:layout_marginTop="10dp"
-            android:textSize="15sp"
             android:text="官梯"
-            app:layout_constraintStart_toStartOf="@+id/guideline3"
+            android:textSize="15sp"
+            app:layout_constraintStart_toEndOf="@+id/search_n2_image"
             app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
         <TextView
             android:id="@+id/search_pop_text5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
+            android:layout_marginStart="5dp"
             android:layout_marginTop="10dp"
-            android:textSize="15sp"
             android:text="剑来"
-            app:layout_constraintStart_toEndOf="@+id/guideline3"
+            android:textSize="15sp"
+            app:layout_constraintStart_toEndOf="@+id/search_n4_image"
             app:layout_constraintTop_toBottomOf="@+id/search_pop_text4" />
 
         <TextView
             android:id="@+id/search_pop_text6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
+            android:layout_marginStart="5dp"
             android:layout_marginTop="10dp"
-            android:textSize="15sp"
             android:text="一世倾城"
-            app:layout_constraintStart_toEndOf="@+id/guideline3"
+            android:textSize="15sp"
+            app:layout_constraintStart_toEndOf="@+id/search_n6_image"
             app:layout_constraintTop_toBottomOf="@+id/search_pop_text5" />
 
         <TextView
@@ -204,7 +274,7 @@
             android:layout_marginStart="5dp"
             android:layout_marginTop="5dp"
             android:background="@android:color/background_light"
-            app:defaultQueryHint="请输入要搜索的书名"
+            app:defaultQueryHint="搜索作者或者书名"
             app:iconifiedByDefault="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/search_cancel_text"

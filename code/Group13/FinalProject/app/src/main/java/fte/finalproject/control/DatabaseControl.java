@@ -21,6 +21,7 @@ public class DatabaseControl extends SQLiteOpenHelper {
     private static final String DB_NAME= "readerBase.db";
     private static final String TABLE_NAME1 = "shelfbook_table";
     private static final String TABLE_NAME2 = "categorybook_table";
+
     private static final int DB_VERSION = 1;
 
 
