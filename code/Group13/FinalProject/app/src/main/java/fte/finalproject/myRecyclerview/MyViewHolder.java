@@ -10,6 +10,15 @@ import android.view.ViewGroup;
 public class MyViewHolder extends RecyclerView.ViewHolder {
     private SparseArray<View> views;
     private View view;
+    private boolean isNormalType;
+
+    public void setNormalTypeType(boolean type) {
+        this.isNormalType = type;
+    }
+
+    public boolean isNormalType() {
+        return isNormalType;
+    }
 
     public MyViewHolder(Context _context, View _view, ViewGroup _viewGroup){
         super(_view);

@@ -16,11 +16,15 @@
             android:visibility="visible"
             style="?android:attr/progressBarStyleLargeInverse"
             />
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/detail_category_recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/detail_category_swipeRefresh"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent">
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/detail_category_recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </android.support.v4.widget.SwipeRefreshLayout>
     </RelativeLayout>
 
 

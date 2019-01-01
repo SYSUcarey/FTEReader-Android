@@ -3,9 +3,12 @@ package fte.finalproject.Fragment;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -25,6 +28,7 @@ import java.util.List;
 
 import fte.finalproject.BookDetailActivity;
 import fte.finalproject.R;
+import fte.finalproject.myRecyclerview.CateRecyclerViewAdapter;
 import fte.finalproject.myRecyclerview.MyRecyclerViewAdapter;
 import fte.finalproject.myRecyclerview.MyViewHolder;
 import fte.finalproject.obj.AllRankingObj;
@@ -42,13 +46,18 @@ public class DetailCategoryFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private List<BookObj> bookObjList = new ArrayList<>();
-    private MyRecyclerViewAdapter recyclerViewAdapter;
+    private CateRecyclerViewAdapter recyclerViewAdapter;
 
     //具体榜单的id
     private String rankingid = "";
 
-    public Handler handler = new Handler();
+    private int total;                  //书籍总数
+    private int lastVisibleItem = 0;
+    private final int PAGE_COUNT = 10;
+
+    Handler handler = new Handler();
     BookService bookService = BookService.getBookService();
 
     @Override
@@ -75,6 +84,8 @@ public class DetailCategoryFragment extends Fragment {
         }
         else this.type = getArguments().getString("type");
         this.title = getArguments().getString("title");
+
+        initBookList();
     }
 
     @Override
@@ -82,68 +93,14 @@ public class DetailCategoryFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detail_category, null);
 
-        //获取书籍列表
-        getBookList();
-
         progressBar = view.findViewById(R.id.detail_category_progressBar);
-        progressBar.setVisibility(View.VISIBLE);
+        swipeRefreshLayout = view.findViewById(R.id.detail_category_swipeRefresh);
+
+        //设置RecyclerView
         recyclerView = view.findViewById(R.id.detail_category_recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerViewAdapter = new MyRecyclerViewAdapter<BookObj>(getActivity(), R.layout.item_book, bookObjList) {
-            @Override
-            public void convert(MyViewHolder holder, BookObj bookObj) {
-                if (isRanking && !bookObjList.isEmpty()) {
-                    Log.d("id", bookObjList.get(0).getTitle());
-                    ImageView rankingImg = holder.getView(R.id.item_book_rankingImg);
-                    if (bookObj.getId().equals(bookObjList.get(0).getId())) {//排行榜第一名
-                        rankingImg.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.first, null));
-                        rankingImg.setVisibility(View.VISIBLE);
-                    } else if (bookObj.getId().equals(bookObjList.get(1).getId())) {//排行榜第二名
-                        rankingImg.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.second, null));
-                        rankingImg.setVisibility(View.VISIBLE);
-                    } else if (bookObj.getId().equals(bookObjList.get(2).getId())) {//排行榜第三名
-                        rankingImg.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.third, null));
-                        rankingImg.setVisibility(View.VISIBLE);
-                    }
-                    else rankingImg.setVisibility(View.GONE);
-                }
-                final ImageView imageView = holder.getView(R.id.item_book_cover);
-                TextView bookName = holder.getView(R.id.item_book_name);
-                TextView bookAuthor = holder.getView(R.id.item_book_author);
-                TextView bookType = holder.getView(R.id.item_book_type);
-                TextView bookIntro = holder.getView(R.id.item_book_intro);
-                bookName.setText(bookObj.getTitle());
-                bookType.setText(bookObj.getMajorCate());
-                bookAuthor.setText(bookObj.getAuthor());
-                bookIntro.setText(bookObj.getShortIntro());
-
-                //通过网络获取书籍图标
-                final String iconURL = BookService.StaticsUrl +  bookObj.getCover();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            URL url = new URL(iconURL);
-                            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                            connection.setRequestMethod("GET");
-                            connection.setConnectTimeout(10000);
-                            if (connection.getResponseCode() == 200) {
-                                InputStream inputStream = connection.getInputStream();
-                                final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        imageView.setImageBitmap(bitmap);
-                                    }
-                                });
-                            }
-                        } catch (Exception e) {
-                            System.err.println(e.getMessage());
-                        }
-                    }}).start();
-            }
-        };
-        recyclerViewAdapter.setOnItemClickListener(new MyRecyclerViewAdapter.OnItemClickListener() {
+        recyclerViewAdapter = new CateRecyclerViewAdapter(getBookList(0, PAGE_COUNT), getActivity(), getBookList(0, PAGE_COUNT).size() > 0 ? true : false, isRanking);
+        recyclerViewAdapter.setOnItemClickListener(new CateRecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void onClick(int position) {
                 //跳转到书籍详情界面
@@ -153,17 +110,65 @@ public class DetailCategoryFragment extends Fragment {
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
-
-            @Override
-            public void onLongClick(int position) {
-
-            }
         });
         recyclerView.setAdapter(recyclerViewAdapter);
+
+        //设置下拉显示的动画颜色
+        swipeRefreshLayout.setColorSchemeColors(Color.RED, Color.BLUE);
+        //下拉刷新的回调事件
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //数据刷新
+                initBookList();
+            }
+        });
+
+        //设置滑动监听器
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                // 在newState为滑到底部时
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    // 如果没有隐藏footView，那么最后一个条目的位置就比我们的getItemCount少1
+                    if (recyclerViewAdapter.isFadeTips() == false && lastVisibleItem + 1 == recyclerViewAdapter.getItemCount()) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                // 然后调用updateRecyclerview方法更新RecyclerView
+                                updateRecyclerView(recyclerViewAdapter.getLastPosition(), recyclerViewAdapter.getLastPosition() + PAGE_COUNT);
+                            }
+                        });
+                    }
+
+                    // 如果隐藏了提示条，我们又上拉加载时，那么最后一个条目就要比getItemCount要少2
+                    if (recyclerViewAdapter.isFadeTips() == true && lastVisibleItem + 2 == recyclerViewAdapter.getItemCount()) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                // 然后调用updateRecyclerview方法更新RecyclerView
+                                updateRecyclerView(recyclerViewAdapter.getLastPosition(), recyclerViewAdapter.getLastPosition() + PAGE_COUNT);
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                // 在滑动完成后，拿到最后一个可见的item的位置
+                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                lastVisibleItem = layoutManager.findLastVisibleItemPosition();
+            }
+        });
+
         return view;
     }
 
-    void getBookList() {
+    void initBookList() {
+        bookObjList.clear();
         if (isRanking) getRankingBookList();
         else getCateBookList();
     }
@@ -225,8 +230,8 @@ public class DetailCategoryFragment extends Fragment {
                             return;
                         }
                         List<BookObj> objList = singleRankingObj.getRanking().getBookList();
-                        //取排行榜前15名
-                        for (int i = 0; i < 15 && i < objList.size(); ++i) {
+                        total = singleRankingObj.getRanking().getTotal();
+                        for (int i = 0; i < objList.size(); ++i) {
                             BookObj bookObj = objList.get(i);
                             String intro = bookObj.getShortIntro();
                             if (intro.length() > 50) intro = intro.substring(0, 50);
@@ -237,8 +242,11 @@ public class DetailCategoryFragment extends Fragment {
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                recyclerViewAdapter.refresh(bookObjList);
+                                updateRecyclerView(0, PAGE_COUNT);
                                 progressBar.setVisibility(View.GONE);
+                                //数据加载完毕时取消动画
+                                swipeRefreshLayout.setRefreshing(false);
+                                Toast.makeText(getActivity(), "数据刷新完成", Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
@@ -254,12 +262,13 @@ public class DetailCategoryFragment extends Fragment {
             public void run() {
                 String gender = (isMale == true) ? "male" : "female";
                 Log.d("type:", "" + type);
-                CategoryObj categoryObj = bookService.getBooksByCategoty(type, title, 0, 100, gender);
+                CategoryObj categoryObj = bookService.getBooksByCategoty(type, title, 0, 1000, gender);
                 if (categoryObj.isOk() == false) {
                     Toast.makeText(getContext(), "网络错误", Toast.LENGTH_LONG).show();
                     Log.d("error", "获取主题书单列表失败");
                     return;
                 }
+                total = categoryObj.getTotal();
                 for (BookObj bookObj : categoryObj.getBooks()) {
                     if (bookObj.getShortIntro().length() > 50){
                         String intro = bookObj.getShortIntro();
@@ -272,11 +281,31 @@ public class DetailCategoryFragment extends Fragment {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        recyclerViewAdapter.refresh(bookObjList);
+                        updateRecyclerView(0, PAGE_COUNT);
                         progressBar.setVisibility(View.GONE);
+                        //数据加载完毕时取消动画
+                        swipeRefreshLayout.setRefreshing(false);
+                        Toast.makeText(getActivity(), "数据刷新完成", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
         }).start();
+    }
+
+    private void updateRecyclerView(int fromIndex, int toIndex) {
+        List<BookObj> newDatas = getBookList(fromIndex, toIndex);
+        if (newDatas.size() > 0) {
+            recyclerViewAdapter.updateList(newDatas, true);
+        } else {
+            recyclerViewAdapter.updateList(null, false);
+        }
+    }
+
+    List<BookObj> getBookList(int from, int to) {
+        List<BookObj> newList = new ArrayList<>();
+        for (int i = from; i < to && i < bookObjList.size(); ++i) {
+            newList.add(bookObjList.get(i));
+        }
+        return newList;
     }
 }
