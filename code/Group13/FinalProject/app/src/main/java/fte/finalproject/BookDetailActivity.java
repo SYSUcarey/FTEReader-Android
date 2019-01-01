@@ -216,13 +216,14 @@ public class BookDetailActivity extends AppCompatActivity {
                             public void run() {
                                 Log.d("width", String.valueOf(cover.getWidth()));
                                 Log.d("height", String.valueOf(cover.getHeight()));
-                                if (cover.getWidth() <= 150 && cover.getHeight() <= 200) {
+                                /*if (cover.getWidth() <= 150 && cover.getHeight() <= 200) {
                                     bookCover.setImageBitmap(Bitmap.createBitmap(cover, 0, 0, cover.getWidth(), cover.getHeight(), largeMatrix, true));
                                 } else if (cover.getWidth() > 300 && cover.getHeight() > 400) {
                                     bookCover.setImageBitmap(Bitmap.createBitmap(cover, 0, 0, cover.getWidth(), cover.getHeight(), littleMatrix, true));
                                 } else {
                                     bookCover.setImageBitmap(cover);
-                                }
+                                }*/
+                                bookCover.setImageBitmap(cover);
                             }
                         });
                     }

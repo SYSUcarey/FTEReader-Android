@@ -42,8 +42,8 @@
             android:layout_height="wrap_content">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_width="100dp"
+                android:layout_height="150dp"
                 android:id="@+id/detail_cover"
                 android:src="@mipmap/bookcover"/>
 
@@ -193,8 +193,8 @@
             android:layout_marginTop="10dp">
 
             <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="100dp"
+                android:layout_height="150dp"
                 android:drawableTop="@mipmap/bookcover"
                 android:text="圣墟"
                 android:background="@null"
@@ -202,8 +202,8 @@
                 android:id="@+id/detail_recom1"/>
 
             <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="100dp"
+                android:layout_height="150dp"
                 android:drawableTop="@mipmap/bookcover"
                 android:text="圣墟"
                 android:background="@null"
@@ -211,8 +211,8 @@
                 android:id="@+id/detail_recom2"/>
 
             <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="100dp"
+                android:layout_height="150dp"
                 android:drawableTop="@mipmap/bookcover"
                 android:text="圣墟"
                 android:background="@null"
