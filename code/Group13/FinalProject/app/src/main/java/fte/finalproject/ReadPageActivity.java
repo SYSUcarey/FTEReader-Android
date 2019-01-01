@@ -46,13 +46,19 @@ public class ReadPageActivity extends AppCompatActivity {
 
     private String bookid;                      // 书籍id
     private CptListObj cptListObj;            //章节列表
-    List<ChapterLinkObj> chapterLinks;
+    List<ChapterLinkObj> chapterLinks;          // 章节查询链接List
+    List<ChapterObj> chapterObjs;    // 章节内容OBJ队列
     private int currChapter;                   //当前阅读到的章节
     private int currPage;                      //当前阅读到的页面(对一个章节而言)[0, currTotalPage - 1]
     private int currTotalPage;                 //当前章节总页数
-    List<ChapterObj> chapterObjs;
+    List<List<String>> chaptersContent;        // 每一章每一页的内容
     StringBuffer showContent = new StringBuffer();
     StringBuffer currentChapterContent = new StringBuffer();
+    private int pageLen = 370;                  //每一页的字节长度-----匹配18sp字体大小
+    int totalChapter;                           // 该书总共的章节数
+    int cache_chapter_range_min;                // 当前缓冲存储的章节数范围下界
+    int cache_chapter_range_max;                // 当前缓冲存储的章节数范围上界
+
 
     private RadioGroup rg_control;
     private RadioButton day_and_night_rb_control;
@@ -120,15 +126,37 @@ public class ReadPageActivity extends AppCompatActivity {
                     Thread initContentThread  = new Thread(new Runnable() {
                         @Override
                         public void run() {
+                            // 获取所有章节信息
                             cptListObj = BookService.getBookService().getChaptersByBookId(bookid);
                             chapterLinks = cptListObj.getImixToc().getChapterLinks();
-                    /*for(int i = 0; i < chapterLinks.size(); i++) {
-                        System.out.println(chapterLinks.get(i).getTitle() + ": " + chapterLinks.get(i).getLink());
-                    }*/
-                            // 获得上下三章的数据
-                            ChapterObj c = BookService.getBookService().getChapterByLink(chapterLinks.get(currChapter).getLink());
-                            //System.out.println(chapterLinks.get(currChapter).getLink());
-                            currentChapterContent.append(c.getIchapter().getBody());
+                            totalChapter = chapterLinks.size();
+                            /*for(int i = 0; i < chapterLinks.size(); i++) {
+                                System.out.println(chapterLinks.get(i).getTitle() + ": " + chapterLinks.get(i).getLink());
+                            }*/
+                            chaptersContent = new ArrayList<>(totalChapter);
+
+                            // 缓存当前章节以及上下共五章的数据
+                            chapterObjs = new ArrayList<>(totalChapter);
+                            cache_chapter_range_min = currChapter - 2;
+                            cache_chapter_range_max = currChapter + 2;
+                            for(int i = cache_chapter_range_min; i <= cache_chapter_range_max; i++) {
+                                //超出章节范围
+                                if(i > totalChapter-1) {
+                                    cache_chapter_range_max--;
+                                    continue;
+                                }
+                                if(i < 0) {
+                                    cache_chapter_range_min++;
+                                    continue;
+                                }
+                                ChapterObj c = BookService.getBookService().getChapterByLink(chapterLinks.get(i).getLink());
+                                System.out.println(chapterLinks.get(i).getLink());
+                                chapterObjs.add(i, c);
+                            }
+                            System.out.println(cache_chapter_range_min + "----" + cache_chapter_range_max);
+                            System.out.println(chapterLinks.size());
+
+                            //currentChapterContent.append(c.getIchapter().getBody());
                             //System.out.println(c.getIchapter().getTitle() + "\n" + c.getIchapter().getBody());
                         }
                     });
@@ -137,26 +165,53 @@ public class ReadPageActivity extends AppCompatActivity {
                     try {
                         initContentThread.join();
                     } catch (InterruptedException e) {
+                        Log.d("[Error] ", "线程获取信息失败");
                         e.printStackTrace();
                     }
 
+                    // 将章节内容分页
+                    // 512字节长度一页
+                    /*currTotalPage = content.length()/pageLen + 1;
+                    System.out.println("分成了" + currTotalPage + "页");
+                    List<String> pages = getStrList(content, pageLen);
+                    System.out.println("已经分割成： " + pages.size() + "页");
+                    System.out.println(pages.get(0));*/
+
+                    /*System.out.println("Test: ");
+                    int len1  = "l".length();
+                    int len2 = "好".length();
+                    int len3 = ",".length();
+                    int len4 = "，".length();
+                    int len5 = "\n".length();
+                    String test = "\u3000\u3000大漠。\r\n\u3000\u3000YES";
+                    System.out.println(test);
+                    int len6 = test.length();
+                    System.out.println("长度：" + len1 + " " + len2 + " " + len3 + " " + len4 + " " + len5 + " " + len6);*/
+
                     // 根据内容适配各帧
-                    //todo
-                    currTotalPage = 10;
-                    String title = "todo";
-                    String content = "todo";
-                    for (int i = 0; i < currTotalPage; ++i) {
+                    int count =(cache_chapter_range_max-cache_chapter_range_min+1);
+                    System.out.println(count);
+                    for (int i = 0; i < count; ++i) {
+                        // 解析章节内容
+                        //String title = chapterObjs.get(0).getIchapter().getTitle(); // 这种获取Title的内容错误的（API问题）
+                        String title = chapterLinks.get(cache_chapter_range_min+i).getTitle();
+                        String content = chapterObjs.get(cache_chapter_range_min+i).getIchapter().getBody();
+                        // 为段首添加缩进
+                        content = "\u3000\u3000" + content;
+                        content = content.replaceAll("\n", "\n\u3000\u3000");
+                        // 新建对应章节内容帧
                         ReadPageFragment fragment = new ReadPageFragment();
+                        // 给帧传数据
                         Bundle bundle = new Bundle();
                         bundle.putString("title", title);
                         bundle.putString("content", content);
                         bundle.putInt("totalPage", currTotalPage);
                         fragment.setArguments(bundle);
                         fragmentList.add(fragment);
-                        fragmentAdapter = new TabFragmentStatePagerAdapter(getSupportFragmentManager(), fragmentList);
                         viewPager.setOnPageChangeListener(new MyPagerChangeListener());
-
                     }
+
+                    fragmentAdapter = new TabFragmentStatePagerAdapter(getSupportFragmentManager(), fragmentList);
 
                     // 用rxjava更新主线程
                     rxjava_update_page(0);
@@ -166,28 +221,10 @@ public class ReadPageActivity extends AppCompatActivity {
         });
         init_fragment_thread.start();
 
-        /*try {
-            init_fragment_thread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
-        // 用rxjava更新主线程
-        /*viewPager.setAdapter(fragmentAdapter);
-        viewPager.setCurrentItem(0);
-        viewPager.setOffscreenPageLimit(currTotalPage - 1);*/
-
-
-        // 获取书本的章节信息：
-        /*Thread get_chapter_thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                chatperList = BookService.getBookService().getChaptersByBookId("5816b415b06d1d32157790b1");
-            }
-        });
-        get_chapter_thread.start();*/
     }
 
 
+    // 获取屏幕宽高等信息
     private void get_screen_info() {
         DisplayMetrics dm = getResources().getDisplayMetrics();
         SCREEN_HEIGHT = dm.heightPixels;
@@ -378,6 +415,16 @@ public class ReadPageActivity extends AppCompatActivity {
             @Override
             public void onNext(Integer value) {
                 Log.d("BackgroundActivity", "onNext");
+                if(type == 0) {
+                    // 初始化适配阅读帧
+                    fragmentAdapter.notifyDataSetChanged();
+                    viewPager.setAdapter(fragmentAdapter);
+                    viewPager.setCurrentItem(0);
+                    viewPager.setOffscreenPageLimit(currTotalPage - 1);
+                    // 适配完毕，取消ProgressBar, 隐藏功能按键
+                    progressBar.setVisibility(View.GONE);
+                    rg_control.setVisibility(View.GONE);
+                }
             }
 
             @Override
@@ -388,20 +435,27 @@ public class ReadPageActivity extends AppCompatActivity {
             @Override
             public void onComplete() {
                 Log.d("BackgroundActivity", "onComplete");
-                // 适配阅读帧
-                fragmentAdapter.notifyDataSetChanged();
-                viewPager.setAdapter(fragmentAdapter);
-                viewPager.setCurrentItem(0);
-                viewPager.setOffscreenPageLimit(currTotalPage - 1);
-
-                // 适配完毕，取消ProgressBar, 隐藏功能按键
-                progressBar.setVisibility(View.GONE);
-                rg_control.setVisibility(View.GONE);
             }
         };
 
         observable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(disposableObserver);
         mCompositeDisposable.add(disposableObserver);
 
+    }
+
+    // 辅助函数 : 将字符串按指定长度分割
+    public static List<String> getStrList(String inputString, int length) {
+        int size = inputString.length() / length;
+        if (inputString.length() % length != 0) {
+            size += 1;
+        }
+        List<String> res = new ArrayList<>();
+        for(int i = 0; i < size - 1; i++) {
+            String s = inputString.substring(i*length, (i+1)*length-1);
+            res.add(s);
+        }
+        String s = inputString.substring((size-1)*length);
+        res.add(s);
+        return res;
     }
 }
