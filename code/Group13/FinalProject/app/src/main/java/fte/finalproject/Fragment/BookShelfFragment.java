@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -60,6 +61,14 @@ public class BookShelfFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        getMyBooks();
+        setRecyclerView();
+        //Toast.makeText(getActivity(), "进入Fragment" + " | " + myBooks.size(), Toast.LENGTH_SHORT).show();
+        super.onResume();
+    }
+
     // 获取书籍数据
     private void getMyBooks() {
         //Bitmap bitmap = ((BitmapDrawable)getResources().getDrawable(R.mipmap.bookcover)).getBitmap();
@@ -95,9 +104,13 @@ public class BookShelfFragment extends Fragment {
                 major.setText(shelfBookObj.getMajor());
                 // 简介
                 TextView intro = holder.getView(R.id.item_book_intro);
-                intro.setText(shelfBookObj.getDescription());
+                String str = shelfBookObj.getDescription();
+                if (str.length() > 50) str = str.substring(0, 50);
+                str += "...";
+                intro.setText(str);
             }
         };
+        adapter.refresh(myBooks);
         adapter.setOnItemClickListener(new MyRecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void onClick(int position) {

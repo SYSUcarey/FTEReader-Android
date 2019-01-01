@@ -50,10 +50,7 @@ public class DatabaseControl extends SQLiteOpenHelper {
     //这个list用于保存所有书架书籍信息
     private List<ShelfBookObj> allShelfBook = null;
     public List<ShelfBookObj> getAllShelfBook() {
-        if (allShelfBook == null) {
-            allShelfBook = getAllShelfBookFromDB();
-        }
-        return allShelfBook;
+        return getAllShelfBookFromDB();
     }
 
     //从数据库中查询所有书架书目
