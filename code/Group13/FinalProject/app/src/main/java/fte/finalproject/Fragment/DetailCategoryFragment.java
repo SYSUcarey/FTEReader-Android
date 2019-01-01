@@ -29,7 +29,6 @@ import fte.finalproject.myRecyclerview.MyRecyclerViewAdapter;
 import fte.finalproject.myRecyclerview.MyViewHolder;
 import fte.finalproject.obj.AllRankingObj;
 import fte.finalproject.obj.BookObj;
-import fte.finalproject.obj.ShelfBookObj;
 import fte.finalproject.obj.SingleRankingObj;
 import fte.finalproject.service.BookService;
 
@@ -41,7 +40,7 @@ public class DetailCategoryFragment extends Fragment {
     private String type;            //具体榜单/具体类型
 
     private RecyclerView recyclerView;
-    private List<ShelfBookObj> bookObjList = new ArrayList<>();
+    private List<BookObj> bookObjList = new ArrayList<>();
     private MyRecyclerViewAdapter recyclerViewAdapter;
 
     //各种榜单/分类的id
@@ -69,19 +68,19 @@ public class DetailCategoryFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.detail_category_recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerViewAdapter = new MyRecyclerViewAdapter<ShelfBookObj>(getActivity(), R.layout.item_book, bookObjList) {
+        recyclerViewAdapter = new MyRecyclerViewAdapter<BookObj>(getActivity(), R.layout.item_book, bookObjList) {
             @Override
-            public void convert(MyViewHolder holder, ShelfBookObj shelfBookObj) {
+            public void convert(MyViewHolder holder, BookObj bookObj) {
                 if (isRanking && !bookObjList.isEmpty()) {
-                    Log.d("id", bookObjList.get(0).getName());
+                    Log.d("id", bookObjList.get(0).getTitle());
                     ImageView rankingImg = holder.getView(R.id.item_book_rankingImg);
-                    if (shelfBookObj.getBookId().equals(bookObjList.get(0).getBookId())) {//排行榜第一名
+                    if (bookObj.getId().equals(bookObjList.get(0).getId())) {//排行榜第一名
                         rankingImg.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.first, null));
                         rankingImg.setVisibility(View.VISIBLE);
-                    } else if (shelfBookObj.getBookId().equals(bookObjList.get(1).getBookId())) {//排行榜第二名
+                    } else if (bookObj.getId().equals(bookObjList.get(1).getId())) {//排行榜第二名
                         rankingImg.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.second, null));
                         rankingImg.setVisibility(View.VISIBLE);
-                    } else if (shelfBookObj.getBookId().equals(bookObjList.get(2).getBookId())) {//排行榜第三名
+                    } else if (bookObj.getId().equals(bookObjList.get(2).getId())) {//排行榜第三名
                         rankingImg.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.third, null));
                         rankingImg.setVisibility(View.VISIBLE);
                     }
@@ -92,14 +91,13 @@ public class DetailCategoryFragment extends Fragment {
                 TextView bookAuthor = holder.getView(R.id.item_book_author);
                 TextView bookType = holder.getView(R.id.item_book_type);
                 TextView bookIntro = holder.getView(R.id.item_book_intro);
-                imageView.setImageBitmap(shelfBookObj.getIcon());
-                bookName.setText(shelfBookObj.getName());
-                bookType.setText(shelfBookObj.getMajor());
-                bookAuthor.setText(shelfBookObj.getAuthor());
-                bookIntro.setText(shelfBookObj.getDescription());
+                bookName.setText(bookObj.getTitle());
+                bookType.setText(bookObj.getMajorCate());
+                bookAuthor.setText(bookObj.getAuthor());
+                bookIntro.setText(bookObj.getShortIntro());
 
                 //通过网络获取书籍图标
-                final String iconURL = BookService.StaticsUrl +  shelfBookObj.getIconURL();
+                final String iconURL = BookService.StaticsUrl +  bookObj.getCover();
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -130,7 +128,7 @@ public class DetailCategoryFragment extends Fragment {
                 //跳转到书籍详情界面
                 Intent intent = new Intent(getActivity(), BookDetailActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putString("id", bookObjList.get(position).getBookId());
+                bundle.putSerializable("bookobj", bookObjList.get(position));
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
@@ -193,7 +191,7 @@ public class DetailCategoryFragment extends Fragment {
                     }
                     Log.d("21", "rankingid" + rankingid);
                     //得到id后再获取具体榜单的书籍信息
-                    Thread thread2 = new Thread(new Runnable() {
+                    new Thread(new Runnable() {
                         @Override
                         public void run() {
                             SingleRankingObj singleRankingObj = bookService.getSingleRankingObj(rankingid);
@@ -207,9 +205,10 @@ public class DetailCategoryFragment extends Fragment {
                             for (int i = 0; i < 15 && i < objList.size(); ++i) {
                                 BookObj bookObj = objList.get(i);
                                 String intro = bookObj.getShortIntro();
-                                if (intro.length() > 40) intro = intro.substring(0, 40);
+                                if (intro.length() > 50) intro = intro.substring(0, 50);
                                 intro += "...";
-                                bookObjList.add(new ShelfBookObj(bookObj.getId(), bookObj.getTitle(), null, bookObj.getCover(), 0, "", 0, intro, bookObj.getAuthor(), bookObj.getMajorCate()));
+                                bookObj.setShortIntro(intro);
+                                bookObjList.add(bookObj);
                             }
                             handler.post(new Runnable() {
                                 @Override
@@ -218,8 +217,7 @@ public class DetailCategoryFragment extends Fragment {
                                 }
                             });
                         }
-                    });
-                    thread2.start();
+                    }).start();
                 }
                 else {                  //具体分类
                     if (isMale) {   //男生

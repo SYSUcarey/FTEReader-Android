@@ -1,6 +1,7 @@
 package fte.finalproject;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -194,6 +195,14 @@ public class MainActivity extends AppCompatActivity {
                         break;
                 }
                 viewPager.setCurrentItem(index);
+            }
+        });
+
+        //搜索按钮点击事件
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, SearchActivity.class));
             }
         });
 

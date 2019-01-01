@@ -2,8 +2,10 @@ package fte.finalproject.obj;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 // 书籍的对象
-public class BookObj {
+public class BookObj implements Serializable {
     // 书籍id
     @SerializedName("_id")
     private String id;
@@ -85,6 +87,10 @@ public class BookObj {
 
     public String getShortIntro() {
         return shortIntro;
+    }
+
+    public void setShortIntro(String shortIntro) {
+        this.shortIntro = shortIntro;
     }
 
     public String getCover() {
