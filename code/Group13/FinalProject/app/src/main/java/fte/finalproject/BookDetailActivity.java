@@ -209,18 +209,18 @@ public class BookDetailActivity extends AppCompatActivity {
                     connection.setConnectTimeout(10000);
                     if (connection.getResponseCode() == 200) {
                         InputStream inputStream = connection.getInputStream();
-                        final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        cover = BitmapFactory.decodeStream(inputStream);
                         mHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                Log.d("width", String.valueOf(bitmap.getWidth()));
-                                Log.d("height", String.valueOf(bitmap.getHeight()));
-                                if (bitmap.getWidth() <= 150 && bitmap.getHeight() <= 200) {
-                                    bookCover.setImageBitmap(Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), largeMatrix, true));
-                                } else if (bitmap.getWidth() > 300 && bitmap.getHeight() > 400) {
-                                    bookCover.setImageBitmap(Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), littleMatrix, true));
+                                Log.d("width", String.valueOf(cover.getWidth()));
+                                Log.d("height", String.valueOf(cover.getHeight()));
+                                if (cover.getWidth() <= 150 && cover.getHeight() <= 200) {
+                                    bookCover.setImageBitmap(Bitmap.createBitmap(cover, 0, 0, cover.getWidth(), cover.getHeight(), largeMatrix, true));
+                                } else if (cover.getWidth() > 300 && cover.getHeight() > 400) {
+                                    bookCover.setImageBitmap(Bitmap.createBitmap(cover, 0, 0, cover.getWidth(), cover.getHeight(), littleMatrix, true));
                                 } else {
-                                    bookCover.setImageBitmap(bitmap);
+                                    bookCover.setImageBitmap(cover);
                                 }
                             }
                         });
@@ -276,7 +276,7 @@ public class BookDetailActivity extends AppCompatActivity {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatabaseControl.getInstance(BookDetailActivity.this).addShelfBook(new ShelfBookObj(bookObj.getId(), bookObj.getTitle(), cover, "",0, "online", 0, bookObj.getLongIntro(), bookObj.getAuthor(), bookObj.getMajorCate()));
+                DatabaseControl.getInstance(BookDetailActivity.this).addShelfBook(new ShelfBookObj(bookObj.getId(), bookObj.getTitle(), cover, bookObj.getCover(),0, "online", 0, bookObj.getLongIntro(), bookObj.getAuthor(), bookObj.getMajorCate()));
             }
         });
 
