@@ -15,9 +15,13 @@
 
         <ListView
             android:id="@+id/search_fuzzy_list"
-            android:layout_width="match_parent"
+            android:divider="@null"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
             android:layout_marginTop="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <android.support.v7.widget.RecyclerView
@@ -40,7 +44,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.075" />
+            app:layout_constraintGuide_percent="0.2" />
 
         <android.support.constraint.Guideline
             android:id="@+id/guideline3"
@@ -67,7 +71,7 @@
             android:layout_marginTop="10dp"
             android:text="天骄战纪"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/guideline2" />
+            app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
         <TextView
             android:id="@+id/search_pop_text2"
@@ -97,7 +101,7 @@
             android:layout_marginTop="10dp"
             android:text="官梯"
             app:layout_constraintStart_toStartOf="@+id/guideline3"
-            app:layout_constraintTop_toBottomOf="@+id/guideline2" />
+            app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
         <TextView
             android:id="@+id/search_pop_text5"
@@ -163,6 +167,8 @@
             android:id="@+id/search_history_list"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:divider="@null"
+            android:layout_marginStart="15dp"
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -172,22 +178,24 @@
     <android.support.constraint.ConstraintLayout
         android:id="@+id/search_top_layout"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="42dp"
         android:background="@android:color/holo_red_light"
         app:layout_constraintBottom_toBottomOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <SearchView
+        <android.support.v7.widget.SearchView
             android:id="@+id/search_search_searchView"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:layout_marginBottom="5dp"
             android:layout_marginEnd="10dp"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="5dp"
             android:layout_marginTop="5dp"
             android:background="@android:color/background_light"
+            app:defaultQueryHint="请输入要搜索的书名"
+            app:iconifiedByDefault="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/search_cancel_text"
             app:layout_constraintStart_toStartOf="parent"
