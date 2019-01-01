@@ -106,7 +106,7 @@ public class SearchActivity extends AppCompatActivity {
                 TextView author = holder.getView(R.id.item_book_author);
                 author.setText(book.getAuthor());
                 TextView major = holder.getView(R.id.item_book_type);
-                major.setText(book.getContentType());
+                major.setText(book.getCat());
                 TextView intro = holder.getView(R.id.item_book_intro);
                 String introString = book.getShortIntro();
                 if (introString.length() > 50){
