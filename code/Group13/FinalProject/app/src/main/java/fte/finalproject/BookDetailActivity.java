@@ -3,8 +3,10 @@ package fte.finalproject;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.icu.util.LocaleData;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,17 +22,17 @@ import android.widget.Toast;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import fte.finalproject.control.DatabaseControl;
 import fte.finalproject.obj.BookObj;
 import fte.finalproject.obj.CategoryObj;
 import fte.finalproject.obj.ChapterLinkObj;
-import fte.finalproject.obj.ChapterLinks;
-import fte.finalproject.obj.ChapterObj;
-import fte.finalproject.obj.CptListObj;
-import fte.finalproject.obj.SearchResultObj;
+import fte.finalproject.obj.RecomListObj;
 import fte.finalproject.obj.ShelfBookObj;
 import fte.finalproject.service.BookService;
 
@@ -40,7 +42,12 @@ public class BookDetailActivity extends AppCompatActivity {
     RadioButton readButton;
     RadioButton downloadButton;
     Button moreButton;
+    Button recom1;
+    Button recom2;
+    Button recom3;
 
+    ImageView back;
+    TextView pageTitle;
     ImageView bookCover;
     TextView bookTitle;
     TextView bookInfo;
@@ -66,12 +73,16 @@ public class BookDetailActivity extends AppCompatActivity {
 
     Handler mHandler = new Handler();
 
+    private SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-mm'T'HH:MM:SS");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_detail);
 
         // 获取控件
+        back = findViewById(R.id.detail_back);
+        pageTitle = findViewById(R.id.detail_title);
         addButton = findViewById(R.id.detail_bottom_add);
         readButton = findViewById(R.id.detail_bottom_read);
         downloadButton = findViewById(R.id.detail_bottom_download);
@@ -84,6 +95,9 @@ public class BookDetailActivity extends AppCompatActivity {
         retentionRatio = findViewById(R.id.detail_retentionRatio2);
         bookIntro = findViewById(R.id.detail_longIntro);
         recomRG = findViewById(R.id.detail_recomRG);
+        recom1 = findViewById(R.id.detail_recom1);
+        recom2 = findViewById(R.id.detail_recom2);
+        recom3 = findViewById(R.id.detail_recom3);
 
         Intent intent = getIntent();
         final Bundle bundle = intent.getExtras();
@@ -98,18 +112,36 @@ public class BookDetailActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         bookTitle.setText(bookObj.getTitle());
+                        pageTitle.setText(bookObj.getTitle());
                         int wordNum = bookObj.getWordCount() / 10000;
                         bookInfo.setText(bookObj.getAuthor() + " | " + bookObj.getMinorCate() + " | " + String.valueOf(wordNum) + "万字");
-                        updateTime.setText(bookObj.getUpdated());
+                        String updateStr = "";
+                        try {
+                            Date date = format.parse(bookObj.getUpdated());
+                            Date now = new Date(System.currentTimeMillis());
+                            long period = now.getTime() - date.getTime();
+                            Log.d("period", String.valueOf(period));
+                            if (period / 86400000 < 1) {
+                                updateStr = "今天";
+                            } else if (period / 86400000 > 1) {
+                                updateStr = String.valueOf(period / 86400000) + "天前";
+                            }
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        updateTime.setText(updateStr);
                         int followerNum = bookObj.getLatelyFollower() / 10000;
                         follower.setText(String.valueOf(followerNum) + "万人+");
                         retentionRatio.setText(bookObj.getRetentionRatio() + "%");
-                        bookIntro.setText(bookObj.getLongIntro());
+                        String intro = bookObj.getLongIntro();
+                        if (intro.length() > 60) intro = intro.substring(0, 60);
+                        intro += "...";
+                        bookIntro.setText(intro);
 
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                categoryObj = BookService.getBookService().getBooksByCategoty("reputation", bookObj.getMajorCate(), 0, 3, bookObj.getGender()[0]);
+                                categoryObj = BookService.getBookService().getBooksByCategoty("reputation", bookObj.getMajorCate(), 0, 10, bookObj.getGender()[0]);
                                 Log.d("size", String.valueOf(categoryObj.getBooks().size()));
                                 for (int i = 0; i < categoryObj.getBooks().size(); i++) {
                                     final int j = i;
@@ -118,34 +150,36 @@ public class BookDetailActivity extends AppCompatActivity {
                                         @Override
                                         public void run() {
                                             bookObjs.add(temp);
-                                            final String iconURL = BookService.StaticsUrl +  temp.getCover();
-                                            final Button button = (Button)recomRG.getChildAt(j);
-                                            button.setText(bookObjs.get(j).getTitle());
-                                            new Thread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    try {
-                                                        URL url = new URL(iconURL);
-                                                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                                                        connection.setRequestMethod("GET");
-                                                        connection.setConnectTimeout(10000);
-                                                        if (connection.getResponseCode() == 200) {
-                                                            InputStream inputStream = connection.getInputStream();
-                                                            final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                                                            mHandler.post(new Runnable() {
-                                                                @Override
-                                                                public void run() {
-                                                                    Drawable drawable = new BitmapDrawable(bitmap);
-                                                                    drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
-                                                                    button.setCompoundDrawables(null, drawable, null, null);
-                                                                }
-                                                            });
+                                            if (j < 3) {
+                                                final String iconURL = BookService.StaticsUrl +  temp.getCover();
+                                                final Button button = (Button)recomRG.getChildAt(j);
+                                                button.setText(bookObjs.get(j).getTitle());
+                                                new Thread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        try {
+                                                            URL url = new URL(iconURL);
+                                                            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                                                            connection.setRequestMethod("GET");
+                                                            connection.setConnectTimeout(10000);
+                                                            if (connection.getResponseCode() == 200) {
+                                                                InputStream inputStream = connection.getInputStream();
+                                                                final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                                                                mHandler.post(new Runnable() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        Drawable drawable = new BitmapDrawable(bitmap);
+                                                                        drawable.setBounds(0, 0, bitmap.getWidth() * 2, bitmap.getHeight() * 2);
+                                                                        button.setCompoundDrawables(null, drawable, null, null);
+                                                                    }
+                                                                });
+                                                            }
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
                                                         }
-                                                    } catch (Exception e) {
-                                                        e.printStackTrace();
                                                     }
-                                                }
-                                            }).start();
+                                                }).start();
+                                            }
                                         }
                                     });
 
@@ -161,6 +195,8 @@ public class BookDetailActivity extends AppCompatActivity {
 
         // 获取封面图片
         final String iconURL = BookService.StaticsUrl +  bookObj.getCover();
+        final Matrix matrix = new Matrix();
+        matrix.postScale((float)2.0, (float)2.0);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -175,7 +211,11 @@ public class BookDetailActivity extends AppCompatActivity {
                         mHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                bookCover.setImageBitmap(bitmap);
+                                if (bitmap.getWidth() <= 140 && bitmap.getHeight() <= 200) {
+                                    bookCover.setImageBitmap(Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true));
+                                } else {
+                                    bookCover.setImageBitmap(bitmap);
+                                }
                             }
                         });
                     }
@@ -185,7 +225,46 @@ public class BookDetailActivity extends AppCompatActivity {
             }
         }).start();
 
-        // 获取同类书籍
+        recom1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(BookDetailActivity.this, BookDetailActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("bookobj", bookObjs.get(0));
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        });
+
+        recom2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(BookDetailActivity.this, BookDetailActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("bookobj", bookObjs.get(1));
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        });
+
+        recom3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(BookDetailActivity.this, BookDetailActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("bookobj", bookObjs.get(2));
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        });
+
+        // 返回
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         // 加入书架
         addButton.setOnClickListener(new View.OnClickListener() {
@@ -231,7 +310,12 @@ public class BookDetailActivity extends AppCompatActivity {
         moreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(BookDetailActivity.this, RecomActivity.class);
+                Bundle bundle = new Bundle();
+                RecomListObj recomListObj = new RecomListObj(bookObjs);
+                bundle.putSerializable("list", recomListObj);
+                intent.putExtras(bundle);
+                startActivity(intent);
             }
         });
     }

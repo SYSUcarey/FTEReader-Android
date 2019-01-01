@@ -33,16 +33,19 @@
         </activity>
         <activity
             android:name=".SearchActivity"
-            android:windowSoftInputMode="adjustPan|stateHidden" >
-<!--
+            android:windowSoftInputMode="adjustPan|stateHidden">
+
+            <!--
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
+            </intent-filter>
+            -->
 
         </activity>
         <activity android:name=".CategoryActivity" />
+        <activity android:name=".RecomActivity"></activity>
     </application>
 
 </manifest>
