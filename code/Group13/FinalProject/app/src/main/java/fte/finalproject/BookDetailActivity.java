@@ -2,12 +2,15 @@ package fte.finalproject;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
@@ -29,6 +32,14 @@ public class BookDetailActivity extends AppCompatActivity {
     RadioButton downloadButton;
     Button moreButton;
 
+    ImageView bookCover;
+    TextView bookTitle;
+    TextView bookInfo;
+    TextView updateTime;
+    TextView follower;
+    TextView retentionRatio;
+    TextView bookIntro;
+
     private String bookid;
 
     private BookObj bookObj;
@@ -38,6 +49,8 @@ public class BookDetailActivity extends AppCompatActivity {
     private List<ChapterLinkObj> linkList;
 
     private StringBuilder stringBuilder = new StringBuilder();
+
+    Handler mHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +62,13 @@ public class BookDetailActivity extends AppCompatActivity {
         readButton = findViewById(R.id.detail_bottom_read);
         downloadButton = findViewById(R.id.detail_bottom_download);
         moreButton = findViewById(R.id.detail_more);
+        bookCover = findViewById(R.id.detail_cover);
+        bookTitle = findViewById(R.id.detail_bookTitle);
+        bookInfo = findViewById(R.id.detail_TV);
+        updateTime = findViewById(R.id.detail_update);
+        follower = findViewById(R.id.detail_follower2);
+        retentionRatio = findViewById(R.id.detail_retentionRatio2);
+        bookIntro = findViewById(R.id.detail_longIntro);
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
