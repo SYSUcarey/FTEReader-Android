@@ -102,8 +102,6 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
-        //设置搜索函数
-
         //设置历史列表adapter
         ArrayAdapter<String> historyAdapter = new ArrayAdapter<>(this,R.layout.item_listview,histories);
         historyList.setAdapter(historyAdapter);
