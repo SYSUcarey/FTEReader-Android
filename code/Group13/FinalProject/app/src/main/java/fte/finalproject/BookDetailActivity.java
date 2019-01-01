@@ -130,8 +130,8 @@ public class BookDetailActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                         updateTime.setText(updateStr);
-                        int followerNum = bookObj.getLatelyFollower() / 10000;
-                        follower.setText(String.valueOf(followerNum) + "万人+");
+                        // int followerNum = bookObj.getLatelyFollower() / 10000;
+                        follower.setText(String.valueOf(bookObj.getLatelyFollower()) + "人");
                         retentionRatio.setText(bookObj.getRetentionRatio() + "%");
                         String intro = bookObj.getLongIntro();
                         if (intro.length() > 60) intro = intro.substring(0, 60);
@@ -195,8 +195,10 @@ public class BookDetailActivity extends AppCompatActivity {
 
         // 获取封面图片
         final String iconURL = BookService.StaticsUrl +  bookObj.getCover();
-        final Matrix matrix = new Matrix();
-        matrix.postScale((float)2.0, (float)2.0);
+        final Matrix largeMatrix = new Matrix();
+        final Matrix littleMatrix = new Matrix();
+        largeMatrix.postScale((float)2, (float)2);
+        littleMatrix.postScale((float)0.5, (float)0.5);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -211,8 +213,12 @@ public class BookDetailActivity extends AppCompatActivity {
                         mHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                if (bitmap.getWidth() <= 140 && bitmap.getHeight() <= 200) {
-                                    bookCover.setImageBitmap(Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true));
+                                Log.d("width", String.valueOf(bitmap.getWidth()));
+                                Log.d("height", String.valueOf(bitmap.getHeight()));
+                                if (bitmap.getWidth() <= 150 && bitmap.getHeight() <= 200) {
+                                    bookCover.setImageBitmap(Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), largeMatrix, true));
+                                } else if (bitmap.getWidth() > 300 && bitmap.getHeight() > 400) {
+                                    bookCover.setImageBitmap(Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), littleMatrix, true));
                                 } else {
                                     bookCover.setImageBitmap(bitmap);
                                 }
