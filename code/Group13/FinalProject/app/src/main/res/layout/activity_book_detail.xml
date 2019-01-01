@@ -30,7 +30,7 @@
                 android:id="@+id/detail_title"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:text="圣墟"
+                android:text=""
                 android:textSize="20sp"
                 android:textColor="#000000"
                 android:layout_centerInParent="true"
@@ -44,14 +44,13 @@
             <ImageView
                 android:layout_width="100dp"
                 android:layout_height="150dp"
-                android:id="@+id/detail_cover"
-                android:src="@mipmap/bookcover"/>
+                android:id="@+id/detail_cover" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/detail_bookTitle"
-                android:text="圣墟"
+                android:text=""
                 android:textSize="22sp"
                 app:layout_constraintLeft_toRightOf="@id/detail_cover"
                 app:layout_constraintTop_toTopOf="@id/detail_cover"
@@ -62,7 +61,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/detail_TV"
-                android:text="辰东 | 东方玄幻 | 496万字"
+                android:text=""
                 android:textSize="14sp"
                 android:textColor="@color/colorGrey"
                 app:layout_constraintLeft_toRightOf="@id/detail_cover"
@@ -74,7 +73,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/detail_update"
-                android:text="昨天"
+                android:text=""
                 android:textSize="14sp"
                 android:textColor="@color/colorRed"
                 android:layout_weight="1"
@@ -106,7 +105,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/detail_follower2"
-                android:text="17万人+"
+                android:text=""
                 android:textSize="16sp"
                 android:textColor="@color/colorBlack"
                 android:layout_toRightOf="@id/detail_follower1"
@@ -130,7 +129,7 @@
                 android:id="@+id/detail_retentionRatio2"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:text="52.68%"
+                android:text=""
                 android:textSize="16sp"
                 android:textColor="@color/colorBlack"/>
 
@@ -145,7 +144,7 @@
             app:layout_constraintTop_toBottomOf="@+id/detail_CV"
             android:textSize="12sp"
             android:layout_marginBottom="10dp"
-            android:text="在破败中崛起，在寂灭中复苏。沧海成尘，雷电枯竭，那一缕幽雾又一次临近大地，世间的枷锁被打开了，一个全新的世界就此揭开神秘的一角……"/>
+            android:text=""/>
 
     </LinearLayout>
 
@@ -195,8 +194,7 @@
             <Button
                 android:layout_width="100dp"
                 android:layout_height="150dp"
-                android:drawableTop="@mipmap/bookcover"
-                android:text="圣墟"
+                android:text=""
                 android:background="@null"
                 android:layout_weight="1"
                 android:id="@+id/detail_recom1"/>
@@ -204,8 +202,7 @@
             <Button
                 android:layout_width="100dp"
                 android:layout_height="150dp"
-                android:drawableTop="@mipmap/bookcover"
-                android:text="圣墟"
+                android:text=""
                 android:background="@null"
                 android:layout_weight="1"
                 android:id="@+id/detail_recom2"/>
@@ -213,8 +210,7 @@
             <Button
                 android:layout_width="100dp"
                 android:layout_height="150dp"
-                android:drawableTop="@mipmap/bookcover"
-                android:text="圣墟"
+                android:text=""
                 android:background="@null"
                 android:layout_weight="1"
                 android:id="@+id/detail_recom3"/>

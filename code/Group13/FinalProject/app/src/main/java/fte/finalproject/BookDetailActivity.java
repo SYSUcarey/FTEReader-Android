@@ -104,6 +104,45 @@ public class BookDetailActivity extends AppCompatActivity {
         final Bundle bundle = intent.getExtras();
         bookObj = (BookObj)bundle.getSerializable("bookobj");
 
+        // 获取封面图片
+        final String iconURL = BookService.StaticsUrl +  bookObj.getCover();
+        final Matrix largeMatrix = new Matrix();
+        final Matrix littleMatrix = new Matrix();
+        largeMatrix.postScale((float)2, (float)2);
+        littleMatrix.postScale((float)0.5, (float)0.5);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL(iconURL);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestMethod("GET");
+                    connection.setConnectTimeout(10000);
+                    if (connection.getResponseCode() == 200) {
+                        InputStream inputStream = connection.getInputStream();
+                        cover = BitmapFactory.decodeStream(inputStream);
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Log.d("width", String.valueOf(cover.getWidth()));
+                                Log.d("height", String.valueOf(cover.getHeight()));
+                                /*if (cover.getWidth() <= 150 && cover.getHeight() <= 200) {
+                                    bookCover.setImageBitmap(Bitmap.createBitmap(cover, 0, 0, cover.getWidth(), cover.getHeight(), largeMatrix, true));
+                                } else if (cover.getWidth() > 300 && cover.getHeight() > 400) {
+                                    bookCover.setImageBitmap(Bitmap.createBitmap(cover, 0, 0, cover.getWidth(), cover.getHeight(), littleMatrix, true));
+                                } else {
+                                    bookCover.setImageBitmap(cover);
+                                }*/
+                                bookCover.setImageBitmap(cover);
+                            }
+                        });
+                    }
+                } catch (Exception e) {
+                    System.err.println(e.getMessage());
+                }
+            }
+        }).start();
+
         // 获取书籍相关信息
         new Thread(new Runnable() {
             @Override
@@ -190,46 +229,6 @@ public class BookDetailActivity extends AppCompatActivity {
                         }).start();
                     }
                 });
-            }
-        }).start();
-
-
-        // 获取封面图片
-        final String iconURL = BookService.StaticsUrl +  bookObj.getCover();
-        final Matrix largeMatrix = new Matrix();
-        final Matrix littleMatrix = new Matrix();
-        largeMatrix.postScale((float)2, (float)2);
-        littleMatrix.postScale((float)0.5, (float)0.5);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    URL url = new URL(iconURL);
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestMethod("GET");
-                    connection.setConnectTimeout(10000);
-                    if (connection.getResponseCode() == 200) {
-                        InputStream inputStream = connection.getInputStream();
-                        cover = BitmapFactory.decodeStream(inputStream);
-                        mHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Log.d("width", String.valueOf(cover.getWidth()));
-                                Log.d("height", String.valueOf(cover.getHeight()));
-                                /*if (cover.getWidth() <= 150 && cover.getHeight() <= 200) {
-                                    bookCover.setImageBitmap(Bitmap.createBitmap(cover, 0, 0, cover.getWidth(), cover.getHeight(), largeMatrix, true));
-                                } else if (cover.getWidth() > 300 && cover.getHeight() > 400) {
-                                    bookCover.setImageBitmap(Bitmap.createBitmap(cover, 0, 0, cover.getWidth(), cover.getHeight(), littleMatrix, true));
-                                } else {
-                                    bookCover.setImageBitmap(cover);
-                                }*/
-                                bookCover.setImageBitmap(cover);
-                            }
-                        });
-                    }
-                } catch (Exception e) {
-                    System.err.println(e.getMessage());
-                }
             }
         }).start();
 
