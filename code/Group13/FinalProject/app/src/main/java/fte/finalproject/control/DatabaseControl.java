@@ -108,11 +108,11 @@ public class DatabaseControl extends SQLiteOpenHelper {
     }
 
     //更新阅读进度
-    public void updateProgress(int progress, int id) {
+    public void updateProgress(int progress, String id) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues value = new ContentValues();
         value.put("progress", progress);
-        db.update("product", value, "_id=?", new String[] { String.valueOf(id) });
+        db.update("product", value, "_id=?", new String[] { id });
         db.close();
     }
 
