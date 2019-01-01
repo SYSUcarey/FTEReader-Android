@@ -8,6 +8,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.icu.util.LocaleData;
 import android.os.Handler;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -272,13 +273,13 @@ public class BookDetailActivity extends AppCompatActivity {
             }
         });
 
-        // 加入书架
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DatabaseControl.getInstance(BookDetailActivity.this).addShelfBook(new ShelfBookObj(bookObj.getId(), bookObj.getTitle(), cover, bookObj.getCover(),0, "online", 0, bookObj.getLongIntro(), bookObj.getAuthor(), bookObj.getMajorCate()));
-            }
-        });
+        if (DatabaseControl.getInstance(BookDetailActivity.this).judgeBookExist(bookObj.getId())) {
+            // 已存在
+            setButtonToDelete();
+        } else {
+            // 不存在
+            setButtonToAdd();
+        }
 
         // 阅读
         readButton.setOnClickListener(new View.OnClickListener() {
@@ -325,4 +326,31 @@ public class BookDetailActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void setButtonToAdd() {
+        addButton.setText("加入书架");
+        addButton.setTextColor(getResources().getColor(R.color.colorRed));
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseControl.getInstance(BookDetailActivity.this).addShelfBook(new ShelfBookObj(bookObj.getId(), bookObj.getTitle(), cover, bookObj.getCover(),0, "online", 0, bookObj.getLongIntro(), bookObj.getAuthor(), bookObj.getMajorCate()));
+                Toast.makeText(BookDetailActivity.this, "已添加《" + bookObj.getTitle() + "》", Toast.LENGTH_SHORT).show();
+                setButtonToDelete();
+            }
+        });
+    }
+
+    private void setButtonToDelete() {
+        addButton.setText("移除书架");
+        addButton.setTextColor(getResources().getColor(R.color.colorGrey));
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseControl.getInstance(BookDetailActivity.this).deleteShelfBook(bookObj.getId());
+                Toast.makeText(BookDetailActivity.this, "已移除《" + bookObj.getTitle() + "》", Toast.LENGTH_SHORT).show();
+                setButtonToAdd();
+            }
+        });
+    }
+
 }
