@@ -69,6 +69,7 @@ public class BookShelfFragment extends Fragment {
         setRecyclerView();
         //Toast.makeText(getActivity(), "进入Fragment" + " | " + myBooks.size(), Toast.LENGTH_SHORT).show();
 //        System.out.println("onResume: " + myBooks.get(0).getReadChapter());
+        //System.out.println("横竖屏状态：MainActivity-BookShelfFragment: " + DatabaseControl.getInstance(getActivity()).get_Hor_Or_Ver_Screen_Status(0));
         super.onResume();
     }
 

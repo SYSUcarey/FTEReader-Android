@@ -97,22 +97,32 @@ public class ReadPageActivity extends AppCompatActivity {
 
     // 功能栏是否显示
     boolean show_functional_button = false;
-    boolean is_vertical_screen = true;
+    boolean is_vertical_screen;
 
     // 活动上下文
     Context context;
+
+    // 广播
+    MyReceiver myReceiver;
+    IntentFilter intentFilter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_read_page);
+        //System.out.println("onCreate创建");
+
         //从传递的参数中获取章节相关信息
         Intent intent = this.getIntent();
         Bundle bundle = intent.getExtras();
         bookid = bundle.getString("bookid");
         currChapter = bundle.getInt("currentChapter");
-        System.out.println("bookid: " + bookid + "  currentChapter: " + currChapter);
+        //System.out.println("bookid: " + bookid + "  currentChapter: " + currChapter);
 
+
+        // 横竖屏状态控制
+        set_Hor_or_Ver_Screen();
 
         // 获取页面控件
         init_page_control();
@@ -134,9 +144,21 @@ public class ReadPageActivity extends AppCompatActivity {
         // 初始化底部信息栏显示
         init_bottom_info_layout();
 
-
         //初始化 Fragment
         init_fragment();
+    }
+
+    private void set_Hor_or_Ver_Screen() {
+        // 获取默认用户下的横竖屏状态
+        int hor_or_ver_screen = DatabaseControl.getInstance(this).get_Hor_Or_Ver_Screen_Status(0);
+        //System.out.println("从数据库中获取到的横竖屏状态： " + hor_or_ver_screen);
+        if(hor_or_ver_screen == 1)
+            is_vertical_screen = true;
+        else {
+            is_vertical_screen = false;
+            // 切换成横屏
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
     }
 
     // 初始化底部信息栏显示
@@ -155,10 +177,10 @@ public class ReadPageActivity extends AppCompatActivity {
     // 注册底部信息栏的系统接收广播
     private void init_info_broadcast() {
         //注册广播接受者java代码
-        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);    // 电量变化广播
+        intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);    // 电量变化广播
         intentFilter.addAction(ACTION_TIME_TICK);
         //创建广播接受者对象
-        MyReceiver myReceiver = new MyReceiver();
+        myReceiver = new MyReceiver();
         //注册receiver
         registerReceiver(myReceiver, intentFilter);
     }
@@ -197,7 +219,7 @@ public class ReadPageActivity extends AppCompatActivity {
                             chaptersContent = new ArrayList<>(totalChapter);
 
                             // 缓存当前章节以及上下10章的数据
-                            System.out.println(totalChapter);
+                            //System.out.println(totalChapter);
                             chapterObjs = new ArrayList<ChapterObj>(totalChapter){};
                             cache_chapter_range_min = currChapter - 10;
                             cache_chapter_range_max = currChapter + 10;
@@ -212,12 +234,12 @@ public class ReadPageActivity extends AppCompatActivity {
                                     continue;
                                 }
                                 ChapterObj c = BookService.getBookService().getChapterByLink(chapterLinks.get(i).getLink());
-                                System.out.println(chapterLinks.get(i).getLink());
+                                //System.out.println(chapterLinks.get(i).getLink());
                                 chapterObjs.add(i-cache_chapter_range_min, c);
-                                System.out.println(i);
+                                //System.out.println(i);
                             }
                             System.out.println(cache_chapter_range_min + "----" + cache_chapter_range_max);
-                            System.out.println(chapterLinks.size());
+                            //System.out.println(chapterLinks.size());
 
                             //currentChapterContent.append(c.getIchapter().getBody());
                             //System.out.println(c.getIchapter().getTitle() + "\n" + c.getIchapter().getBody());
@@ -305,10 +327,11 @@ public class ReadPageActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
+        //System.out.println("onPause");
         // 将阅读到的当前章节存入数据库
         DatabaseControl.getInstance(this).updateProgress(currChapter, bookid);
         // todo:注销广播
-
+        unregisterReceiver(myReceiver);
         super.onPause();
     }
 
@@ -403,19 +426,24 @@ public class ReadPageActivity extends AppCompatActivity {
         horizontal_and_vertical_rb_control.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String msg = "当前横竖屏状态：" + ((is_vertical_screen)?"竖屏":"横屏");
+                System.out.println(msg);
                 // 当前竖屏状态
                 if(is_vertical_screen) {
+                    // 记录状态数据转变,更新默认用户
+                    is_vertical_screen = false;
+                    DatabaseControl.getInstance(context).updateStatus(0,0);
                     // 切换成横屏
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                    // 记录状态数据转变
-                    is_vertical_screen = false;
                 }
                 // 当前横屏状态
                 else {
-                    // 切换成竖屏状态
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                     // 记录状态数据转变
                     is_vertical_screen = true;
+                    DatabaseControl.getInstance(context).updateStatus(0,1);
+                    // 切换成竖屏状态
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
                 }
             }
         });

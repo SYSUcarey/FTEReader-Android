@@ -21,7 +21,7 @@ public class DatabaseControl extends SQLiteOpenHelper {
     private static final String DB_NAME= "readerBase.db";
     private static final String TABLE_NAME1 = "shelfbook_table";
     private static final String TABLE_NAME2 = "categorybook_table";
-
+    private static final String TABLE_NAME3 = "status_table";
     private static final int DB_VERSION = 1;
 
 
@@ -153,6 +153,31 @@ public class DatabaseControl extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM " + TABLE_NAME2);
     }
 
+    // 更新用户阅读器习惯的状态
+    public void updateStatus(int user_id, int hor_or_ver_screen) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues value = new ContentValues();
+        value.put("hor_or_ver_screen", hor_or_ver_screen);
+        db.update(TABLE_NAME3, value, "user_id=?", new String[] { Integer.toString(user_id)});
+        db.close();
+    }
+
+    // 获取用户阅读器习惯的横竖屏
+    public int get_Hor_Or_Ver_Screen_Status(int user_id) {
+        SQLiteDatabase db = getWritableDatabase();
+        String id = Integer.toString(user_id);
+        String sql = String.format("SELECT * FROM " + TABLE_NAME3  + " where user_id='%s'" , id);
+        Cursor cursor = db.rawQuery(sql, null);
+        int res = 1;
+        while (cursor.moveToNext()) {
+            res = cursor.getInt(cursor.getColumnIndex("hor_or_ver_screen"));
+            return res;
+        }
+        cursor.close();
+        db.close();
+        return res;
+    }
+
 
     public DatabaseControl(Context context) {
         super(context, DB_NAME, null, DB_VERSION );
@@ -168,8 +193,14 @@ public class DatabaseControl extends SQLiteOpenHelper {
         String CREATE_TABLE2 = "CREATE TABLE if not exists "
                 + TABLE_NAME2
                 + " (_id INTEGER PRIMARY KEY, content TEXT)";
+        // 阅读器状态保存
+        String CREATE_TABLE3 = "CREATE TABLE if not exists "
+                + TABLE_NAME3
+                + " (user_id INTEGER PRIMARY KEY, hor_or_ver_screen INTEGER)";
         sqLiteDatabase.execSQL(CREATE_TABLE1);
         sqLiteDatabase.execSQL(CREATE_TABLE2);
+        sqLiteDatabase.execSQL(CREATE_TABLE3);
+
         Resources res = MainActivity.getContext().getResources();
         Bitmap bitmap = BitmapFactory.decodeResource(res, R.mipmap.bookcover);
         ContentValues values = new ContentValues();
@@ -198,6 +229,12 @@ public class DatabaseControl extends SQLiteOpenHelper {
         values.put("progress",book.getReadChapter());
         values.put("image",bitmapToBytes(book.getIcon()));
         sqLiteDatabase.insert(TABLE_NAME1,null,values);
+
+        // 往阅读器状态表格中保存一条初始阅读器状态
+        values.clear();
+        values.put("user_id", 0);           // 用户id为0，表示默认状态
+        values.put("hor_or_ver_screen", 1); // 1表示竖屏，0表示横屏
+        sqLiteDatabase.insert(TABLE_NAME3,null,values);
     }
 
     @Override
