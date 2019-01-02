@@ -1,7 +1,9 @@
 package fte.finalproject;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
@@ -25,7 +27,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import fte.finalproject.Fragment.ReadPageFragment;
@@ -43,6 +47,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
+
+import static android.content.Intent.ACTION_TIME_TICK;
 
 
 public class ReadPageActivity extends AppCompatActivity {
@@ -111,6 +117,9 @@ public class ReadPageActivity extends AppCompatActivity {
         // 获取页面宽高
         get_screen_info();
 
+        // 注册底部信息栏的系统接收广播
+        init_info_broadcast();
+
         // 设置功能按键
         set_functional_button();
 
@@ -119,11 +128,40 @@ public class ReadPageActivity extends AppCompatActivity {
         // 全屏阅读，去除手机状态栏
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        // 初始化底部信息栏显示
+        init_bottom_info_layout();
+
+
         //初始化 Fragment
         init_fragment();
     }
 
+    // 初始化底部信息栏显示
+    private void init_bottom_info_layout() {
+        // 设置当前时间
+        // 设置时间格式
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
+        // 获取当前时间
+        Date curdate = new Date(System.currentTimeMillis());
+        // 按照格式将Date 时间转化成格式字符串
+        String time = formatter.format(curdate);
+        // UI设置显示
+        time_control.setText(time);
+    }
 
+    // 注册底部信息栏的系统接收广播
+    private void init_info_broadcast() {
+        //注册广播接受者java代码
+        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);    // 电量变化广播
+        intentFilter.addAction(ACTION_TIME_TICK);
+        //创建广播接受者对象
+        MyReceiver myReceiver = new MyReceiver();
+        //注册receiver
+        registerReceiver(myReceiver, intentFilter);
+    }
+
+
+    // 阅读帧初始化
     private void init_fragment() {
         // 用线程进行帧初始化，避免进入阅读界面阻塞
         Thread init_fragment_thread = new Thread(new Runnable() {
@@ -269,6 +307,8 @@ public class ReadPageActivity extends AppCompatActivity {
         super.onPause();
     }
 
+
+    // 屏幕点击处理
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
 
@@ -317,38 +357,6 @@ public class ReadPageActivity extends AppCompatActivity {
 
         return super.dispatchTouchEvent(event);
     }
-
-    // 处理屏幕点击事件
-    /*@Override
-    public boolean onTouchEvent(MotionEvent event) {
-        float x = 0, y = 0;
-        if(MotionEvent.ACTION_DOWN == event.getAction()) {
-            x = event.getX();
-            y = event.getY();
-            if(x > SCREEN_WIDTH/3 && x < SCREEN_WIDTH*2/3 && y > SCREEN_HEIGHT/5 && y < SCREEN_HEIGHT*4/5) {
-                System.out.println("中间" + x + ":" + y);
-                if(show_functional_button) {
-                    rg_control.setVisibility(View.GONE);
-                    show_functional_button = false;
-                }
-                else {
-                    rg_control.setVisibility(View.VISIBLE);
-                    show_functional_button = true;
-                }
-
-            }
-            else if(x <= SCREEN_WIDTH/3) {
-                Toast.makeText(ReadPageActivity.this, "向上翻页", Toast.LENGTH_SHORT).show();
-
-            }
-            else {
-                Toast.makeText(ReadPageActivity.this, "向下翻页", Toast.LENGTH_SHORT).show();
-            }
-        }
-
-
-        return super.onTouchEvent(event);
-    }*/
 
     // 设置功能按键
     private void set_functional_button() {
@@ -419,7 +427,7 @@ public class ReadPageActivity extends AppCompatActivity {
 
                     // 已经缓存到网络上的最后一章了，没有更新
                     if(cache_chapter_range_max == totalChapter) {
-                        Toast.makeText(ReadPageActivity.this, "已经是最后一章了！客官", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(ReadPageActivity.this, "已经是最后一章了！客官", Toast.LENGTH_LONG).show();
                     }
                     else {
                         // 隐藏ViewPager避免添加帧的时候滑动ViewPager报错
@@ -507,7 +515,7 @@ public class ReadPageActivity extends AppCompatActivity {
                 if((currChapter-cache_chapter_range_min) == cache_left) {
                     // 已经是网络上的第一章了
                     if(cache_chapter_range_min == 0) {
-                        Toast.makeText(ReadPageActivity.this, "已经是第一章了！客官", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(ReadPageActivity.this, "已经是第一章了！客官", Toast.LENGTH_LONG).show();
                     }
                     else {
                         // 隐藏ViewPager避免添加帧的时候滑动ViewPager报错
@@ -683,4 +691,35 @@ public class ReadPageActivity extends AppCompatActivity {
         res.add(s);
         return res;
     }
+
+    // 注册获取系统广播
+    class MyReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // TODO Auto-generated method stub
+            // 判断它是否是为电量变化的Broadcast Action
+            // 电量变化广播
+            if(Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())){
+                //获取当前电量
+                int level = intent.getIntExtra("level", 0);
+                //电量的总刻度
+                int scale = intent.getIntExtra("scale", 100);
+                //把它转成百分比
+                int percent = level*100/scale;
+                battery_percent_control.setText(Integer.toString(percent));
+            }
+            else if (Intent.ACTION_TIME_TICK.equals(intent.getAction())) {
+                // 设置时间格式
+                SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
+                // 获取当前时间
+                Date curdate = new Date(System.currentTimeMillis());
+                // 按照格式将Date 时间转化成格式字符串
+                String time = formatter.format(curdate);
+                // UI设置显示
+                time_control.setText(time);
+            }
+        }
+
+    }
+
 }
