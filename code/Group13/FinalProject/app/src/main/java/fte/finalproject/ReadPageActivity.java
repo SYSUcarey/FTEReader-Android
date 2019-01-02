@@ -127,11 +127,11 @@ public class ReadPageActivity extends AppCompatActivity {
         //System.out.println("bookid: " + bookid + "  currentChapter: " + currChapter);
 
 
-        // 设置用户阅读习惯状态与界面适配
-        set_Reading_Status();
-
         // 获取页面控件
         init_page_control();
+
+        // 设置用户阅读习惯状态与界面适配
+        set_Reading_Status();
 
         // 获取页面宽高
         get_screen_info();
@@ -167,9 +167,11 @@ public class ReadPageActivity extends AppCompatActivity {
             // 切换成横屏
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
-        day_or_night_status = userStatusObj.getDay_or_night_status();
-    }
 
+        day_or_night_status = userStatusObj.getDay_or_night_status();
+        if(day_or_night_status == 1) whole_layout_control.setBackgroundColor(getResources().getColor(R.color.nightBackGround));
+
+    }
 
     // 初始化底部信息栏显示
     private void init_bottom_info_layout() {
@@ -338,17 +340,19 @@ public class ReadPageActivity extends AppCompatActivity {
         Toast.makeText(ReadPageActivity.this, str, Toast.LENGTH_SHORT).show();*/
     }
 
-
     @Override
     protected void onPause() {
         //System.out.println("onPause");
         // 将阅读到的当前章节存入数据库
         DatabaseControl.getInstance(this).updateProgress(currChapter, bookid);
+        /*// 将当前设置的用户习惯存入数据库(报错)
+        userStatusObj.setDay_or_night_status(day_or_night_status);
+        userStatusObj.setHor_or_ver_screen(day_or_night_status);
+        DatabaseControl.getInstance(this).updateStatus(0,userStatusObj);*/
         // todo:注销广播
         unregisterReceiver(myReceiver);
         super.onPause();
     }
-
 
     // 屏幕点击处理
     @Override
@@ -412,12 +416,14 @@ public class ReadPageActivity extends AppCompatActivity {
             drawable.setBounds(0, 0, 70, 70);
             horizontal_and_vertical_rb_control.setCompoundDrawables(null, drawable, null,null);
             horizontal_and_vertical_rb_control.setText("横屏");
+            horizontal_and_vertical_rb_control.setTextColor(Color.BLACK);
         }
         else {
             drawable = getResources().getDrawable(R.mipmap.vertical_screen);
             drawable.setBounds(0, 0, 70, 70);
             horizontal_and_vertical_rb_control.setCompoundDrawables(null, drawable, null,null);
             horizontal_and_vertical_rb_control.setText("竖屏");
+            horizontal_and_vertical_rb_control.setTextColor(Color.BLACK);
         }
         drawable = getResources().getDrawable(R.mipmap.textsize);
         drawable.setBounds(0, 0, 70, 70);
@@ -436,13 +442,19 @@ public class ReadPageActivity extends AppCompatActivity {
                 //Toast.makeText(ReadPageActivity.this, "夜间/白日切换功能还没实现呢！客官", Toast.LENGTH_LONG).show();
                 if(day_or_night_status == 0) {
                     whole_layout_control.setBackgroundColor(getResources().getColor(R.color.nightBackGround));
-                    init_fragment();
                     day_or_night_status = 1;
+                    userStatusObj.setDay_or_night_status(day_or_night_status);
+                    DatabaseControl.getInstance(context).updateStatus(0, userStatusObj);
+                    init_fragment();
+                    day_and_night_rb_control.setTextColor(Color.BLACK);
                 }
                 else {
                     whole_layout_control.setBackgroundColor(getResources().getColor(R.color.PapayaWhip));
                     day_or_night_status = 0;
+                    userStatusObj.setDay_or_night_status(day_or_night_status);
+                    DatabaseControl.getInstance(context).updateStatus(0, userStatusObj);
                     init_fragment();
+                    day_and_night_rb_control.setTextColor(Color.BLACK);
                 }
             }
         });
@@ -456,6 +468,7 @@ public class ReadPageActivity extends AppCompatActivity {
                 if(is_vertical_screen) {
                     // 记录状态数据转变,更新默认用户
                     is_vertical_screen = false;
+                    horizontal_and_vertical_rb_control.setTextColor(Color.BLACK);
                     DatabaseControl.getInstance(context).updateStatus(0,0);
                     // 切换成横屏
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -464,6 +477,7 @@ public class ReadPageActivity extends AppCompatActivity {
                 else {
                     // 记录状态数据转变
                     is_vertical_screen = true;
+                    horizontal_and_vertical_rb_control.setTextColor(Color.BLACK);
                     DatabaseControl.getInstance(context).updateStatus(0,1);
                     // 切换成竖屏状态
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -710,8 +724,7 @@ public class ReadPageActivity extends AppCompatActivity {
             }
         }
     }
-
-
+    
     // 辅助函数：判断网络是否连接
     public boolean isNetWorkConnected(Context context) {
         if (context != null) {

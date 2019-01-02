@@ -67,7 +67,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:clickable="false">
         <RadioButton
             android:id="@+id/read_page_day_and_night_rb"
             style="@style/BottomRB"
