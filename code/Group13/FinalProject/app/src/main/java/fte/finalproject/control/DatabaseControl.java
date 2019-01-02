@@ -16,6 +16,7 @@ import java.util.List;
 import fte.finalproject.MainActivity;
 import fte.finalproject.R;
 import fte.finalproject.obj.ShelfBookObj;
+import fte.finalproject.obj.UserStatusObj;
 
 public class DatabaseControl extends SQLiteOpenHelper {
     private static final String DB_NAME= "readerBase.db";
@@ -178,6 +179,37 @@ public class DatabaseControl extends SQLiteOpenHelper {
         return res;
     }
 
+    // 更新用户阅读器习惯的状态
+    public void updateStatus(int user_id, UserStatusObj u) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues value = new ContentValues();
+        value.put("hor_or_ver_screen", u.getHor_or_ver_screen()); // 1表示竖屏，0表示横屏
+        value.put("day_or_night_status", u.getDay_or_night_status()); // 0表示日间，1表示夜间
+        value.put("textSize", u.getTextSize()); // 字体大小
+        db.update(TABLE_NAME3, value, "user_id=?", new String[] { Integer.toString(user_id)});
+        db.close();
+    }
+
+    public UserStatusObj get_User_Status_Obj(int user_id) {
+        SQLiteDatabase db = getWritableDatabase();
+        String id = Integer.toString(user_id);
+        String sql = String.format("SELECT * FROM " + TABLE_NAME3  + " where user_id='%s'" , id);
+        Cursor cursor = db.rawQuery(sql, null);
+        UserStatusObj res = null;
+        while (cursor.moveToNext()) {
+            int hor_or_ver_screen = cursor.getInt(cursor.getColumnIndex("hor_or_ver_screen"));
+            int day_or_night_status = cursor.getInt(cursor.getColumnIndex("day_or_night_status"));
+            int textSize = cursor.getInt(cursor.getColumnIndex("textSize"));
+            res = new UserStatusObj(user_id, hor_or_ver_screen, day_or_night_status, textSize);
+            return res;
+        }
+        cursor.close();
+        db.close();
+        return res;
+    }
+
+
+
 
     public DatabaseControl(Context context) {
         super(context, DB_NAME, null, DB_VERSION );
@@ -196,7 +228,7 @@ public class DatabaseControl extends SQLiteOpenHelper {
         // 阅读器状态保存
         String CREATE_TABLE3 = "CREATE TABLE if not exists "
                 + TABLE_NAME3
-                + " (user_id INTEGER PRIMARY KEY, hor_or_ver_screen INTEGER)";
+                + " (user_id INTEGER PRIMARY KEY, hor_or_ver_screen INTEGER, day_or_night_status INTEGER, textSize INTEGER)";
         sqLiteDatabase.execSQL(CREATE_TABLE1);
         sqLiteDatabase.execSQL(CREATE_TABLE2);
         sqLiteDatabase.execSQL(CREATE_TABLE3);
@@ -231,9 +263,12 @@ public class DatabaseControl extends SQLiteOpenHelper {
         sqLiteDatabase.insert(TABLE_NAME1,null,values);
 
         // 往阅读器状态表格中保存一条初始阅读器状态
+        UserStatusObj u = new UserStatusObj(0,1,0,18);
         values.clear();
         values.put("user_id", 0);           // 用户id为0，表示默认状态
-        values.put("hor_or_ver_screen", 1); // 1表示竖屏，0表示横屏
+        values.put("hor_or_ver_screen", u.getHor_or_ver_screen()); // 1表示竖屏，0表示横屏
+        values.put("day_or_night_status", u.getDay_or_night_status()); // 0表示日间，1表示夜间
+        values.put("textSize", u.getTextSize()); // 字体大小
         sqLiteDatabase.insert(TABLE_NAME3,null,values);
     }
 

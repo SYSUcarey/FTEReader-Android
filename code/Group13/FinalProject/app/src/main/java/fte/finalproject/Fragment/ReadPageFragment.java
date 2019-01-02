@@ -5,6 +5,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import fte.finalproject.R;
@@ -16,12 +18,14 @@ public class ReadPageFragment extends Fragment {
     private String content;     //本章内容
     int currentChapter;         //当前章节数
     int totalChapter;           //总共章节数
+    int day_or_night_status;    // 日间或夜间模式
 
     // 帧页面View
     View view;
     // 帧页面控件
     private TextView titile_control;        // 标题
     private TextView content_control;       // 阅读页内容
+    private FrameLayout whole_layout_control;    // 整个框页面
     //private TextView progress_control;      // 阅读此章节的进度
 
 
@@ -32,6 +36,8 @@ public class ReadPageFragment extends Fragment {
         this.totalChapter = getArguments().getInt("totalChapter");
         this.content = getArguments().getString("content");
         this.title = getArguments().getString("title");
+        this.day_or_night_status = getArguments().getInt("day_or_night_status");
+        System.out.println("日间夜间：" + day_or_night_status);
     }
 
     @Override
@@ -53,12 +59,17 @@ public class ReadPageFragment extends Fragment {
     private void init_page_info() {
         titile_control.setText(title);      // 设置标题
         content_control.setText(content);   // 设置阅读页内容
+        if(day_or_night_status == 0) {
+            whole_layout_control.setBackgroundColor(getResources().getColor(R.color.PapayaWhip));
+        }
+        else whole_layout_control.setBackgroundColor(getResources().getColor(R.color.nightBackGround));
         //progress_control.setText(Integer.toString(currentChapter+1) + "/" + Integer.toString(totalChapter+1));
     }
 
     private void init_page_control() {
         titile_control = view.findViewById(R.id.fragment_read_page_title);
         content_control = view.findViewById(R.id.fragment_read_page_content);
+        whole_layout_control = view.findViewById(R.id.fragment_read_page_whole_layout);
         //progress_control = view.findViewById(R.id.fragment_read_page_process);
     }
 }

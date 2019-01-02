@@ -40,6 +40,7 @@ import fte.finalproject.obj.ChapterLinkObj;
 import fte.finalproject.obj.ChapterLinks;
 import fte.finalproject.obj.ChapterObj;
 import fte.finalproject.obj.CptListObj;
+import fte.finalproject.obj.UserStatusObj;
 import fte.finalproject.service.BookService;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -90,6 +91,7 @@ public class ReadPageActivity extends AppCompatActivity {
     private TextView battery_percent_control;
     private TextView time_control;
     private TextView read_page_process_control;
+    private RelativeLayout whole_layout_control;
 
     // 屏幕宽高
     float SCREEN_HEIGHT;
@@ -97,7 +99,6 @@ public class ReadPageActivity extends AppCompatActivity {
 
     // 功能栏是否显示
     boolean show_functional_button = false;
-    boolean is_vertical_screen;
 
     // 活动上下文
     Context context;
@@ -105,6 +106,11 @@ public class ReadPageActivity extends AppCompatActivity {
     // 广播
     MyReceiver myReceiver;
     IntentFilter intentFilter;
+
+    // 用户阅读状态
+    UserStatusObj userStatusObj;
+    boolean is_vertical_screen;
+    int day_or_night_status;
 
 
     @Override
@@ -121,8 +127,8 @@ public class ReadPageActivity extends AppCompatActivity {
         //System.out.println("bookid: " + bookid + "  currentChapter: " + currChapter);
 
 
-        // 横竖屏状态控制
-        set_Hor_or_Ver_Screen();
+        // 设置用户阅读习惯状态与界面适配
+        set_Reading_Status();
 
         // 获取页面控件
         init_page_control();
@@ -148,9 +154,11 @@ public class ReadPageActivity extends AppCompatActivity {
         init_fragment();
     }
 
-    private void set_Hor_or_Ver_Screen() {
+    private void set_Reading_Status() {
+        // 获取用户状态(默认用户状态)
+        userStatusObj = DatabaseControl.getInstance(this).get_User_Status_Obj(0);
         // 获取默认用户下的横竖屏状态
-        int hor_or_ver_screen = DatabaseControl.getInstance(this).get_Hor_Or_Ver_Screen_Status(0);
+        int hor_or_ver_screen = userStatusObj.getHor_or_ver_screen();
         //System.out.println("从数据库中获取到的横竖屏状态： " + hor_or_ver_screen);
         if(hor_or_ver_screen == 1)
             is_vertical_screen = true;
@@ -159,7 +167,9 @@ public class ReadPageActivity extends AppCompatActivity {
             // 切换成横屏
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
+        day_or_night_status = userStatusObj.getDay_or_night_status();
     }
+
 
     // 初始化底部信息栏显示
     private void init_bottom_info_layout() {
@@ -185,9 +195,13 @@ public class ReadPageActivity extends AppCompatActivity {
         registerReceiver(myReceiver, intentFilter);
     }
 
-
     // 阅读帧初始化
     private void init_fragment() {
+        // 设置等待进度条
+        progressBar.setVisibility(View.VISIBLE);
+        viewPager.setVisibility(View.GONE);
+        // 清空当前的FragmentList
+        fragmentList.clear();
         // 用线程进行帧初始化，避免进入阅读界面阻塞
         Thread init_fragment_thread = new Thread(new Runnable() {
             @Override
@@ -296,6 +310,7 @@ public class ReadPageActivity extends AppCompatActivity {
                         bundle.putString("content", content);
                         bundle.putInt("currentChapter", i);
                         bundle.putInt("totalChapter", totalChapter);
+                        bundle.putInt("day_or_night_status", day_or_night_status);
                         fragment.setArguments(bundle);
                         // 将新加的帧放入队列中
                         fragmentList.add(fragment);
@@ -313,7 +328,6 @@ public class ReadPageActivity extends AppCompatActivity {
         init_fragment_thread.start();
 
     }
-
 
     // 获取屏幕宽高等信息
     private void get_screen_info() {
@@ -419,7 +433,17 @@ public class ReadPageActivity extends AppCompatActivity {
         day_and_night_rb_control.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ReadPageActivity.this, "夜间/白日切换功能还没实现呢！客官", Toast.LENGTH_LONG).show();
+                //Toast.makeText(ReadPageActivity.this, "夜间/白日切换功能还没实现呢！客官", Toast.LENGTH_LONG).show();
+                if(day_or_night_status == 0) {
+                    whole_layout_control.setBackgroundColor(getResources().getColor(R.color.nightBackGround));
+                    init_fragment();
+                    day_or_night_status = 1;
+                }
+                else {
+                    whole_layout_control.setBackgroundColor(getResources().getColor(R.color.PapayaWhip));
+                    day_or_night_status = 0;
+                    init_fragment();
+                }
             }
         });
         // 横屏竖屏功能切换
@@ -443,7 +467,6 @@ public class ReadPageActivity extends AppCompatActivity {
                     DatabaseControl.getInstance(context).updateStatus(0,1);
                     // 切换成竖屏状态
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
                 }
             }
         });
@@ -485,7 +508,7 @@ public class ReadPageActivity extends AppCompatActivity {
         battery_percent_control = findViewById(R.id.activity_read_page_battery_percent);
         time_control = findViewById(R.id.activity_read_page_time);
         read_page_process_control = findViewById(R.id.activity_read_page_process);
-
+        whole_layout_control = findViewById(R.id.read_page_whole_layout);
     }
 
     //设置一个ViewPager的监听事件，左右滑动ViewPager时进行处理
@@ -731,6 +754,7 @@ public class ReadPageActivity extends AppCompatActivity {
                     // 适配完毕，取消ProgressBar, 隐藏功能按键，显示底部信息栏
                     progressBar.setVisibility(View.GONE);
                     rg_control.setVisibility(View.GONE);
+                    viewPager.setVisibility(View.VISIBLE);
                     read_page_process_control.setText(Integer.toString(currChapter+1) + "/" + Integer.toString(totalChapter+1));
                     bottom_layout_control.setVisibility(View.VISIBLE);
                 }

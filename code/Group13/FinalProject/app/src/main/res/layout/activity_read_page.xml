@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/read_page_whole_layout"
     android:background="@color/PapayaWhip">
 
     <android.support.v4.view.ViewPager
@@ -10,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:overScrollMode="never"
-        android:layout_marginBottom="40sp"/>
+        android:layout_marginBottom="40sp" />
 
     <!--底部UI-->
     <RelativeLayout

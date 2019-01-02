@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Fragment.ReadPageFragment"
-    android:background="@color/PapayaWhip">
+    android:id="@+id/fragment_read_page_whole_layout"
+    android:background="@color/nightBackGround">
 
     <!-- TODO: Update blank fragment layout -->
     <RelativeLayout
