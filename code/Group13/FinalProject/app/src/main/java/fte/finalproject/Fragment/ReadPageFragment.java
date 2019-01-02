@@ -22,7 +22,7 @@ public class ReadPageFragment extends Fragment {
     // 帧页面控件
     private TextView titile_control;        // 标题
     private TextView content_control;       // 阅读页内容
-    private TextView progress_control;      // 阅读此章节的进度
+    //private TextView progress_control;      // 阅读此章节的进度
 
 
     @Override
@@ -53,12 +53,12 @@ public class ReadPageFragment extends Fragment {
     private void init_page_info() {
         titile_control.setText(title);      // 设置标题
         content_control.setText(content);   // 设置阅读页内容
-        progress_control.setText(Integer.toString(currentChapter+1) + "/" + Integer.toString(totalChapter+1));
+        //progress_control.setText(Integer.toString(currentChapter+1) + "/" + Integer.toString(totalChapter+1));
     }
 
     private void init_page_control() {
         titile_control = view.findViewById(R.id.fragment_read_page_title);
         content_control = view.findViewById(R.id.fragment_read_page_content);
-        progress_control = view.findViewById(R.id.fragment_read_page_process);
+        //progress_control = view.findViewById(R.id.fragment_read_page_process);
     }
 }

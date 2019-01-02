@@ -2,6 +2,7 @@ package fte.finalproject;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -20,6 +21,8 @@ import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -76,6 +79,11 @@ public class ReadPageActivity extends AppCompatActivity {
     private RadioButton download_rb_control;
     private RadioButton catalog_rb_control;
     private ProgressBar progressBar;
+    private RelativeLayout bottom_layout_control;
+    private TextView battery_percent_control;
+    private TextView time_control;
+    private TextView read_page_process_control;
+
 
     float SCREEN_HEIGHT;
     float SCREEN_WIDTH;
@@ -261,7 +269,7 @@ public class ReadPageActivity extends AppCompatActivity {
         super.onPause();
     }
 
-    /*@Override
+    @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
 
         if (MotionEvent.ACTION_DOWN == event.getAction()) {
@@ -283,13 +291,15 @@ public class ReadPageActivity extends AppCompatActivity {
                 System.out.println("中间" + DownX + ":" + DownY);
                 if (show_functional_button) {
                     rg_control.setVisibility(View.GONE);
+                    bottom_layout_control.setVisibility(View.VISIBLE);
                     show_functional_button = false;
                 } else {
+                    bottom_layout_control.setVisibility(View.GONE);
                     rg_control.setVisibility(View.VISIBLE);
                     show_functional_button = true;
                 }
 
-            } else if (DownX <= SCREEN_WIDTH / 3) {
+            } /*else if (DownX <= SCREEN_WIDTH / 3) {
                 // todo:翻页有bug
                 Toast.makeText(ReadPageActivity.this, "向上翻页", Toast.LENGTH_SHORT).show();
                 System.out.println("当前阅读到的章节： " + (currChapter+1));
@@ -301,12 +311,12 @@ public class ReadPageActivity extends AppCompatActivity {
                 System.out.println("当前阅读到的章节：" + (currChapter+1));
                 if(currChapter+1 <= cache_chapter_range_max)
                     viewPager.setCurrentItem((currChapter+1-cache_chapter_range_min), false);
-            }
+            }*/
         }
 
 
         return super.dispatchTouchEvent(event);
-    }*/
+    }
 
     // 处理屏幕点击事件
     /*@Override
@@ -370,6 +380,11 @@ public class ReadPageActivity extends AppCompatActivity {
         catalog_rb_control = findViewById(R.id.read_page_catalog_rb);
         viewPager = findViewById(R.id.read_page_viewPager);
         progressBar = findViewById(R.id.read_page_progressbar);
+        bottom_layout_control = findViewById(R.id.activity_read_page_bottom_layout);
+        battery_percent_control = findViewById(R.id.activity_read_page_battery_percent);
+        time_control = findViewById(R.id.activity_read_page_time);
+        read_page_process_control = findViewById(R.id.activity_read_page_process);
+
     }
 
     //设置一个ViewPager的监听事件，左右滑动ViewPager时进行处理
@@ -397,6 +412,8 @@ public class ReadPageActivity extends AppCompatActivity {
             if (arg0 == from + 1) {
                 // 当前章节数+1
                 currChapter++;
+                // 设置进度显示
+                read_page_process_control.setText(Integer.toString(currChapter+1) + "/" + Integer.toString(totalChapter+1));
                 // 滑动到当前缓存剩余量不多时，当前再访问剩余量设置是五章节(不包括当前章节)
                 if(arg0 == (cache_chapter_range_max-cache_chapter_range_min) - cache_left) {
 
@@ -483,6 +500,8 @@ public class ReadPageActivity extends AppCompatActivity {
             else if (arg0 == from) {
                 // 当前章节数-1
                 currChapter--;
+                // 设置进度显示
+                read_page_process_control.setText(Integer.toString(currChapter+1) + "/" + Integer.toString(totalChapter+1));
                 // 滑动到当前缓存剩余量不多时，当前再访问剩余量设置是五章节(不包括当前章节)
                 System.out.println("arg0-currChapter-min-max: " + arg0 + " " + currChapter + " " + cache_chapter_range_min + " " + cache_chapter_range_max);
                 if((currChapter-cache_chapter_range_min) == cache_left) {
@@ -608,9 +627,11 @@ public class ReadPageActivity extends AppCompatActivity {
                     // 跳到上次阅读到的章节
                     viewPager.setCurrentItem(currChapter-cache_chapter_range_min);
                     viewPager.setOffscreenPageLimit(currTotalPage - 1);
-                    // 适配完毕，取消ProgressBar, 隐藏功能按键
+                    // 适配完毕，取消ProgressBar, 隐藏功能按键，显示底部信息栏
                     progressBar.setVisibility(View.GONE);
                     rg_control.setVisibility(View.GONE);
+                    read_page_process_control.setText(Integer.toString(currChapter+1) + "/" + Integer.toString(totalChapter+1));
+                    bottom_layout_control.setVisibility(View.VISIBLE);
                 }
                 // type == 1 界面获取下N章节更新
                 else if(type == 1) {
@@ -623,17 +644,12 @@ public class ReadPageActivity extends AppCompatActivity {
                 else if(type == 2) {
                     // 适配Adapter
                     fragmentAdapter.notifyDataSetChanged();
-                    System.out.println("刚才阅读到： " + currChapter);
-                    System.out.println("arg0-currChapter-min-max: " + 0 + " " + currChapter + " " + cache_chapter_range_min + " " + cache_chapter_range_max);
-
                     // 跳回到刚才阅读到的章节
                     viewPager.setCurrentItem((currChapter-cache_chapter_range_min), false);
                     // 适配完毕，取消ProgressBar, 隐藏功能按键
                     progressBar.setVisibility(View.GONE);
                     viewPager.setVisibility(View.VISIBLE);
-
                 }
-
             }
 
             @Override

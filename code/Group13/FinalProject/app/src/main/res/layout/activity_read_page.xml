@@ -11,12 +11,55 @@
         android:layout_height="match_parent"
         android:overScrollMode="never"/>
 
+    <!--底部UI-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/activity_read_page_bottom_layout"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone"
+        android:layout_marginBottom="10sp"
+        android:layout_marginLeft="20sp"
+        android:layout_marginRight="10sp">
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/activity_read_page_battery_layout"
+            android:layout_centerVertical="true">
+            <ImageView
+                android:layout_width="30sp"
+                android:layout_height="10sp"
+                android:src="@mipmap/battery"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:id="@+id/activity_read_page_battery_percent"
+                android:text="87"
+                android:textSize="7sp"/>
+        </RelativeLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/activity_read_page_time"
+            android:text="11:15"
+            android:layout_toRightOf="@id/activity_read_page_battery_layout" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/activity_read_page_process"
+            android:text="1/8"
+            android:layout_alignParentRight="true" />
+    </RelativeLayout>
+
     <ProgressBar
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/read_page_progressbar"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"/>
+
     <RadioGroup
         android:id="@+id/read_page_bottom_rg"
         android:layout_width="match_parent"
