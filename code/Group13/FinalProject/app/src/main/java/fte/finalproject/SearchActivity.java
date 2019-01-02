@@ -16,6 +16,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -52,7 +53,7 @@ public class SearchActivity extends AppCompatActivity {
     private ListView historyList;
     private ListView fuzzyList;
     private ConstraintLayout initialLayout;
-    private ConstraintLayout searchLayout;
+    private LinearLayout searchLayout;
     private RecyclerView resultList;
     private List<String> histories;
     private List<String> tempFuzzy;
@@ -230,7 +231,7 @@ public class SearchActivity extends AppCompatActivity {
                 }
                 //设置可见
                 searchLayout.setVisibility(View.VISIBLE);
-                fuzzyList.setVisibility(View.INVISIBLE);
+                fuzzyList.setVisibility(View.GONE);
                 resultList.setVisibility(View.VISIBLE);
                 //填充数据
                 new Thread(new Runnable() {
@@ -258,23 +259,23 @@ public class SearchActivity extends AppCompatActivity {
                 if (!isSubmit) {
                     if (s.equals("")) {
                         initialLayout.setVisibility(View.VISIBLE);
-                        searchLayout.setVisibility(View.INVISIBLE);
+                        searchLayout.setVisibility(View.GONE);
                     }
                     else {
-                        initialLayout.setVisibility(View.INVISIBLE);
+                        initialLayout.setVisibility(View.GONE);
                         searchLayout.setVisibility(View.VISIBLE);
                         fuzzyList.setVisibility(View.VISIBLE);
-                        resultList.setVisibility(View.INVISIBLE);
+                        resultList.setVisibility(View.GONE);
                     }
                 }
                 else {
                     if (s.equals("")) {
-                        fuzzyList.setVisibility(View.INVISIBLE);
+                        fuzzyList.setVisibility(View.GONE);
                         resultList.setVisibility(View.VISIBLE);
                     }
                     else {
                         fuzzyList.setVisibility(View.VISIBLE);
-                        resultList.setVisibility(View.INVISIBLE);
+                        resultList.setVisibility(View.GONE);
                     }
                 }
                 //填充数据
@@ -335,9 +336,9 @@ public class SearchActivity extends AppCompatActivity {
                     getInstance(getBaseContext()).addSearchHistory(s);
                 }
                 //设置可见
-                initialLayout.setVisibility(View.INVISIBLE);
+                initialLayout.setVisibility(View.GONE);
                 searchLayout.setVisibility(View.VISIBLE);
-                fuzzyList.setVisibility(View.INVISIBLE);
+                fuzzyList.setVisibility(View.GONE);
                 resultList.setVisibility(View.VISIBLE);
                 //填充数据
                 new Thread(new Runnable() {
@@ -378,9 +379,9 @@ public class SearchActivity extends AppCompatActivity {
     public void recordClick(final String s) {
         isSubmit = true;
         //设置可见
-        initialLayout.setVisibility(View.INVISIBLE);
+        initialLayout.setVisibility(View.GONE);
         searchLayout.setVisibility(View.VISIBLE);
-        fuzzyList.setVisibility(View.INVISIBLE);
+        fuzzyList.setVisibility(View.GONE);
         resultList.setVisibility(View.VISIBLE);
         //添加历史
         if (!histories.contains(s)){

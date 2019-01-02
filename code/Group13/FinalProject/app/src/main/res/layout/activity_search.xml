@@ -7,40 +7,37 @@
     tools:context=".SearchActivity"
     android:background="#FFFFFF">
 
-    <android.support.constraint.ConstraintLayout
+    <LinearLayout
         android:id="@+id/search_afters_layout"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="invisible"
-        app:layout_constraintTop_toBottomOf="@+id/guideline">
+        app:layout_constraintTop_toBottomOf="@+id/search_top_layout">
 
         <ListView
             android:id="@+id/search_fuzzy_list"
-            android:divider="@null"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="5dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:divider="@null" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/search_result_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="80dp"
-            android:layout_marginTop="20dp"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </android.support.constraint.ConstraintLayout>
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="60dp"
+            android:visibility="invisible" />
+    </LinearLayout>
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/search_initial_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/guideline">
+        app:layout_constraintTop_toBottomOf="@+id/search_top_layout">
 
         <ImageView
             android:id="@+id/search_n1_image"
@@ -207,8 +204,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:textSize="18sp"
             android:text="大家都在搜"
+            android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="@+id/search_popular_image"
             app:layout_constraintStart_toEndOf="@+id/search_popular_image"
             app:layout_constraintTop_toTopOf="@+id/search_popular_image" />
@@ -229,8 +226,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_marginTop="30dp"
-            android:textSize="18sp"
             android:text="搜索历史"
+            android:textSize="18sp"
             app:layout_constraintStart_toEndOf="@+id/search_history_image"
             app:layout_constraintTop_toBottomOf="@+id/search_pop_text3" />
 
@@ -248,9 +245,9 @@
             android:id="@+id/search_history_list"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:divider="@null"
             android:layout_marginStart="15dp"
             android:layout_marginTop="8dp"
+            android:divider="@null"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/search_history_image" />
@@ -261,7 +258,6 @@
         android:layout_width="0dp"
         android:layout_height="42dp"
         android:background="@android:color/holo_red_light"
-        app:layout_constraintBottom_toBottomOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -295,12 +291,5 @@
 
     </android.support.constraint.ConstraintLayout>
 
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.075" />
-    
-    
+
 </android.support.constraint.ConstraintLayout>
