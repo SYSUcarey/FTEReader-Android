@@ -109,7 +109,7 @@ public class BookDetailActivity extends AppCompatActivity {
         final Matrix largeMatrix = new Matrix();
         final Matrix littleMatrix = new Matrix();
         largeMatrix.postScale((float)2, (float)2);
-        littleMatrix.postScale((float)0.5, (float)0.5);
+        littleMatrix.postScale((float)0.4, (float)0.4);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -162,9 +162,9 @@ public class BookDetailActivity extends AppCompatActivity {
                             long period = now.getTime() - date.getTime();
                             Log.d("period", String.valueOf(period));
                             if (period / 86400000 < 1) {
-                                updateStr = "今天";
+                                updateStr = "上次更新: 今天";
                             } else if (period / 86400000 > 1) {
-                                updateStr = String.valueOf(period / 86400000) + "天前";
+                                updateStr = "上次更新: " + String.valueOf(period / 86400000) + "天前";
                             }
                         } catch (ParseException e) {
                             e.printStackTrace();
@@ -174,7 +174,7 @@ public class BookDetailActivity extends AppCompatActivity {
                         follower.setText(String.valueOf(bookObj.getLatelyFollower()) + "人");
                         retentionRatio.setText(bookObj.getRetentionRatio() + "%");
                         String intro = bookObj.getLongIntro();
-                        if (intro.length() > 60) intro = intro.substring(0, 60);
+                        if (intro.length() > 50) intro = intro.substring(0, 50);
                         intro += "...";
                         bookIntro.setText(intro);
 
@@ -208,8 +208,13 @@ public class BookDetailActivity extends AppCompatActivity {
                                                                 mHandler.post(new Runnable() {
                                                                     @Override
                                                                     public void run() {
-                                                                        Drawable drawable = new BitmapDrawable(bitmap);
-                                                                        drawable.setBounds(0, 0, bitmap.getWidth() * 2, bitmap.getHeight() * 2);
+                                                                        Drawable drawable = null;
+                                                                        if (bitmap.getWidth() >= 300) {
+                                                                            drawable = new BitmapDrawable(Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), littleMatrix, true));
+                                                                        } else {
+                                                                            drawable = new BitmapDrawable(bitmap);
+                                                                        }
+                                                                        drawable.setBounds(0, 0, drawable.getMinimumWidth() * 5, drawable.getMinimumHeight() * 5);
                                                                         button.setCompoundDrawables(null, drawable, null, null);
                                                                     }
                                                                 });
