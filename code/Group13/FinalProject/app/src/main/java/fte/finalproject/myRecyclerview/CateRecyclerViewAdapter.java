@@ -71,8 +71,8 @@ public class CateRecyclerViewAdapter extends RecyclerView.Adapter<MyViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
         if (data.isEmpty()) return;
-        BookObj bookObj = data.get(position);
         if (holder.isNormalType() == true) {//是正常的布局
+            BookObj bookObj = data.get(position);
             if (isRanking && !data.isEmpty()) {
                 ImageView rankingImg = holder.getView(R.id.item_book_rankingImg);
                 if (position == 0) {//排行榜第一名
@@ -182,12 +182,12 @@ public class CateRecyclerViewAdapter extends RecyclerView.Adapter<MyViewHolder> 
 
     @Override
     public int getItemCount() {
-        return data.size();
+        return data.size() + 1;
     }
 
     //获取列表中数据源的最后一个位置
     public int getLastPosition() {
-        return data.size() - 1;
+        return data.size();
     }
 
     // 根据条目位置返回ViewType，以供onCreateViewHolder方法内获取不同的Holder

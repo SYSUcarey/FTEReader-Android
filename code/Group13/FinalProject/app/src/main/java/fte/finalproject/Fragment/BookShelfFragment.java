@@ -68,7 +68,7 @@ public class BookShelfFragment extends Fragment {
         getMyBooks();
         setRecyclerView();
         //Toast.makeText(getActivity(), "进入Fragment" + " | " + myBooks.size(), Toast.LENGTH_SHORT).show();
-        System.out.println("onResume: " + myBooks.get(0).getReadChapter());
+//        System.out.println("onResume: " + myBooks.get(0).getReadChapter());
         super.onResume();
     }
 
@@ -141,6 +141,8 @@ public class BookShelfFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         DatabaseControl.getInstance(getActivity()).deleteShelfBook(myBooks.get(position).getBookId());
+                        getMyBooks();
+                        setRecyclerView();
                     }
                 });
                 dialog.show();

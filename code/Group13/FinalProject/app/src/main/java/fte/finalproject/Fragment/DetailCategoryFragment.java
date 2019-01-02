@@ -1,11 +1,15 @@
 package fte.finalproject.Fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -133,24 +137,24 @@ public class DetailCategoryFragment extends Fragment {
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     // 如果没有隐藏footView，那么最后一个条目的位置就比我们的getItemCount少1
                     if (recyclerViewAdapter.isFadeTips() == false && lastVisibleItem + 1 == recyclerViewAdapter.getItemCount()) {
-                        handler.post(new Runnable() {
+                        handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
                                 // 然后调用updateRecyclerview方法更新RecyclerView
                                 updateRecyclerView(recyclerViewAdapter.getLastPosition(), recyclerViewAdapter.getLastPosition() + PAGE_COUNT);
                             }
-                        });
+                        }, 500);
                     }
 
                     // 如果隐藏了提示条，我们又上拉加载时，那么最后一个条目就要比getItemCount要少2
                     if (recyclerViewAdapter.isFadeTips() == true && lastVisibleItem + 2 == recyclerViewAdapter.getItemCount()) {
-                        handler.post(new Runnable() {
+                        handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
                                 // 然后调用updateRecyclerview方法更新RecyclerView
                                 updateRecyclerView(recyclerViewAdapter.getLastPosition(), recyclerViewAdapter.getLastPosition() + PAGE_COUNT);
                             }
-                        });
+                        }, 500);
                     }
                 }
             }
@@ -169,6 +173,13 @@ public class DetailCategoryFragment extends Fragment {
 
     void initBookList() {
         bookObjList.clear();
+        //检查网络连接
+        ConnectivityManager connect = (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = connect.getActiveNetworkInfo();
+        if (info == null || !info.isAvailable()) {
+            Toast.makeText(getActivity(), "网络连接状况：未连接", Toast.LENGTH_LONG).show();
+            return;
+        }
         if (isRanking) getRankingBookList();
         else getCateBookList();
     }
@@ -179,8 +190,10 @@ public class DetailCategoryFragment extends Fragment {
             @Override
             public void run() {
                 AllRankingObj allRankingObj = bookService.getAllRankingObj();
-                if (allRankingObj.isOk() == false) {
-                    Toast.makeText(getContext(), "网络错误", Toast.LENGTH_LONG).show();
+                if (allRankingObj == null || allRankingObj.isOk() == false) {
+                    Looper.prepare();
+                    Toast.makeText(getContext(), "获取数据失败", Toast.LENGTH_LONG).show();
+                    Looper.loop();
                     Log.d("error", "获取全部排行榜失败");
                     return;
                 }
@@ -224,8 +237,10 @@ public class DetailCategoryFragment extends Fragment {
                     @Override
                     public void run() {
                         SingleRankingObj singleRankingObj = bookService.getSingleRankingObj(rankingid);
-                        if (singleRankingObj.isOk() == false) {
-                            Toast.makeText(getContext(), "网络错误", Toast.LENGTH_LONG).show();
+                        if (singleRankingObj == null || singleRankingObj.isOk() == false) {
+                            Looper.prepare();
+                            Toast.makeText(getContext(), "获取失败", Toast.LENGTH_LONG).show();
+                            Looper.loop();
                             Log.d("error", "获取单一排行榜失败");
                             return;
                         }
@@ -263,8 +278,10 @@ public class DetailCategoryFragment extends Fragment {
                 String gender = (isMale == true) ? "male" : "female";
                 Log.d("type:", "" + type);
                 final CategoryObj categoryObj = bookService.getBooksByCategoty(type, title, 0, 30000, gender);
-                if (categoryObj.isOk() == false) {
-                    Toast.makeText(getContext(), "网络错误", Toast.LENGTH_LONG).show();
+                if (categoryObj == null || categoryObj.isOk() == false) {
+                    Looper.prepare();
+                    Toast.makeText(getContext(), "获取数据失败", Toast.LENGTH_LONG).show();
+                    Looper.loop();
                     Log.d("error", "获取主题书单列表失败");
                     return;
                 }
