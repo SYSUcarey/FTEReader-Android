@@ -174,7 +174,7 @@ public class BookDetailActivity extends AppCompatActivity {
                         follower.setText(String.valueOf(bookObj.getLatelyFollower()) + "人");
                         retentionRatio.setText(bookObj.getRetentionRatio() + "%");
                         String intro = bookObj.getLongIntro();
-                        if (intro.length() > 50) intro = intro.substring(0, 50);
+                        if (intro.length() > 100) intro = intro.substring(0, 100);
                         intro += "...";
                         bookIntro.setText(intro);
 
