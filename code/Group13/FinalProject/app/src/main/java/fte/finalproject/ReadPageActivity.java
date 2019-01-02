@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
@@ -71,13 +72,13 @@ public class ReadPageActivity extends AppCompatActivity {
     int cache_chapter_range_min;                // 当前缓冲存储的章节数范围下界
     int cache_chapter_range_max;                // 当前缓冲存储的章节数范围上界
 
-    // 处理点击
+    // 处理点击的坐标变量
     private float DownX;
     private float DownY;
     private float UpX;
     private float UpY;
 
-
+    // 页面控件处理
     private RadioGroup rg_control;
     private RadioButton day_and_night_rb_control;
     private RadioButton horizontal_and_vertical_rb_control;
@@ -90,11 +91,13 @@ public class ReadPageActivity extends AppCompatActivity {
     private TextView time_control;
     private TextView read_page_process_control;
 
-
+    // 屏幕宽高
     float SCREEN_HEIGHT;
     float SCREEN_WIDTH;
 
+    // 功能栏是否显示
     boolean show_functional_button = false;
+    boolean is_vertical_screen = true;
 
     // 活动上下文
     Context context;
@@ -304,6 +307,8 @@ public class ReadPageActivity extends AppCompatActivity {
     protected void onPause() {
         // 将阅读到的当前章节存入数据库
         DatabaseControl.getInstance(this).updateProgress(currChapter, bookid);
+        // todo:注销广播
+
         super.onPause();
     }
 
@@ -364,9 +369,19 @@ public class ReadPageActivity extends AppCompatActivity {
         Drawable drawable = getResources().getDrawable(R.mipmap.nighttime);
         drawable.setBounds(0, 0, 70, 70);
         day_and_night_rb_control.setCompoundDrawables(null, drawable , null,null);
-        drawable = getResources().getDrawable(R.mipmap.horizontal_screen);
-        drawable.setBounds(0, 0, 70, 70);
-        horizontal_and_vertical_rb_control.setCompoundDrawables(null, drawable, null,null);
+        // 根据当前横竖屏状况设置图标
+        if(is_vertical_screen) {
+            drawable = getResources().getDrawable(R.mipmap.horizontal_screen);
+            drawable.setBounds(0, 0, 70, 70);
+            horizontal_and_vertical_rb_control.setCompoundDrawables(null, drawable, null,null);
+            horizontal_and_vertical_rb_control.setText("横屏");
+        }
+        else {
+            drawable = getResources().getDrawable(R.mipmap.vertical_screen);
+            drawable.setBounds(0, 0, 70, 70);
+            horizontal_and_vertical_rb_control.setCompoundDrawables(null, drawable, null,null);
+            horizontal_and_vertical_rb_control.setText("竖屏");
+        }
         drawable = getResources().getDrawable(R.mipmap.textsize);
         drawable.setBounds(0, 0, 70, 70);
         setting_rb_control.setCompoundDrawables(null, drawable,null, null);
@@ -376,6 +391,56 @@ public class ReadPageActivity extends AppCompatActivity {
         drawable = getResources().getDrawable(R.mipmap.catalog);
         drawable.setBounds(0, 0, 70, 70);
         catalog_rb_control.setCompoundDrawables(null, drawable,null, null);
+        // 设置功能按钮的点击响应处理
+        // 夜间/白日功能切换
+        day_and_night_rb_control.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(ReadPageActivity.this, "夜间/白日切换功能还没实现呢！客官", Toast.LENGTH_LONG).show();
+            }
+        });
+        // 横屏竖屏功能切换
+        horizontal_and_vertical_rb_control.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 当前竖屏状态
+                if(is_vertical_screen) {
+                    // 切换成横屏
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                    // 记录状态数据转变
+                    is_vertical_screen = false;
+                }
+                // 当前横屏状态
+                else {
+                    // 切换成竖屏状态
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                    // 记录状态数据转变
+                    is_vertical_screen = true;
+                }
+            }
+        });
+        // 字体样式和大小设置功能
+        setting_rb_control.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(ReadPageActivity.this, "字体样式和大小设置功能还没实现呢！客官", Toast.LENGTH_LONG).show();
+            }
+        });
+        // 下载功能
+        download_rb_control.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(ReadPageActivity.this, "文本下载功能还没实现呢！客官", Toast.LENGTH_LONG).show();
+            }
+        });
+        // 目录功能
+        catalog_rb_control.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(ReadPageActivity.this, "目录功能还没实现呢！客官", Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 
     // 获取页面控件
