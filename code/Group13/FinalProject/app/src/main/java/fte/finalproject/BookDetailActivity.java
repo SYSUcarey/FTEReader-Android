@@ -1,5 +1,6 @@
 package fte.finalproject;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -7,6 +8,8 @@ import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.icu.util.LocaleData;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
@@ -110,22 +113,26 @@ public class BookDetailActivity extends AppCompatActivity {
         final Matrix littleMatrix = new Matrix();
         largeMatrix.postScale((float)2, (float)2);
         littleMatrix.postScale((float)0.4, (float)0.4);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    URL url = new URL(iconURL);
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestMethod("GET");
-                    connection.setConnectTimeout(10000);
-                    if (connection.getResponseCode() == 200) {
-                        InputStream inputStream = connection.getInputStream();
-                        cover = BitmapFactory.decodeStream(inputStream);
-                        mHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Log.d("width", String.valueOf(cover.getWidth()));
-                                Log.d("height", String.valueOf(cover.getHeight()));
+        if (!isNetWorkConnected(BookDetailActivity.this)) {
+            Toast.makeText(BookDetailActivity.this, "未连接网络", Toast.LENGTH_SHORT).show();
+        } else {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        URL url = new URL(iconURL);
+                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                        connection.setRequestMethod("GET");
+                        connection.setConnectTimeout(10000);
+                        if (connection.getResponseCode() == 200) {
+                            InputStream inputStream = connection.getInputStream();
+                            cover = BitmapFactory.decodeStream(inputStream);
+                            if (cover != null) {
+                                mHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Log.d("width", String.valueOf(cover.getWidth()));
+                                        Log.d("height", String.valueOf(cover.getHeight()));
                                 /*if (cover.getWidth() <= 150 && cover.getHeight() <= 200) {
                                     bookCover.setImageBitmap(Bitmap.createBitmap(cover, 0, 0, cover.getWidth(), cover.getHeight(), largeMatrix, true));
                                 } else if (cover.getWidth() > 300 && cover.getHeight() > 400) {
@@ -133,109 +140,111 @@ public class BookDetailActivity extends AppCompatActivity {
                                 } else {
                                     bookCover.setImageBitmap(cover);
                                 }*/
-                                bookCover.setImageBitmap(cover);
+                                        bookCover.setImageBitmap(cover);
+                                    }
+                                });
                             }
-                        });
-                    }
-                } catch (Exception e) {
-                    System.err.println(e.getMessage());
-                }
-            }
-        }).start();
-
-        // 获取书籍相关信息
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                bookObj = BookService.getBookService().getBookById(bookObj.getId());
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        bookTitle.setText(bookObj.getTitle());
-                        pageTitle.setText(bookObj.getTitle());
-                        int wordNum = bookObj.getWordCount() / 10000;
-                        bookInfo.setText(bookObj.getAuthor() + " | " + bookObj.getMinorCate() + " | " + String.valueOf(wordNum) + "万字");
-                        String updateStr = "";
-                        try {
-                            Date date = format.parse(bookObj.getUpdated());
-                            Date now = new Date(System.currentTimeMillis());
-                            long period = now.getTime() - date.getTime();
-                            Log.d("period", String.valueOf(period));
-                            if (period / 86400000 < 1) {
-                                updateStr = "上次更新: 今天";
-                            } else if (period / 86400000 > 1) {
-                                updateStr = "上次更新: " + String.valueOf(period / 86400000) + "天前";
-                            }
-                        } catch (ParseException e) {
-                            e.printStackTrace();
                         }
-                        updateTime.setText(updateStr);
-                        // int followerNum = bookObj.getLatelyFollower() / 10000;
-                        follower.setText(String.valueOf(bookObj.getLatelyFollower()) + "人");
-                        retentionRatio.setText(bookObj.getRetentionRatio() + "%");
-                        String intro = bookObj.getLongIntro();
-                        if (intro.length() > 100) intro = intro.substring(0, 100);
-                        intro += "...";
-                        bookIntro.setText(intro);
-
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                categoryObj = BookService.getBookService().getBooksByCategoty("reputation", bookObj.getMajorCate(), 0, 10, bookObj.getGender()[0]);
-                                Log.d("size", String.valueOf(categoryObj.getBooks().size()));
-                                for (int i = 0; i < categoryObj.getBooks().size(); i++) {
-                                    final int j = i;
-                                    final BookObj temp = BookService.getBookService().getBookById(categoryObj.getBooks().get(j).getId());
-                                    mHandler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            bookObjs.add(temp);
-                                            if (j < 3) {
-                                                final String iconURL = BookService.StaticsUrl +  temp.getCover();
-                                                final Button button = (Button)recomRG.getChildAt(j);
-                                                button.setText(bookObjs.get(j).getTitle());
-                                                new Thread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        try {
-                                                            URL url = new URL(iconURL);
-                                                            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                                                            connection.setRequestMethod("GET");
-                                                            connection.setConnectTimeout(10000);
-                                                            if (connection.getResponseCode() == 200) {
-                                                                InputStream inputStream = connection.getInputStream();
-                                                                final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                                                                mHandler.post(new Runnable() {
-                                                                    @Override
-                                                                    public void run() {
-                                                                        Drawable drawable = null;
-                                                                        if (bitmap.getWidth() >= 300) {
-                                                                            drawable = new BitmapDrawable(Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), littleMatrix, true));
-                                                                        } else {
-                                                                            drawable = new BitmapDrawable(bitmap);
-                                                                        }
-                                                                        drawable.setBounds(0, 0, drawable.getMinimumWidth() * 5, drawable.getMinimumHeight() * 5);
-                                                                        button.setCompoundDrawables(null, drawable, null, null);
-                                                                    }
-                                                                });
-                                                            }
-                                                        } catch (Exception e) {
-                                                            e.printStackTrace();
-                                                        }
-                                                    }
-                                                }).start();
-                                            }
-                                        }
-                                    });
-
-
-                                }
-                            }
-                        }).start();
+                    } catch (Exception e) {
+                        System.err.println(e.getMessage());
                     }
-                });
-            }
-        }).start();
+                }
+            }).start();
+        }
+
+        if (!isNetWorkConnected(BookDetailActivity.this)) {
+            Toast.makeText(BookDetailActivity.this, "未连接网络", Toast.LENGTH_SHORT).show();
+        } else {
+            // 获取书籍相关信息
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    bookObj = BookService.getBookService().getBookById(bookObj.getId());
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            bookTitle.setText(bookObj.getTitle());
+                            pageTitle.setText(bookObj.getTitle());
+                            int wordNum = bookObj.getWordCount() / 10000;
+                            bookInfo.setText(bookObj.getAuthor() + " | " + bookObj.getMinorCate() + " | " + String.valueOf(wordNum) + "万字");
+                            String updateStr = "";
+                            try {
+                                Date date = format.parse(bookObj.getUpdated());
+                                Date now = new Date(System.currentTimeMillis());
+                                long period = now.getTime() - date.getTime();
+                                Log.d("period", String.valueOf(period));
+                                if (period / 86400000 < 1) {
+                                    updateStr = "上次更新: 今天";
+                                } else if (period / 86400000 > 1) {
+                                    updateStr = "上次更新: " + String.valueOf(period / 86400000) + "天前";
+                                }
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            updateTime.setText(updateStr);
+                            // int followerNum = bookObj.getLatelyFollower() / 10000;
+                            follower.setText(String.valueOf(bookObj.getLatelyFollower()) + "人");
+                            retentionRatio.setText(bookObj.getRetentionRatio() + "%");
+                            String intro = bookObj.getLongIntro();
+                            if (intro.length() > 80) intro = intro.substring(0, 80);
+                            intro += "...";
+                            bookIntro.setText(intro);
+
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    categoryObj = BookService.getBookService().getBooksByCategoty("reputation", bookObj.getMajorCate(), 0, 10, bookObj.getGender()[0]);
+                                    Log.d("size", String.valueOf(categoryObj.getBooks().size()));
+                                    for (int i = 0; i < categoryObj.getBooks().size(); i++) {
+                                        final int j = i;
+                                        final BookObj temp = BookService.getBookService().getBookById(categoryObj.getBooks().get(j).getId());
+                                        mHandler.post(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                bookObjs.add(temp);
+                                                if (j < 3) {
+                                                    final String iconURL = BookService.StaticsUrl +  temp.getCover();
+                                                    final Button button = (Button)recomRG.getChildAt(j);
+                                                    button.setText(bookObjs.get(j).getTitle());
+                                                    new Thread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            try {
+                                                                URL url = new URL(iconURL);
+                                                                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                                                                connection.setRequestMethod("GET");
+                                                                connection.setConnectTimeout(10000);
+                                                                if (connection.getResponseCode() == 200) {
+                                                                    InputStream inputStream = connection.getInputStream();
+                                                                    final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                                                                    mHandler.post(new Runnable() {
+                                                                        @Override
+                                                                        public void run() {
+                                                                            Drawable drawable = null;
+                                                                            drawable = new BitmapDrawable(Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), littleMatrix, true));
+                                                                            drawable.setBounds(0, 0, 270, 360);
+                                                                            button.setCompoundDrawables(null, drawable, null, null);
+                                                                        }
+                                                                    });
+                                                                }
+                                                            } catch (Exception e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                        }
+                                                    }).start();
+                                                }
+                                            }
+                                        });
+
+
+                                    }
+                                }
+                            }).start();
+                        }
+                    });
+                }
+            }).start();
+        }
 
         recom1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -356,6 +365,19 @@ public class BookDetailActivity extends AppCompatActivity {
                 setButtonToAdd();
             }
         });
+    }
+
+    // 辅助函数：判断网络是否连接
+    private boolean isNetWorkConnected(Context context) {
+        if (context != null) {
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) context
+                    .getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
+            if (mNetworkInfo != null) {
+                return mNetworkInfo.isConnected();
+            }
+        }
+        return false;
     }
 
 }
