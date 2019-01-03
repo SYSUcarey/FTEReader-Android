@@ -283,11 +283,13 @@ public class SearchActivity extends AppCompatActivity {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            String[] tss = getBookService().getFuzzySearchResult(s).getData();
-                            List<String> t;
-                            if (tss != null)
-                                t = Arrays.asList(tss);
-                            else t = new ArrayList<>();
+                            List<SearchResultObj.book> tss = getBookService().getSearchResultObj(s,0,10).getBookList();
+                            List<String> t = new ArrayList<>();
+                            if (tss != null){
+                                int size = tss.size();
+                                for (int i = 0 ; i < size; i++)
+                                    t.add(tss.get(i).getTitle());
+                            }
                             tempFuzzy.clear();
                             if (t.size() > 0)
                                 tempFuzzy.addAll(t);
