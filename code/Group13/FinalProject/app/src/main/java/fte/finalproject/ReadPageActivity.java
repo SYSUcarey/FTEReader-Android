@@ -62,7 +62,7 @@ public class ReadPageActivity extends AppCompatActivity {
     private CptListObj cptListObj;            //章节列表
     List<ChapterLinkObj> chapterLinks;          // 章节查询链接List
     List<ChapterObj> chapterObjs;    // 章节内容OBJ队列
-    private int currChapter;                   //当前阅读到的章节
+    private int currChapter;                   //当前阅读到的章节       zero-based
     private int currPage;                      //当前阅读到的页面(对一个章节而言)[0, currTotalPage - 1]
     private int currTotalPage;                 //当前章节总页数
     List<List<String>> chaptersContent;        // 每一章每一页的内容
@@ -70,8 +70,8 @@ public class ReadPageActivity extends AppCompatActivity {
     StringBuffer currentChapterContent = new StringBuffer();
     private int pageLen = 370;                  //每一页的字节长度-----匹配18sp字体大小
     int totalChapter;                           // 该书总共的章节数
-    int cache_chapter_range_min;                // 当前缓冲存储的章节数范围下界
-    int cache_chapter_range_max;                // 当前缓冲存储的章节数范围上界
+    int cache_chapter_range_min;                // 当前缓冲存储的章节数范围下界 zero-based
+    int cache_chapter_range_max;                // 当前缓冲存储的章节数范围上界 zero-based
 
     // 处理点击的坐标变量
     private float DownX;
@@ -204,6 +204,7 @@ public class ReadPageActivity extends AppCompatActivity {
         viewPager.setVisibility(View.GONE);
         // 清空当前的FragmentList
         fragmentList.clear();
+        System.out.println("上次看到的章节数为：（zero-based）" + currChapter);
         // 用线程进行帧初始化，避免进入阅读界面阻塞
         Thread init_fragment_thread = new Thread(new Runnable() {
             @Override
@@ -229,6 +230,7 @@ public class ReadPageActivity extends AppCompatActivity {
                             cptListObj = BookService.getBookService().getChaptersByBookId(bookid);
                             chapterLinks = cptListObj.getImixToc().getChapterLinks();
                             totalChapter = chapterLinks.size();
+                            System.out.println("共有章节数目： " + totalChapter);
                             /*for(int i = 0; i < chapterLinks.size(); i++) {
                                 System.out.println(chapterLinks.get(i).getTitle() + ": " + chapterLinks.get(i).getLink());
                             }*/
@@ -240,10 +242,13 @@ public class ReadPageActivity extends AppCompatActivity {
                             cache_chapter_range_min = currChapter - 10;
                             cache_chapter_range_max = currChapter + 10;
                             for(int i = cache_chapter_range_min; i <= cache_chapter_range_max; i++) {
+                                System.out.println("正在下载（zero-based）： i---" + i + "  min---" + cache_chapter_range_min + "---max---" + cache_chapter_range_max);
                                 //超出章节范围
                                 if(i > totalChapter-1) {
-                                    cache_chapter_range_max--;
-                                    continue;
+                                    //cache_chapter_range_max--;
+                                    cache_chapter_range_max = totalChapter-1;
+                                    break;
+                                    //continue;
                                 }
                                 if(i < 0) {
                                     cache_chapter_range_min++;
@@ -463,7 +468,7 @@ public class ReadPageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String msg = "当前横竖屏状态：" + ((is_vertical_screen)?"竖屏":"横屏");
-                System.out.println(msg);
+                //System.out.println(msg);
                 // 当前竖屏状态
                 if(is_vertical_screen) {
                     // 记录状态数据转变,更新默认用户
@@ -576,10 +581,11 @@ public class ReadPageActivity extends AppCompatActivity {
                                         for(int i = 1; i <= cache_num; i++) {
                                             int newChapterNum = cache_chapter_range_max + i;
                                             // 非法章节数(已超出网络给出的章节数)
-                                            if(newChapterNum > totalChapter) continue;
+                                            if(newChapterNum >= totalChapter) continue;
                                             // 合法章节则获取新章节
                                             ChapterObj c = BookService.getBookService().getChapterByLink(chapterLinks.get(newChapterNum).getLink());
-                                            System.out.println(chapterLinks.get(newChapterNum).getLink());
+                                            System.out.println("正在下载（zero-based）： newChapterNum---" + newChapterNum + "  min---" + cache_chapter_range_min + "---max---" + cache_chapter_range_max);
+                                            System.out.println("获取章节： " + newChapterNum + "------" + chapterLinks.get(newChapterNum).getLink());
                                             chapterObjs.add(newChapterNum-cache_chapter_range_min, c);
                                         }
                                     }
@@ -598,7 +604,7 @@ public class ReadPageActivity extends AppCompatActivity {
                                 for(int i = 1; i <= cache_num; i++) {
                                     int newChapterNum = cache_chapter_range_max + 1;
                                     // 已经超出总章节数
-                                    if(newChapterNum > totalChapter) continue;
+                                    if(newChapterNum >= totalChapter) continue;
                                     // 合法的章节数
                                     cache_chapter_range_max++;
                                     // 解析章节内容
@@ -724,7 +730,7 @@ public class ReadPageActivity extends AppCompatActivity {
             }
         }
     }
-    
+
     // 辅助函数：判断网络是否连接
     public boolean isNetWorkConnected(Context context) {
         if (context != null) {
