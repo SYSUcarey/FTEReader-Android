@@ -341,16 +341,18 @@ public class ReadPageActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        //System.out.println("onPause");
+        System.out.println("onPause");
         // 将阅读到的当前章节存入数据库
         DatabaseControl.getInstance(this).updateProgress(currChapter, bookid);
-        /*// 将当前设置的用户习惯存入数据库(报错)
-        userStatusObj.setDay_or_night_status(day_or_night_status);
-        userStatusObj.setHor_or_ver_screen(day_or_night_status);
-        DatabaseControl.getInstance(this).updateStatus(0,userStatusObj);*/
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        System.out.println("onDestroy");
         // todo:注销广播
         unregisterReceiver(myReceiver);
-        super.onPause();
+        super.onDestroy();
     }
 
     // 屏幕点击处理
