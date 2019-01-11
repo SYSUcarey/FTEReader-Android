@@ -1,10 +1,14 @@
 package fte.finalproject;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import java.io.InputStream;
@@ -68,6 +73,19 @@ public class SearchActivity extends AppCompatActivity {
             "圣墟","极品透视学生","正道潜龙","斗罗大陆","雪中悍刀行",
             "枭臣","将夜","校花的贴身高手","大刁民","偷香高手",};
 
+
+    // 辅助函数：判断网络是否连接
+    public boolean isNetWorkConnected(Context context) {
+        if (context != null) {
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) context
+                    .getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
+            if (mNetworkInfo != null) {
+                return mNetworkInfo.isConnected();
+            }
+        }
+        return false;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,19 +137,26 @@ public class SearchActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         try {
-                            URL url = new URL( BookService.StaticsUrl + book.getCover());
-                            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                            connection.setRequestMethod("GET");
-                            connection.setConnectTimeout(10000);
-                            if (connection.getResponseCode() == 200) {
-                                InputStream inputStream = connection.getInputStream();
-                                final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        cover.setImageBitmap(bitmap);
-                                    }
-                                });
+                            if (isNetWorkConnected(MainActivity.getContext())) {
+                                URL url = new URL(BookService.StaticsUrl + book.getCover());
+                                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                                connection.setRequestMethod("GET");
+                                connection.setConnectTimeout(10000);
+                                if (connection.getResponseCode() == 200) {
+                                    InputStream inputStream = connection.getInputStream();
+                                    final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            cover.setImageBitmap(bitmap);
+                                        }
+                                    });
+                                }
+                            }
+                            else{
+                                Looper.prepare();
+                                Toast.makeText(SearchActivity.this,"网络似乎出现了点问题",Toast.LENGTH_SHORT).show();
+                                Looper.loop();
                             }
                         } catch (Exception e) {
                             System.err.println(e.getMessage());
@@ -148,16 +173,23 @@ public class SearchActivity extends AppCompatActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        final BookObj t = getBookService().getBookById(results.get(position).get_id());
-                        if (t != null)
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                bundle.putSerializable("bookobj",t);
-                                intent.putExtras(bundle);
-                                startActivity(intent);
-                            }
-                        });
+                        if (isNetWorkConnected(MainActivity.getContext())) {
+                            final BookObj t = getBookService().getBookById(results.get(position).get_id());
+                            if (t != null)
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        bundle.putSerializable("bookobj", t);
+                                        intent.putExtras(bundle);
+                                        startActivity(intent);
+                                    }
+                                });
+                        }
+                        else {
+                            Looper.prepare();
+                            Toast.makeText(SearchActivity.this,"网络似乎出现了点问题",Toast.LENGTH_SHORT).show();
+                            Looper.loop();
+                        }
                     }
                 }).start();
             }
@@ -237,16 +269,23 @@ public class SearchActivity extends AppCompatActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        List<SearchResultObj.book> t = getBookService().getSearchResultObj(s,0,8).getBookList();
-                        results.clear();
-                        if (t.size() > 0)
-                            results.addAll(t);
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                recyclerViewAdapter.notifyDataSetChanged();
-                            }
-                        });
+                        if (isNetWorkConnected(MainActivity.getContext())) {
+                            List<SearchResultObj.book> t = getBookService().getSearchResultObj(s, 0, 8).getBookList();
+                            results.clear();
+                            if (t.size() > 0)
+                                results.addAll(t);
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    recyclerViewAdapter.notifyDataSetChanged();
+                                }
+                            });
+                        }
+                        else {
+                            Looper.prepare();
+                            Toast.makeText(SearchActivity.this,"网络似乎出现了点问题",Toast.LENGTH_SHORT).show();
+                            Looper.loop();
+                        }
                     }
                 }).start();
                 recyclerViewAdapter.notifyDataSetChanged();
@@ -283,22 +322,29 @@ public class SearchActivity extends AppCompatActivity {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            List<SearchResultObj.book> tss = getBookService().getSearchResultObj(s,0,10).getBookList();
-                            List<String> t = new ArrayList<>();
-                            if (tss != null){
-                                int size = tss.size();
-                                for (int i = 0 ; i < size; i++)
-                                    t.add(tss.get(i).getTitle());
-                            }
-                            tempFuzzy.clear();
-                            if (t.size() > 0)
-                                tempFuzzy.addAll(t);
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    fuzzyAdapter.notifyDataSetChanged();
+                            if (isNetWorkConnected(MainActivity.getContext())) {
+                                List<SearchResultObj.book> tss = getBookService().getSearchResultObj(s, 0, 10).getBookList();
+                                List<String> t = new ArrayList<>();
+                                if (tss != null) {
+                                    int size = tss.size();
+                                    for (int i = 0; i < size; i++)
+                                        t.add(tss.get(i).getTitle());
                                 }
-                            });
+                                tempFuzzy.clear();
+                                if (t.size() > 0)
+                                    tempFuzzy.addAll(t);
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        fuzzyAdapter.notifyDataSetChanged();
+                                    }
+                                });
+                            }
+                            else {
+                                Looper.prepare();
+                                Toast.makeText(SearchActivity.this,"网络似乎出现了点问题",Toast.LENGTH_SHORT).show();
+                                Looper.loop();
+                            }
                         }
                     }).start();
                     fuzzyAdapter.notifyDataSetChanged();
@@ -346,16 +392,23 @@ public class SearchActivity extends AppCompatActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        List<SearchResultObj.book> t = getBookService().getSearchResultObj(s,0,8).getBookList();
-                        results.clear();
-                        if (t.size() > 0)
-                            results.addAll(t);
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                recyclerViewAdapter.notifyDataSetChanged();
-                            }
-                        });
+                        if (isNetWorkConnected(MainActivity.getContext())) {
+                            List<SearchResultObj.book> t = getBookService().getSearchResultObj(s, 0, 8).getBookList();
+                            results.clear();
+                            if (t.size() > 0)
+                                results.addAll(t);
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    recyclerViewAdapter.notifyDataSetChanged();
+                                }
+                            });
+                        }
+                        else {
+                            Looper.prepare();
+                            Toast.makeText(SearchActivity.this,"网络似乎出现了点问题",Toast.LENGTH_SHORT).show();
+                            Looper.loop();
+                        }
                     }
                 }).start();
                 recyclerViewAdapter.notifyDataSetChanged();
@@ -394,16 +447,23 @@ public class SearchActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                List<SearchResultObj.book> t = getBookService().getSearchResultObj(s,0,8).getBookList();
-                results.clear();
-                if (t.size() > 0)
-                    results.addAll(t);
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        recyclerViewAdapter.notifyDataSetChanged();
-                    }
-                });
+                if (isNetWorkConnected(MainActivity.getContext())) {
+                    List<SearchResultObj.book> t = getBookService().getSearchResultObj(s, 0, 8).getBookList();
+                    results.clear();
+                    if (t.size() > 0)
+                        results.addAll(t);
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            recyclerViewAdapter.notifyDataSetChanged();
+                        }
+                    });
+                }
+                else {
+                    Looper.prepare();
+                    Toast.makeText(SearchActivity.this,"网络似乎出现了点问题",Toast.LENGTH_SHORT).show();
+                    Looper.loop();
+                }
             }
         }).start();
         recyclerViewAdapter.notifyDataSetChanged();
