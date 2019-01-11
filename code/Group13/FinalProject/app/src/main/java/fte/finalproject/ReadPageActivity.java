@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
@@ -63,12 +64,7 @@ public class ReadPageActivity extends AppCompatActivity {
     List<ChapterLinkObj> chapterLinks;          // 章节查询链接List
     List<ChapterObj> chapterObjs;    // 章节内容OBJ队列
     private int currChapter;                   //当前阅读到的章节       zero-based
-    private int currPage;                      //当前阅读到的页面(对一个章节而言)[0, currTotalPage - 1]
-    private int currTotalPage;                 //当前章节总页数
     List<List<String>> chaptersContent;        // 每一章每一页的内容
-    StringBuffer showContent = new StringBuffer();
-    StringBuffer currentChapterContent = new StringBuffer();
-    private int pageLen = 370;                  //每一页的字节长度-----匹配18sp字体大小
     int totalChapter;                           // 该书总共的章节数
     int cache_chapter_range_min;                // 当前缓冲存储的章节数范围下界 zero-based
     int cache_chapter_range_max;                // 当前缓冲存储的章节数范围上界 zero-based
@@ -117,7 +113,7 @@ public class ReadPageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_read_page);
-        //System.out.println("onCreate创建");
+        System.out.println("onCreate创建");
 
         //从传递的参数中获取章节相关信息
         Intent intent = this.getIntent();
@@ -154,6 +150,7 @@ public class ReadPageActivity extends AppCompatActivity {
         init_fragment();
     }
 
+    // 从数据库中获取用户的阅读习惯
     private void set_Reading_Status() {
         // 获取用户状态(默认用户状态)
         userStatusObj = DatabaseControl.getInstance(this).get_User_Status_Obj(0);
@@ -237,7 +234,6 @@ public class ReadPageActivity extends AppCompatActivity {
                             chaptersContent = new ArrayList<>(totalChapter);
 
                             // 缓存当前章节以及上下10章的数据
-                            //System.out.println(totalChapter);
                             chapterObjs = new ArrayList<ChapterObj>(totalChapter){};
                             cache_chapter_range_min = currChapter - 10;
                             cache_chapter_range_max = currChapter + 10;
@@ -315,8 +311,6 @@ public class ReadPageActivity extends AppCompatActivity {
                         Bundle bundle = new Bundle();
                         bundle.putString("title", title);
                         bundle.putString("content", content);
-                        bundle.putInt("currentChapter", i);
-                        bundle.putInt("totalChapter", totalChapter);
                         bundle.putInt("day_or_night_status", day_or_night_status);
                         fragment.setArguments(bundle);
                         // 将新加的帧放入队列中
@@ -360,6 +354,7 @@ public class ReadPageActivity extends AppCompatActivity {
     }
 
     // 屏幕点击处理
+    // 处理屏幕滑动翻页和点击中部弹出功能按键底框
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
 
@@ -378,8 +373,9 @@ public class ReadPageActivity extends AppCompatActivity {
         }
         // 点击事件
         else {
+            System.out.println("点击位置：" + DownX + ":" + DownY);
+            System.out.println("屏幕宽高：" + SCREEN_WIDTH + " " + SCREEN_HEIGHT);
             if (DownX > SCREEN_WIDTH / 3 && DownX < SCREEN_WIDTH * 2 / 3 && DownY > SCREEN_HEIGHT / 5 && DownY < SCREEN_HEIGHT * 4 / 5) {
-                System.out.println("中间" + DownX + ":" + DownY);
                 if (show_functional_button) {
                     rg_control.setVisibility(View.GONE);
                     bottom_layout_control.setVisibility(View.VISIBLE);
@@ -410,11 +406,24 @@ public class ReadPageActivity extends AppCompatActivity {
     }
 
     // 设置功能按键
+    // 图标样式&&点击处理
     private void set_functional_button() {
         // 设置底部功能按钮的大小
-        Drawable drawable = getResources().getDrawable(R.mipmap.nighttime);
-        drawable.setBounds(0, 0, 70, 70);
-        day_and_night_rb_control.setCompoundDrawables(null, drawable , null,null);
+        Drawable drawable;
+        // 根据当前阅读日间/夜间模式设置图标
+
+        if(day_or_night_status == 0) {
+            drawable = getResources().getDrawable(R.mipmap.nighttime);
+            drawable.setBounds(0, 0, 70, 70);
+            day_and_night_rb_control.setCompoundDrawables(null, drawable, null, null);
+            day_and_night_rb_control.setText("夜间");
+        }
+        else {
+            drawable = getResources().getDrawable(R.mipmap.daytime);
+            drawable.setBounds(0, 0, 70, 70);
+            day_and_night_rb_control.setCompoundDrawables(null, drawable, null, null);
+            day_and_night_rb_control.setText("日间");
+        }
         // 根据当前横竖屏状况设置图标
         if(is_vertical_screen) {
             drawable = getResources().getDrawable(R.mipmap.horizontal_screen);
@@ -450,19 +459,29 @@ public class ReadPageActivity extends AppCompatActivity {
                     day_or_night_status = 1;
                     userStatusObj.setDay_or_night_status(day_or_night_status);
                     DatabaseControl.getInstance(context).updateStatus(0, userStatusObj);
-                    init_fragment();
+                    changeFrameStyle();
                     day_and_night_rb_control.setTextColor(Color.BLACK);
+                    Drawable drawable = getResources().getDrawable(R.mipmap.daytime);
+                    drawable.setBounds(0, 0, 70, 70);
+                    day_and_night_rb_control.setCompoundDrawables(null, drawable, null, null);
+                    day_and_night_rb_control.setText("日间");
                 }
                 else {
                     whole_layout_control.setBackgroundColor(getResources().getColor(R.color.PapayaWhip));
                     day_or_night_status = 0;
                     userStatusObj.setDay_or_night_status(day_or_night_status);
                     DatabaseControl.getInstance(context).updateStatus(0, userStatusObj);
-                    init_fragment();
+                    //init_fragment();
+                    changeFrameStyle();
                     day_and_night_rb_control.setTextColor(Color.BLACK);
+                    Drawable drawable = getResources().getDrawable(R.mipmap.nighttime);
+                    drawable.setBounds(0, 0, 70, 70);
+                    day_and_night_rb_control.setCompoundDrawables(null, drawable, null, null);
+                    day_and_night_rb_control.setText("夜间");
                 }
             }
         });
+
         // 横屏竖屏功能切换
         horizontal_and_vertical_rb_control.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -477,6 +496,11 @@ public class ReadPageActivity extends AppCompatActivity {
                     DatabaseControl.getInstance(context).updateStatus(0,0);
                     // 切换成横屏
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                    Drawable drawable = getResources().getDrawable(R.mipmap.vertical_screen);
+                    drawable.setBounds(0, 0, 70, 70);
+                    horizontal_and_vertical_rb_control.setCompoundDrawables(null, drawable, null,null);
+                    horizontal_and_vertical_rb_control.setText("竖屏");
+                    horizontal_and_vertical_rb_control.setTextColor(Color.BLACK);
                 }
                 // 当前横屏状态
                 else {
@@ -486,6 +510,11 @@ public class ReadPageActivity extends AppCompatActivity {
                     DatabaseControl.getInstance(context).updateStatus(0,1);
                     // 切换成竖屏状态
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                    Drawable drawable = getResources().getDrawable(R.mipmap.horizontal_screen);
+                    drawable.setBounds(0, 0, 70, 70);
+                    horizontal_and_vertical_rb_control.setCompoundDrawables(null, drawable, null,null);
+                    horizontal_and_vertical_rb_control.setText("横屏");
+                    horizontal_and_vertical_rb_control.setTextColor(Color.BLACK);
                 }
             }
         });
@@ -532,8 +561,6 @@ public class ReadPageActivity extends AppCompatActivity {
 
     //设置一个ViewPager的监听事件，左右滑动ViewPager时进行处理
     //当滑动到当前缓存的倒数第M章的时候，进行网络资源访问，获取新的N章的资源
-    //当滑动到当前缓存的第一页时
-    //需要添加新的Fragment
     public class MyPagerChangeListener implements ViewPager.OnPageChangeListener {
         int from;
         @Override
@@ -578,15 +605,20 @@ public class ReadPageActivity extends AppCompatActivity {
                                 Thread getNewChapterThread = new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        for(int i = 1; i <= cache_num; i++) {
-                                            int newChapterNum = cache_chapter_range_max + i;
-                                            // 非法章节数(已超出网络给出的章节数)
-                                            if(newChapterNum >= totalChapter) continue;
-                                            // 合法章节则获取新章节
-                                            ChapterObj c = BookService.getBookService().getChapterByLink(chapterLinks.get(newChapterNum).getLink());
-                                            System.out.println("正在下载（zero-based）： newChapterNum---" + newChapterNum + "  min---" + cache_chapter_range_min + "---max---" + cache_chapter_range_max);
-                                            System.out.println("获取章节： " + newChapterNum + "------" + chapterLinks.get(newChapterNum).getLink());
-                                            chapterObjs.add(newChapterNum-cache_chapter_range_min, c);
+                                        if(isNetWorkConnected(context)) {
+                                            for (int i = 1; i <= cache_num; i++) {
+                                                int newChapterNum = cache_chapter_range_max + i;
+                                                // 非法章节数(已超出网络给出的章节数)
+                                                if (newChapterNum >= totalChapter) continue;
+                                                // 合法章节则获取新章节
+                                                ChapterObj c = BookService.getBookService().getChapterByLink(chapterLinks.get(newChapterNum).getLink());
+                                                System.out.println("正在下载（zero-based）： newChapterNum---" + newChapterNum + "  min---" + cache_chapter_range_min + "---max---" + cache_chapter_range_max);
+                                                System.out.println("获取章节： " + newChapterNum + "------" + chapterLinks.get(newChapterNum).getLink());
+                                                chapterObjs.add(newChapterNum - cache_chapter_range_min, c);
+                                            }
+                                        }
+                                        else {
+                                            Log.e("ERROR", "网络连接状况：未连接");
                                         }
                                     }
                                 });
@@ -599,12 +631,14 @@ public class ReadPageActivity extends AppCompatActivity {
                                     e.printStackTrace();
                                 }
 
-
+                                System.out.println("子线程更新完毕");
                                 // 新增N个帧
                                 for(int i = 1; i <= cache_num; i++) {
                                     int newChapterNum = cache_chapter_range_max + 1;
                                     // 已经超出总章节数
                                     if(newChapterNum >= totalChapter) continue;
+                                    // 网络连接故障，要获取的章节未缓存成功，不添加新帧
+                                    if(newChapterNum - cache_chapter_range_min >= chapterObjs.size()) break;
                                     // 合法的章节数
                                     cache_chapter_range_max++;
                                     // 解析章节内容
@@ -624,8 +658,7 @@ public class ReadPageActivity extends AppCompatActivity {
                                     Bundle bundle = new Bundle();
                                     bundle.putString("title", title);
                                     bundle.putString("content", content);
-                                    bundle.putInt("currentChapter", newChapterNum);
-                                    bundle.putInt("totalChapter", totalChapter);
+                                    bundle.putInt("day_or_night_status", day_or_night_status);
                                     fragment.setArguments(bundle);
                                     // 将新加的帧放入队列中
                                     fragmentList.add(fragment);
@@ -645,7 +678,7 @@ public class ReadPageActivity extends AppCompatActivity {
                 // 当前章节数-1
                 currChapter--;
                 // 设置进度显示
-                read_page_process_control.setText(Integer.toString(currChapter+1) + "/" + Integer.toString(totalChapter+1));
+                read_page_process_control.setText(Integer.toString(currChapter+1) + "/" + Integer.toString(totalChapter));
                 // 滑动到当前缓存剩余量不多时，当前再访问剩余量设置是五章节(不包括当前章节)
                 System.out.println("arg0-currChapter-min-max: " + arg0 + " " + currChapter + " " + cache_chapter_range_min + " " + cache_chapter_range_max);
                 if((currChapter-cache_chapter_range_min) == cache_left) {
@@ -712,8 +745,7 @@ public class ReadPageActivity extends AppCompatActivity {
                                     Bundle bundle = new Bundle();
                                     bundle.putString("title", title);
                                     bundle.putString("content", content);
-                                    bundle.putInt("currentChapter", newChapterNum);
-                                    bundle.putInt("totalChapter", totalChapter);
+                                    bundle.putInt("day_or_night_status", day_or_night_status);
                                     fragment.setArguments(bundle);
                                     // 将新加的帧放入队列中
                                     fragmentList.add(0,fragment);
@@ -769,7 +801,6 @@ public class ReadPageActivity extends AppCompatActivity {
                     viewPager.setAdapter(fragmentAdapter);
                     // 跳到上次阅读到的章节
                     viewPager.setCurrentItem(currChapter-cache_chapter_range_min);
-                    viewPager.setOffscreenPageLimit(currTotalPage - 1);
                     // 适配完毕，取消ProgressBar, 隐藏功能按键，显示底部信息栏
                     progressBar.setVisibility(View.GONE);
                     rg_control.setVisibility(View.GONE);
@@ -829,6 +860,7 @@ public class ReadPageActivity extends AppCompatActivity {
     }
 
     // 注册获取系统广播
+    // 广播获取系统电量和时间
     class MyReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -856,6 +888,64 @@ public class ReadPageActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+
+    // 当使用功能按键切换阅读界面阅读习惯时
+    // 不必要重新进行网络访问
+    // 直接改变阅读帧的样式
+    public void changeFrameStyle() {
+        System.out.println("---------[changeFrameStyle]-----------");
+        // 设置等待进度条
+        progressBar.setVisibility(View.VISIBLE);
+        viewPager.setVisibility(View.GONE);
+        // 清空当前的FragmentList
+        fragmentList.clear();
+        for(int i = cache_chapter_range_min; i<= cache_chapter_range_max; i++) {
+            // 解析章节内容
+            //String title = chapterObjs.get(0).getIchapter().getTitle(); // 这种获取Title的内容错误的（API问题）
+            String title = chapterLinks.get(i).getTitle();
+            String content;
+            if(chapterObjs.get(i-cache_chapter_range_min) == null) {
+                content = "章节获取失败了呢！客官";
+            }
+            else content = chapterObjs.get(i-cache_chapter_range_min).getIchapter().getBody();
+            // 为段首添加缩进
+            content = "\u3000\u3000" + content;
+            content = content.replaceAll("\n", "\n\u3000\u3000");
+            // 新建对应章节内容帧
+            ReadPageFragment fragment = new ReadPageFragment();
+            // 给帧传数据
+            Bundle bundle = new Bundle();
+            bundle.putString("title", title);
+            bundle.putString("content", content);
+            bundle.putInt("day_or_night_status", day_or_night_status);
+            fragment.setArguments(bundle);
+            // 将新加的帧放入队列中
+            fragmentList.add(fragment);
+        }
+        rxjava_update_page(2);
+    }
+
+
+    // 重载onConfigurationChanged函数处理横竖屏切换
+    // 使得不必重新回调Activity整个生命周期
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            //text_screen.append("\n 当前屏幕为横屏");
+            System.out.println("当前屏幕为横屏");
+        } else {
+            //text_screen.append("\n 当前屏幕为竖屏");
+            System.out.println("当前屏幕为竖屏");
+
+        }
+        // 重新设置屏幕宽高
+        get_screen_info();
+        super.onConfigurationChanged(newConfig);
+        Log.e("TAG", "onConfigurationChanged");
+        //  setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);  //设置横屏
     }
 
 }

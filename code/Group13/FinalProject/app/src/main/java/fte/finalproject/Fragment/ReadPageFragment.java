@@ -16,8 +16,6 @@ public class ReadPageFragment extends Fragment {
     // 页面数据
     private String title;       //章节名
     private String content;     //本章内容
-    int currentChapter;         //当前章节数
-    int totalChapter;           //总共章节数
     int day_or_night_status;    // 日间或夜间模式
 
     // 帧页面View
@@ -26,18 +24,15 @@ public class ReadPageFragment extends Fragment {
     private TextView titile_control;        // 标题
     private TextView content_control;       // 阅读页内容
     private FrameLayout whole_layout_control;    // 整个框页面
-    //private TextView progress_control;      // 阅读此章节的进度
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.currentChapter = getArguments().getInt("currentChapter");
-        this.totalChapter = getArguments().getInt("totalChapter");
         this.content = getArguments().getString("content");
         this.title = getArguments().getString("title");
         this.day_or_night_status = getArguments().getInt("day_or_night_status");
-        System.out.println("日间夜间：" + day_or_night_status);
+        //System.out.println("日间夜间：" + day_or_night_status);
     }
 
     @Override
