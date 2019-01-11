@@ -19,7 +19,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/activity_read_page_bottom_layout"
         android:layout_alignParentBottom="true"
-        android:visibility="gone"
         android:layout_marginBottom="10sp"
         android:layout_marginLeft="20sp"
         android:layout_marginRight="10sp">
@@ -68,7 +67,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_alignParentBottom="true"
-        android:clickable="false">
+        android:clickable="false"
+        android:visibility="gone">
         <RadioButton
             android:id="@+id/read_page_day_and_night_rb"
             style="@style/BottomRB"

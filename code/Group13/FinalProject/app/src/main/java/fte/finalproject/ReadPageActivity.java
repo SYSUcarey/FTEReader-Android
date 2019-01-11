@@ -1,5 +1,6 @@
 package fte.finalproject;
 
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +17,8 @@ import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.DisplayCutout;
@@ -37,6 +40,8 @@ import java.util.List;
 import fte.finalproject.Fragment.ReadPageFragment;
 import fte.finalproject.Fragment.TabFragmentStatePagerAdapter;
 import fte.finalproject.control.DatabaseControl;
+import fte.finalproject.myRecyclerview.MyRecyclerViewAdapter;
+import fte.finalproject.myRecyclerview.MyViewHolder;
 import fte.finalproject.obj.ChapterLinkObj;
 import fte.finalproject.obj.ChapterLinks;
 import fte.finalproject.obj.ChapterObj;
@@ -107,6 +112,10 @@ public class ReadPageActivity extends AppCompatActivity {
     UserStatusObj userStatusObj;
     boolean is_vertical_screen;
     int day_or_night_status;
+
+    // 目录弹窗
+    MyRecyclerViewAdapter<String> adapter;
+    List<String> myCategory;
 
 
     @Override
@@ -552,10 +561,65 @@ public class ReadPageActivity extends AppCompatActivity {
         catalog_rb_control.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ReadPageActivity.this, "目录功能还没实现呢！客官", Toast.LENGTH_LONG).show();
+                //Toast.makeText(ReadPageActivity.this, "目录功能还没实现呢！客官", Toast.LENGTH_LONG).show();
+                // 弹出一个目录选择框
+                final Dialog dialog = new Dialog(context);
+                dialog.setContentView(R.layout.catalog_dialog);
+                // 书籍目录RecyclerView
+                RecyclerView dialog_catalog = dialog.findViewById(R.id.catalog_recylerView);
+                // 书籍目录数据初始化
+                myCategory = new ArrayList<>();
+                for(int i = 0; i < chapterLinks.size(); i++)
+                    myCategory.add(chapterLinks.get(i).getTitle());
+
+                // 设置 Adapter
+                adapter = new MyRecyclerViewAdapter<String>(context, R.layout.item_catalog, myCategory) {
+                    @Override
+                    public void convert(MyViewHolder holder, String s) {
+                        TextView title = holder.getView(R.id.catalog_title);
+                        title.setText(s);
+                    }
+                };
+                // 设置点击目录跳转到相应章节
+                adapter.setOnItemClickListener(new MyRecyclerViewAdapter.OnItemClickListener() {
+                    @Override
+                    public void onClick(int position) {
+                        // dialog目录框消失
+                        dialog.dismiss();
+                        // 设置等待进度条
+                        viewPager.setVisibility(View.GONE);
+                        progressBar.setVisibility(View.VISIBLE);
+                        // 清空当前的FragmentList
+                        fragmentList.clear();
+                        // 设置跳转章节数
+                        currChapter = position;
+                        // 加载帧
+                        init_fragment();
+                        // 更新UI
+                        //rxjava_update_page(2);
+                    }
+
+                    @Override
+                    public void onLongClick(int position) {
+
+                    }
+                });
+
+                final WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+                params.width = 800;
+                params.height = 1200;
+                dialog.getWindow().setAttributes(params);
+
+                // 适配 Adapter
+                dialog_catalog.setAdapter(adapter);
+                // 设置 RecyclerView 布局
+                dialog_catalog.setLayoutManager(new LinearLayoutManager(context));
+
+                // 设置 dialog 属性并显示
+                dialog.setCancelable(true);
+                dialog.show();
             }
         });
-
     }
 
     // 获取页面控件
@@ -599,7 +663,7 @@ public class ReadPageActivity extends AppCompatActivity {
                 // 当前章节数+1
                 currChapter++;
                 // 设置进度显示
-                read_page_process_control.setText(Integer.toString(currChapter+1) + "/" + Integer.toString(totalChapter+1));
+                read_page_process_control.setText(Integer.toString(currChapter+1) + "/" + Integer.toString(totalChapter));
                 // 滑动到当前缓存剩余量不多时，当前再访问剩余量设置是五章节(不包括当前章节)
                 if(arg0 == (cache_chapter_range_max-cache_chapter_range_min) - cache_left) {
 
@@ -825,7 +889,7 @@ public class ReadPageActivity extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                     rg_control.setVisibility(View.GONE);
                     viewPager.setVisibility(View.VISIBLE);
-                    read_page_process_control.setText(Integer.toString(currChapter+1) + "/" + Integer.toString(totalChapter+1));
+                    read_page_process_control.setText(Integer.toString(currChapter+1) + "/" + Integer.toString(totalChapter));
                     bottom_layout_control.setVisibility(View.VISIBLE);
                 }
                 // type == 1 界面获取下N章节更新
