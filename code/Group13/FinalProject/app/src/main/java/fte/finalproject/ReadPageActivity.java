@@ -157,10 +157,13 @@ public class ReadPageActivity extends AppCompatActivity {
         // 获取默认用户下的横竖屏状态
         int hor_or_ver_screen = userStatusObj.getHor_or_ver_screen();
         //System.out.println("从数据库中获取到的横竖屏状态： " + hor_or_ver_screen);
-        if(hor_or_ver_screen == 1)
+        if(hor_or_ver_screen == 1) {
             is_vertical_screen = true;
+            System.out.println("新建Activity：数据库中是竖屏状态");
+        }
         else {
             is_vertical_screen = false;
+            System.out.println("新建Activity：数据库中是横屏状态");
             // 切换成横屏
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
@@ -344,12 +347,17 @@ public class ReadPageActivity extends AppCompatActivity {
         System.out.println("onPause");
         // 将阅读到的当前章节存入数据库
         DatabaseControl.getInstance(this).updateProgress(currChapter, bookid);
+        // 将当前设置的用户习惯存入数据库(报错)
+        userStatusObj.setDay_or_night_status(day_or_night_status);
+        userStatusObj.setHor_or_ver_screen((is_vertical_screen?1:0));
+        DatabaseControl.getInstance(this).updateStatus(0,userStatusObj);
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
         System.out.println("onDestroy");
+        System.out.println("横竖屏状况：" + ((is_vertical_screen) ? "竖屏":"横屏"));
         // todo:注销广播
         unregisterReceiver(myReceiver);
         super.onDestroy();
@@ -494,8 +502,10 @@ public class ReadPageActivity extends AppCompatActivity {
                 if(is_vertical_screen) {
                     // 记录状态数据转变,更新默认用户
                     is_vertical_screen = false;
+                    userStatusObj.setHor_or_ver_screen(0);
                     horizontal_and_vertical_rb_control.setTextColor(Color.BLACK);
-                    DatabaseControl.getInstance(context).updateStatus(0,0);
+                    //DatabaseControl.getInstance(context).updateStatus(0,0);
+                    DatabaseControl.getInstance(context).updateStatus(0, userStatusObj);
                     // 切换成横屏
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                     Drawable drawable = getResources().getDrawable(R.mipmap.vertical_screen);
@@ -508,8 +518,12 @@ public class ReadPageActivity extends AppCompatActivity {
                 else {
                     // 记录状态数据转变
                     is_vertical_screen = true;
+                    userStatusObj.setHor_or_ver_screen(1);
                     horizontal_and_vertical_rb_control.setTextColor(Color.BLACK);
-                    DatabaseControl.getInstance(context).updateStatus(0,1);
+                    //DatabaseControl.getInstance(context).updateStatus(0,1);
+                    DatabaseControl.getInstance(context).updateStatus(0, userStatusObj);
+                    System.out.println("改成竖屏");
+                    System.out.println(DatabaseControl.getInstance(context).get_Hor_Or_Ver_Screen_Status(0));
                     // 切换成竖屏状态
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                     Drawable drawable = getResources().getDrawable(R.mipmap.horizontal_screen);
@@ -702,15 +716,17 @@ public class ReadPageActivity extends AppCompatActivity {
                                 Thread getNewChapterThread = new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        for(int i = 1; i <= cache_num; i++) {
-                                            int newChapterNum = cache_chapter_range_min - i;
-                                            // 非法章节数(已经到第一章了)
-                                            if(newChapterNum < 0) continue;
-                                            // 合法章节则获取新章节
-                                            ChapterObj c = BookService.getBookService().getChapterByLink(chapterLinks.get(newChapterNum).getLink());
-                                            System.out.println(chapterLinks.get(newChapterNum).getLink());
-                                            // 在队列头插入章节信息
-                                            chapterObjs.add(0, c);
+                                        if(isNetWorkConnected(context)) {
+                                            for (int i = 1; i <= cache_num; i++) {
+                                                int newChapterNum = cache_chapter_range_min - i;
+                                                // 非法章节数(已经到第一章了)
+                                                if (newChapterNum < 0) continue;
+                                                // 合法章节则获取新章节
+                                                ChapterObj c = BookService.getBookService().getChapterByLink(chapterLinks.get(newChapterNum).getLink());
+                                                System.out.println(chapterLinks.get(newChapterNum).getLink());
+                                                // 在队列头插入章节信息
+                                                chapterObjs.add(0, c);
+                                            }
                                         }
                                     }
                                 });
@@ -726,8 +742,10 @@ public class ReadPageActivity extends AppCompatActivity {
                                 // 新增N个帧
                                 for(int i = 1; i <= cache_num; i++) {
                                     int newChapterNum = cache_chapter_range_min - 1;
-                                    // 已经超出总章节数
+                                    // 比第一章还小，非法章节数
                                     if(newChapterNum < 0) continue;
+                                    // 因网络故障未缓存到所要章节
+                                    if(cache_chapter_range_max - cache_chapter_range_min + 1 >= chapterObjs.size()) break;
                                     // 合法的章节数
                                     cache_chapter_range_min--;
                                     // 解析章节内容
@@ -941,7 +959,12 @@ public class ReadPageActivity extends AppCompatActivity {
         } else {
             //text_screen.append("\n 当前屏幕为竖屏");
             System.out.println("当前屏幕为竖屏");
+        }
+        if(is_vertical_screen == true) {
 
+            System.out.println("数据库中是竖屏");
+        } else {
+            System.out.println("数据库中是横屏");
         }
         // 重新设置屏幕宽高
         get_screen_info();
