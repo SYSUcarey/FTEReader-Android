@@ -24,6 +24,7 @@ import android.util.Log;
 import android.view.DisplayCutout;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
@@ -65,6 +66,7 @@ public class ReadPageActivity extends AppCompatActivity {
     private ViewPager viewPager;
 
     private String bookid;                      // 书籍id
+    private String bookname;                    // 书籍名
     private CptListObj cptListObj;            //章节列表
     List<ChapterLinkObj> chapterLinks;          // 章节查询链接List
     List<ChapterObj> chapterObjs;    // 章节内容OBJ队列
@@ -128,6 +130,7 @@ public class ReadPageActivity extends AppCompatActivity {
         Intent intent = this.getIntent();
         Bundle bundle = intent.getExtras();
         bookid = bundle.getString("bookid");
+        bookname = bundle.getString("bookname");
         currChapter = bundle.getInt("currentChapter");
         //System.out.println("bookid: " + bookid + "  currentChapter: " + currChapter);
 
@@ -564,7 +567,10 @@ public class ReadPageActivity extends AppCompatActivity {
                 //Toast.makeText(ReadPageActivity.this, "目录功能还没实现呢！客官", Toast.LENGTH_LONG).show();
                 // 弹出一个目录选择框
                 final Dialog dialog = new Dialog(context);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setContentView(R.layout.catalog_dialog);
+                TextView title = dialog.findViewById(R.id.catalog_title);
+                title.setText(bookname);
                 // 书籍目录RecyclerView
                 RecyclerView dialog_catalog = dialog.findViewById(R.id.catalog_recylerView);
                 // 书籍目录数据初始化
@@ -612,6 +618,7 @@ public class ReadPageActivity extends AppCompatActivity {
 
                 // 适配 Adapter
                 dialog_catalog.setAdapter(adapter);
+
                 // 设置 RecyclerView 布局
                 dialog_catalog.setLayoutManager(new LinearLayoutManager(context));
 

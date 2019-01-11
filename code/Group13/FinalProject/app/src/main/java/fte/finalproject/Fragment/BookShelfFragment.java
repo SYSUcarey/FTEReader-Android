@@ -122,6 +122,7 @@ public class BookShelfFragment extends Fragment {
                 Bundle bundle = new Bundle();
                 bundle.putString("bookid", myBooks.get(position).getBookId());
                 bundle.putInt("currentChapter", myBooks.get(position).getReadChapter());
+                bundle.putString("bookname", myBooks.get(position).getName());
                 System.out.println("传进去当前阅读章节数为：" + myBooks.get(position).getReadChapter());
                 intent.putExtras(bundle);
                 startActivity(intent);
