@@ -84,11 +84,11 @@
             style="@style/BottomRB"
             android:text="设置"
             android:drawableTop="@mipmap/textsize" />
-        <RadioButton
+        <!--<RadioButton
             android:id="@+id/read_page_download_rb"
             style="@style/BottomRB"
             android:text="下载"
-            android:drawableTop="@mipmap/download"/>
+            android:drawableTop="@mipmap/download"/>-->
         <RadioButton
             android:id="@+id/read_page_catalog_rb"
             style="@style/BottomRB"

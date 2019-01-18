@@ -85,7 +85,7 @@ public class ReadPageActivity extends AppCompatActivity {
     private RadioButton day_and_night_rb_control;
     private RadioButton horizontal_and_vertical_rb_control;
     private RadioButton setting_rb_control;
-    private RadioButton download_rb_control;
+    //private RadioButton download_rb_control;
     private RadioButton catalog_rb_control;
     private ProgressBar progressBar;
     private RelativeLayout bottom_layout_control;
@@ -224,7 +224,8 @@ public class ReadPageActivity extends AppCompatActivity {
                 if(!isNetworkConnected) {
                     Looper.prepare();
                     // 弹出Toast提示
-                    Toast.makeText(ReadPageActivity.this, "网络连接状况：未连接", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ReadPageActivity.this, "网络未连接,书籍获取失败", Toast.LENGTH_SHORT).show();
+                    ReadPageActivity.this.finish();
                     Looper.loop();
                     // ProgressBar等待框消失
                     progressBar.setVisibility(View.GONE);
@@ -237,41 +238,51 @@ public class ReadPageActivity extends AppCompatActivity {
                         public void run() {
                             // 获取所有章节信息
                             cptListObj = BookService.getBookService().getChaptersByBookId(bookid);
-                            chapterLinks = cptListObj.getImixToc().getChapterLinks();
-                            totalChapter = chapterLinks.size();
-                            System.out.println("共有章节数目： " + totalChapter);
+                            if(cptListObj != null) {
+                                chapterLinks = cptListObj.getImixToc().getChapterLinks();
+                                totalChapter = chapterLinks.size();
+                                System.out.println("共有章节数目： " + totalChapter);
                             /*for(int i = 0; i < chapterLinks.size(); i++) {
                                 System.out.println(chapterLinks.get(i).getTitle() + ": " + chapterLinks.get(i).getLink());
                             }*/
-                            chaptersContent = new ArrayList<>(totalChapter);
+                                chaptersContent = new ArrayList<>(totalChapter);
 
-                            // 缓存当前章节以及上下10章的数据
-                            chapterObjs = new ArrayList<ChapterObj>(totalChapter){};
-                            cache_chapter_range_min = currChapter - 10;
-                            cache_chapter_range_max = currChapter + 10;
-                            for(int i = cache_chapter_range_min; i <= cache_chapter_range_max; i++) {
-                                System.out.println("正在下载（zero-based）： i---" + i + "  min---" + cache_chapter_range_min + "---max---" + cache_chapter_range_max);
-                                //超出章节范围
-                                if(i > totalChapter-1) {
-                                    //cache_chapter_range_max--;
-                                    cache_chapter_range_max = totalChapter-1;
-                                    break;
-                                    //continue;
+                                // 缓存当前章节以及上下10章的数据
+                                chapterObjs = new ArrayList<ChapterObj>(totalChapter) {
+                                };
+                                cache_chapter_range_min = currChapter - 10;
+                                cache_chapter_range_max = currChapter + 10;
+                                for (int i = cache_chapter_range_min; i <= cache_chapter_range_max; i++) {
+                                    System.out.println("正在下载（zero-based）： i---" + i + "  min---" + cache_chapter_range_min + "---max---" + cache_chapter_range_max);
+                                    //超出章节范围
+                                    if (i > totalChapter - 1) {
+                                        //cache_chapter_range_max--;
+                                        cache_chapter_range_max = totalChapter - 1;
+                                        break;
+                                        //continue;
+                                    }
+                                    if (i < 0) {
+                                        cache_chapter_range_min++;
+                                        continue;
+                                    }
+                                    ChapterObj c = BookService.getBookService().getChapterByLink(chapterLinks.get(i).getLink());
+                                    //System.out.println(chapterLinks.get(i).getLink());
+                                    chapterObjs.add(i - cache_chapter_range_min, c);
+                                    //System.out.println(i);
                                 }
-                                if(i < 0) {
-                                    cache_chapter_range_min++;
-                                    continue;
-                                }
-                                ChapterObj c = BookService.getBookService().getChapterByLink(chapterLinks.get(i).getLink());
-                                //System.out.println(chapterLinks.get(i).getLink());
-                                chapterObjs.add(i-cache_chapter_range_min, c);
-                                //System.out.println(i);
+                                System.out.println(cache_chapter_range_min + "----" + cache_chapter_range_max);
+                                //System.out.println(chapterLinks.size());
+
+                                //currentChapterContent.append(c.getIchapter().getBody());
+                                //System.out.println(c.getIchapter().getTitle() + "\n" + c.getIchapter().getBody());
                             }
-                            System.out.println(cache_chapter_range_min + "----" + cache_chapter_range_max);
-                            //System.out.println(chapterLinks.size());
-
-                            //currentChapterContent.append(c.getIchapter().getBody());
-                            //System.out.println(c.getIchapter().getTitle() + "\n" + c.getIchapter().getBody());
+                            else {
+                                Looper.prepare();
+                                // 弹出Toast提示
+                                Toast.makeText(ReadPageActivity.this, "无法获取书籍源", Toast.LENGTH_SHORT).show();
+                                ReadPageActivity.this.finish();
+                                Looper.loop();
+                            }
                         }
                     });
                     initContentThread.start();
@@ -461,9 +472,9 @@ public class ReadPageActivity extends AppCompatActivity {
         drawable = getResources().getDrawable(R.mipmap.textsize);
         drawable.setBounds(0, 0, 70, 70);
         setting_rb_control.setCompoundDrawables(null, drawable,null, null);
-        drawable = getResources().getDrawable(R.mipmap.download);
+        /*drawable = getResources().getDrawable(R.mipmap.download);
         drawable.setBounds(0, 0, 70, 70);
-        download_rb_control.setCompoundDrawables(null, drawable,null, null);
+        download_rb_control.setCompoundDrawables(null, drawable,null, null);*/
         drawable = getResources().getDrawable(R.mipmap.catalog);
         drawable.setBounds(0, 0, 70, 70);
         catalog_rb_control.setCompoundDrawables(null, drawable,null, null);
@@ -505,7 +516,7 @@ public class ReadPageActivity extends AppCompatActivity {
         horizontal_and_vertical_rb_control.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String msg = "当前横竖屏状态：" + ((is_vertical_screen)?"竖屏":"横屏");
+                //String msg = "当前横竖屏状态：" + ((is_vertical_screen)?"竖屏":"横屏");
                 //System.out.println(msg);
                 // 当前竖屏状态
                 if(is_vertical_screen) {
@@ -551,12 +562,12 @@ public class ReadPageActivity extends AppCompatActivity {
             }
         });
         // 下载功能
-        download_rb_control.setOnClickListener(new View.OnClickListener() {
+        /*download_rb_control.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(ReadPageActivity.this, "文本下载功能还没实现呢！客官", Toast.LENGTH_LONG).show();
             }
-        });
+        });*/
         // 目录功能
         catalog_rb_control.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -565,6 +576,8 @@ public class ReadPageActivity extends AppCompatActivity {
                 // 弹出一个目录选择框
                 final Dialog dialog = new Dialog(context);
                 dialog.setContentView(R.layout.catalog_dialog);
+                // 字体不变红色
+                catalog_rb_control.setTextColor(Color.BLACK);
                 // 书籍目录RecyclerView
                 RecyclerView dialog_catalog = dialog.findViewById(R.id.catalog_recylerView);
                 // 书籍目录数据初始化
@@ -628,7 +641,7 @@ public class ReadPageActivity extends AppCompatActivity {
         day_and_night_rb_control = findViewById(R.id.read_page_day_and_night_rb);
         horizontal_and_vertical_rb_control = findViewById(R.id.read_page_horizontal_and_vertical_rb);
         setting_rb_control = findViewById(R.id.read_page_setting_rb);
-        download_rb_control = findViewById(R.id.read_page_download_rb);
+        //download_rb_control = findViewById(R.id.read_page_download_rb);
         catalog_rb_control = findViewById(R.id.read_page_catalog_rb);
         viewPager = findViewById(R.id.read_page_viewPager);
         progressBar = findViewById(R.id.read_page_progressbar);
