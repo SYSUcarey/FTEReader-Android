@@ -25,8 +25,8 @@
             android:textSize="30sp"
             android:layout_margin="10sp"
             android:id="@+id/dialog_text_setting_textSize"
-            android:layout_toRightOf="@id/dialog_text_setting_minus_imageview"
-            android:layout_toLeftOf="@id/dialog_text_setting_plus_imageview"/>
+            android:layout_toRightOf="@+id/dialog_text_setting_minus_imageview"
+            android:layout_toLeftOf="@+id/dialog_text_setting_plus_imageview"/>
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

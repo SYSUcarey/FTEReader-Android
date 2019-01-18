@@ -270,16 +270,23 @@ public class SearchActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         if (isNetWorkConnected(MainActivity.getContext())) {
-                            List<SearchResultObj.book> t = getBookService().getSearchResultObj(s, 0, 8).getBookList();
+                            SearchResultObj tt = getBookService().getSearchResultObj(s, 0, 8);
                             results.clear();
-                            if (t.size() > 0)
+                            if (tt != null) {
+                                List<SearchResultObj.book> t = tt.getBookList();
                                 results.addAll(t);
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    recyclerViewAdapter.notifyDataSetChanged();
-                                }
-                            });
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        recyclerViewAdapter.notifyDataSetChanged();
+                                    }
+                                });
+                            }
+                            else {
+                                Looper.prepare();
+                                Toast.makeText(SearchActivity.this,"搜索不到相关内容",Toast.LENGTH_SHORT).show();
+                                Looper.loop();
+                            }
                         }
                         else {
                             Looper.prepare();
@@ -323,9 +330,10 @@ public class SearchActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             if (isNetWorkConnected(MainActivity.getContext())) {
-                                List<SearchResultObj.book> tss = getBookService().getSearchResultObj(s, 0, 10).getBookList();
+                                SearchResultObj tt = getBookService().getSearchResultObj(s, 0, 8);
                                 List<String> t = new ArrayList<>();
-                                if (tss != null) {
+                                if (tt != null) {
+                                    List<SearchResultObj.book> tss = tt.getBookList();
                                     int size = tss.size();
                                     for (int i = 0; i < size; i++)
                                         t.add(tss.get(i).getTitle());
@@ -393,9 +401,10 @@ public class SearchActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         if (isNetWorkConnected(MainActivity.getContext())) {
-                            List<SearchResultObj.book> t = getBookService().getSearchResultObj(s, 0, 8).getBookList();
+                            SearchResultObj tt = getBookService().getSearchResultObj(s, 0, 8);
+                            List<SearchResultObj.book> t = tt.getBookList();
                             results.clear();
-                            if (t.size() > 0)
+                            if (t != null)
                                 results.addAll(t);
                             handler.post(new Runnable() {
                                 @Override
@@ -448,16 +457,23 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (isNetWorkConnected(MainActivity.getContext())) {
-                    List<SearchResultObj.book> t = getBookService().getSearchResultObj(s, 0, 8).getBookList();
+                    SearchResultObj tt = getBookService().getSearchResultObj(s, 0, 8);
                     results.clear();
-                    if (t.size() > 0)
+                    if (tt != null) {
+                        List<SearchResultObj.book> t = tt.getBookList();
                         results.addAll(t);
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            recyclerViewAdapter.notifyDataSetChanged();
-                        }
-                    });
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                recyclerViewAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
+                    else {
+                        Looper.prepare();
+                        Toast.makeText(SearchActivity.this,"搜索不到相关内容",Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    }
                 }
                 else {
                     Looper.prepare();
