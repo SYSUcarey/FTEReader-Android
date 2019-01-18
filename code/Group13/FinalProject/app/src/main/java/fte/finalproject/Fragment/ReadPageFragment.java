@@ -2,6 +2,7 @@ package fte.finalproject.Fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ public class ReadPageFragment extends Fragment {
     private String title;       //章节名
     private String content;     //本章内容
     int day_or_night_status;    // 日间或夜间模式
+    int textSize;               //  字体大小
 
     // 帧页面View
     View view;
@@ -32,6 +34,7 @@ public class ReadPageFragment extends Fragment {
         this.content = getArguments().getString("content");
         this.title = getArguments().getString("title");
         this.day_or_night_status = getArguments().getInt("day_or_night_status");
+        this.textSize = getArguments().getInt("textSize");
         //System.out.println("日间夜间：" + day_or_night_status);
     }
 
@@ -54,6 +57,7 @@ public class ReadPageFragment extends Fragment {
     private void init_page_info() {
         titile_control.setText(title);      // 设置标题
         content_control.setText(content);   // 设置阅读页内容
+        content_control.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize);
         if(day_or_night_status == 0) {
             whole_layout_control.setBackgroundColor(getResources().getColor(R.color.PapayaWhip));
         }

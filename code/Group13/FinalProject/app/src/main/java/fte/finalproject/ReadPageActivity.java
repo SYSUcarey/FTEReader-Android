@@ -3,6 +3,7 @@ package fte.finalproject;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
@@ -26,6 +27,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -114,6 +116,7 @@ public class ReadPageActivity extends AppCompatActivity {
     UserStatusObj userStatusObj;
     boolean is_vertical_screen;
     int day_or_night_status;
+    int textSize;
 
     // 目录弹窗
     MyRecyclerViewAdapter<String> adapter;
@@ -183,6 +186,7 @@ public class ReadPageActivity extends AppCompatActivity {
         day_or_night_status = userStatusObj.getDay_or_night_status();
         if(day_or_night_status == 1) whole_layout_control.setBackgroundColor(getResources().getColor(R.color.nightBackGround));
 
+        textSize = userStatusObj.getTextSize();
     }
 
     // 初始化底部信息栏显示
@@ -338,6 +342,7 @@ public class ReadPageActivity extends AppCompatActivity {
                         bundle.putString("title", title);
                         bundle.putString("content", content);
                         bundle.putInt("day_or_night_status", day_or_night_status);
+                        bundle.putInt("textSize", textSize);
                         fragment.setArguments(bundle);
                         // 将新加的帧放入队列中
                         fragmentList.add(fragment);
@@ -373,6 +378,7 @@ public class ReadPageActivity extends AppCompatActivity {
         // 将当前设置的用户习惯存入数据库(报错)
         userStatusObj.setDay_or_night_status(day_or_night_status);
         userStatusObj.setHor_or_ver_screen((is_vertical_screen?1:0));
+        userStatusObj.setTextSize(textSize);
         DatabaseControl.getInstance(this).updateStatus(0,userStatusObj);
         super.onPause();
     }
@@ -561,7 +567,48 @@ public class ReadPageActivity extends AppCompatActivity {
         setting_rb_control.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ReadPageActivity.this, "字体样式和大小设置功能还没实现呢！客官", Toast.LENGTH_LONG).show();
+                //Toast.makeText(ReadPageActivity.this, "字体样式和大小设置功能还没实现呢！客官", Toast.LENGTH_LONG).show();
+                // 弹出一个字体样式大小设置框
+                final Dialog dialog = new Dialog(context);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.dialog_text_setting);
+                // 字体不变红色
+                setting_rb_control.setTextColor(Color.BLACK);
+
+                final WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+                params.width = (int)(SCREEN_WIDTH * 2 / 3);
+                /*params.height = (int)(SCREEN_HEIGHT * 2 / 3);*/
+                dialog.getWindow().setAttributes(params);
+                ImageView textSize_plus_control = dialog.findViewById(R.id.dialog_text_setting_plus_imageview);
+                final ImageView textSize_minus_control = dialog.findViewById(R.id.dialog_text_setting_minus_imageview);
+                final TextView textSize_textView = dialog.findViewById(R.id.dialog_text_setting_textSize);
+                textSize_textView.setText(Integer.toString(textSize));
+                textSize_minus_control.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(textSize > 10) textSize-=2;
+                        textSize_textView.setText(Integer.toString(textSize));
+                        changeFrameStyle();
+                    }
+                });
+                textSize_plus_control.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(textSize < 50) textSize+=2;
+                        textSize_textView.setText(Integer.toString(textSize));
+                        changeFrameStyle();
+                    }
+                });
+                // 设置 dialog 属性并显示
+                dialog.setCancelable(true);
+                dialog.show();
+
+                dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        changeFrameStyle();
+                    }
+                });
             }
         });
         // 下载功能
@@ -626,8 +673,8 @@ public class ReadPageActivity extends AppCompatActivity {
                 });
 
                 final WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
-                params.width = 800;
-                params.height = 1200;
+                params.width = (int)(SCREEN_WIDTH * 2 / 3);
+                params.height = (int)(SCREEN_HEIGHT * 2 / 3);
                 dialog.getWindow().setAttributes(params);
 
                 // 适配 Adapter
@@ -760,6 +807,7 @@ public class ReadPageActivity extends AppCompatActivity {
                                     bundle.putString("title", title);
                                     bundle.putString("content", content);
                                     bundle.putInt("day_or_night_status", day_or_night_status);
+                                    bundle.putInt("textSize", textSize);
                                     fragment.setArguments(bundle);
                                     // 将新加的帧放入队列中
                                     fragmentList.add(fragment);
@@ -851,6 +899,7 @@ public class ReadPageActivity extends AppCompatActivity {
                                     bundle.putString("title", title);
                                     bundle.putString("content", content);
                                     bundle.putInt("day_or_night_status", day_or_night_status);
+                                    bundle.putInt("textSize", textSize);
                                     fragment.setArguments(bundle);
                                     // 将新加的帧放入队列中
                                     fragmentList.add(0,fragment);
@@ -1025,6 +1074,7 @@ public class ReadPageActivity extends AppCompatActivity {
             bundle.putString("title", title);
             bundle.putString("content", content);
             bundle.putInt("day_or_night_status", day_or_night_status);
+            bundle.putInt("textSize", textSize);
             fragment.setArguments(bundle);
             // 将新加的帧放入队列中
             fragmentList.add(fragment);
