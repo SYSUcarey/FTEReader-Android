@@ -44,7 +44,7 @@ public class BookDetailActivity extends AppCompatActivity {
 
     RadioButton addButton;
     RadioButton readButton;
-    RadioButton downloadButton;
+//    RadioButton downloadButton;
     Button moreButton;
     Button recom1;
     Button recom2;
@@ -89,7 +89,7 @@ public class BookDetailActivity extends AppCompatActivity {
         pageTitle = findViewById(R.id.detail_title);
         addButton = findViewById(R.id.detail_bottom_add);
         readButton = findViewById(R.id.detail_bottom_read);
-        downloadButton = findViewById(R.id.detail_bottom_download);
+//        downloadButton = findViewById(R.id.detail_bottom_download);
         moreButton = findViewById(R.id.detail_more);
         bookCover = findViewById(R.id.detail_cover);
         bookTitle = findViewById(R.id.detail_bookTitle);
@@ -308,10 +308,10 @@ public class BookDetailActivity extends AppCompatActivity {
         });
 
         // 下载
-        downloadButton.setOnClickListener(new View.OnClickListener() {
+        /*downloadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*new Thread(new Runnable() {
+                *//*new Thread(new Runnable() {
                     @Override
                     public void run() {
                         for (int i = 0; i < linkList.size(); i++) {
@@ -322,10 +322,10 @@ public class BookDetailActivity extends AppCompatActivity {
                         }
 
                     }
-                }).start();*/
+                }).start();*//*
                 Toast.makeText(BookDetailActivity.this, "功能开发中，敬请期待", Toast.LENGTH_SHORT).show();
             }
-        });
+        });*/
 
         // 查看更多同类书籍
         moreButton.setOnClickListener(new View.OnClickListener() {
