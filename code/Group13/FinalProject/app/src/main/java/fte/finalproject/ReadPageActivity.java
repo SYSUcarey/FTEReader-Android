@@ -122,6 +122,9 @@ public class ReadPageActivity extends AppCompatActivity {
     MyRecyclerViewAdapter<String> adapter;
     List<String> myCategory;
 
+    // 设置功能按钮是否可点击
+    boolean clickable = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -218,6 +221,7 @@ public class ReadPageActivity extends AppCompatActivity {
         // 设置等待进度条
         progressBar.setVisibility(View.VISIBLE);
         viewPager.setVisibility(View.GONE);
+        clickable = false;
         // 清空当前的FragmentList
         fragmentList.clear();
         System.out.println("上次看到的章节数为：（zero-based）" + currChapter);
@@ -396,7 +400,7 @@ public class ReadPageActivity extends AppCompatActivity {
     // 处理屏幕滑动翻页和点击中部弹出功能按键底框
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-
+        if(!clickable) return false;
         if (MotionEvent.ACTION_DOWN == event.getAction()) {
             DownX = event.getX();
             DownY = event.getY();
@@ -492,12 +496,11 @@ public class ReadPageActivity extends AppCompatActivity {
         day_and_night_rb_control.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Toast.makeText(ReadPageActivity.this, "夜间/白日切换功能还没实现呢！客官", Toast.LENGTH_LONG).show();
                 if(day_or_night_status == 0) {
                     whole_layout_control.setBackgroundColor(getResources().getColor(R.color.nightBackGround));
                     day_or_night_status = 1;
-                    userStatusObj.setDay_or_night_status(day_or_night_status);
-                    DatabaseControl.getInstance(context).updateStatus(0, userStatusObj);
+                    //userStatusObj.setDay_or_night_status(day_or_night_status);
+                    //DatabaseControl.getInstance(context).updateStatus(0, userStatusObj);
                     changeFrameStyle();
                     day_and_night_rb_control.setTextColor(Color.BLACK);
                     Drawable drawable = getResources().getDrawable(R.mipmap.daytime);
@@ -508,8 +511,8 @@ public class ReadPageActivity extends AppCompatActivity {
                 else {
                     whole_layout_control.setBackgroundColor(getResources().getColor(R.color.PapayaWhip));
                     day_or_night_status = 0;
-                    userStatusObj.setDay_or_night_status(day_or_night_status);
-                    DatabaseControl.getInstance(context).updateStatus(0, userStatusObj);
+                    //userStatusObj.setDay_or_night_status(day_or_night_status);
+                    //DatabaseControl.getInstance(context).updateStatus(0, userStatusObj);
                     //init_fragment();
                     changeFrameStyle();
                     day_and_night_rb_control.setTextColor(Color.BLACK);
@@ -525,16 +528,14 @@ public class ReadPageActivity extends AppCompatActivity {
         horizontal_and_vertical_rb_control.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //String msg = "当前横竖屏状态：" + ((is_vertical_screen)?"竖屏":"横屏");
-                //System.out.println(msg);
                 // 当前竖屏状态
                 if(is_vertical_screen) {
                     // 记录状态数据转变,更新默认用户
                     is_vertical_screen = false;
-                    userStatusObj.setHor_or_ver_screen(0);
+                    //userStatusObj.setHor_or_ver_screen(0);
                     horizontal_and_vertical_rb_control.setTextColor(Color.BLACK);
                     //DatabaseControl.getInstance(context).updateStatus(0,0);
-                    DatabaseControl.getInstance(context).updateStatus(0, userStatusObj);
+                    //DatabaseControl.getInstance(context).updateStatus(0, userStatusObj);
                     // 切换成横屏
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                     Drawable drawable = getResources().getDrawable(R.mipmap.vertical_screen);
@@ -547,10 +548,10 @@ public class ReadPageActivity extends AppCompatActivity {
                 else {
                     // 记录状态数据转变
                     is_vertical_screen = true;
-                    userStatusObj.setHor_or_ver_screen(1);
+                    //userStatusObj.setHor_or_ver_screen(1);
                     horizontal_and_vertical_rb_control.setTextColor(Color.BLACK);
                     //DatabaseControl.getInstance(context).updateStatus(0,1);
-                    DatabaseControl.getInstance(context).updateStatus(0, userStatusObj);
+                    //DatabaseControl.getInstance(context).updateStatus(0, userStatusObj);
                     System.out.println("改成竖屏");
                     System.out.println(DatabaseControl.getInstance(context).get_Hor_Or_Ver_Screen_Status(0));
                     // 切换成竖屏状态
@@ -567,7 +568,6 @@ public class ReadPageActivity extends AppCompatActivity {
         setting_rb_control.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Toast.makeText(ReadPageActivity.this, "字体样式和大小设置功能还没实现呢！客官", Toast.LENGTH_LONG).show();
                 // 弹出一个字体样式大小设置框
                 final Dialog dialog = new Dialog(context);
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -622,11 +622,14 @@ public class ReadPageActivity extends AppCompatActivity {
         catalog_rb_control.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Toast.makeText(ReadPageActivity.this, "目录功能还没实现呢！客官", Toast.LENGTH_LONG).show();
                 // 弹出一个目录选择框
                 final Dialog dialog = new Dialog(context);
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setContentView(R.layout.catalog_dialog);
+                // 隐藏功能按钮控件框
+                rg_control.setVisibility(View.GONE);
+                show_functional_button = false;
+                bottom_layout_control.setVisibility(View.VISIBLE);
                 // 字体不变红色
                 catalog_rb_control.setTextColor(Color.BLACK);
                 // 设置dialog标题为书名
@@ -656,6 +659,7 @@ public class ReadPageActivity extends AppCompatActivity {
                         // 设置等待进度条
                         viewPager.setVisibility(View.GONE);
                         progressBar.setVisibility(View.VISIBLE);
+                        clickable = false;
                         // 清空当前的FragmentList
                         fragmentList.clear();
                         // 设置跳转章节数
@@ -744,6 +748,7 @@ public class ReadPageActivity extends AppCompatActivity {
                         // 等待后台适配阅读帧
                         viewPager.setVisibility(View.GONE);
                         progressBar.setVisibility(View.VISIBLE);
+                        clickable = false;
                         //使用子线程进行缓存更新
                         Thread update_cache_thread = new Thread(new Runnable() {
                             @Override
@@ -840,6 +845,7 @@ public class ReadPageActivity extends AppCompatActivity {
                         // 等待后台适配阅读帧
                         viewPager.setVisibility(View.GONE);
                         progressBar.setVisibility(View.VISIBLE);
+                        clickable = false;
                         //使用子线程进行缓存更新
                         Thread update_cache_thread = new Thread(new Runnable() {
                             @Override
@@ -959,6 +965,7 @@ public class ReadPageActivity extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                     rg_control.setVisibility(View.GONE);
                     viewPager.setVisibility(View.VISIBLE);
+                    clickable = true;
                     read_page_process_control.setText(Integer.toString(currChapter+1) + "/" + Integer.toString(totalChapter));
                     bottom_layout_control.setVisibility(View.VISIBLE);
                 }
@@ -968,6 +975,7 @@ public class ReadPageActivity extends AppCompatActivity {
                     // 适配完毕，取消ProgressBar, 隐藏功能按键
                     progressBar.setVisibility(View.GONE);
                     viewPager.setVisibility(View.VISIBLE);
+                    clickable = true;
                 }
                 // type == 2 界面获取上N章节更新
                 else if(type == 2) {
@@ -978,6 +986,7 @@ public class ReadPageActivity extends AppCompatActivity {
                     // 适配完毕，取消ProgressBar, 隐藏功能按键
                     progressBar.setVisibility(View.GONE);
                     viewPager.setVisibility(View.VISIBLE);
+                    clickable = true;
                 }
             }
 
