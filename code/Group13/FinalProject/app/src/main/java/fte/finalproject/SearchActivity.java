@@ -65,6 +65,7 @@ public class SearchActivity extends AppCompatActivity {
     private List<SearchResultObj.book> results;
     private MyRecyclerViewAdapter recyclerViewAdapter;
     private boolean isSubmit;
+    private boolean flag;
     public Handler handler = new Handler();
     private String[] hotBooks = {"一品娇宠","剑来","逆天邪神","神医嫡女","官梯",
             "最强狂兵","无敌剑域","一世倾城","天骄战纪","元尊",
@@ -92,6 +93,7 @@ public class SearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         isSubmit = false;
+        flag = true; //用于同步问题的布尔变量
         //初始化列表
         histories = getInstance(getBaseContext()).getAllHistory();
         tempFuzzy = new ArrayList<>();
@@ -325,10 +327,11 @@ public class SearchActivity extends AppCompatActivity {
                     }
                 }
                 //填充数据
-                if (!s.equals("")) {
+                if (!s.equals("")&&flag) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
+                            flag = false;
                             if (isNetWorkConnected(MainActivity.getContext())) {
                                 SearchResultObj tt = getBookService().getSearchResultObj(s, 0, 8);
                                 List<String> t = new ArrayList<>();
@@ -353,6 +356,7 @@ public class SearchActivity extends AppCompatActivity {
                                 Toast.makeText(SearchActivity.this,"网络似乎出现了点问题",Toast.LENGTH_SHORT).show();
                                 Looper.loop();
                             }
+                            flag = true;
                         }
                     }).start();
                     fuzzyAdapter.notifyDataSetChanged();
